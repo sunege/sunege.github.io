@@ -78,7 +78,7 @@ function initObject(){
 	//create geometry
 	var geometry = new THREE.BoxGeometry(20, 20, 20);
 	//create material
-	var material = new THREE.MeshLambertMaterial({color: 0xFF0000});
+	var material = new THREE.MeshLambertMaterial({color: 0xFF0000,wireframe: true});
 	//create object
 	cube[0] = new THREE.Mesh(geometry, material);
 	//add object
@@ -90,7 +90,7 @@ function initObject(){
 	//create geometry
 	var geometry = new THREE.BoxGeometry(20, 20, 20);
 	//create material
-	var material = new THREE.MeshLambertMaterial({color: 0x00FF00});
+	var material = new THREE.MeshLambertMaterial({color: 0x00FF00,wireframe: true});
 	//create object
 	cube[1] = new THREE.Mesh(geometry, material);
 	//add object
@@ -103,7 +103,7 @@ function initObject(){
 	//create geometry
 	var geometry = new THREE.BoxGeometry(20, 20, 20);
 	//create material
-	var material = new THREE.MeshLambertMaterial({color: 0x0000FF});
+	var material = new THREE.MeshLambertMaterial({color: 0x0000FF, wireframe: true});
 	//create object
 	cube[2] = new THREE.Mesh(geometry, material);
 	//add object
@@ -128,6 +128,13 @@ function initLight(){
 	directionalLight.position.set(50, 50, 100);
 	//add light
 	scene.add(directionalLight);
+
+	//create object
+	directionalLight1 = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+	//light position
+	directionalLight1.position.set(-50, -50, -100);
+	//add light
+	scene.add(directionalLight1);
 }
 
 //////////////////////////////
