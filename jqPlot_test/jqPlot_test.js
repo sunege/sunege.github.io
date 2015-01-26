@@ -1,47 +1,50 @@
+//global 
+var plot2D; 
+
+//event
 window.addEventListener("load", function () {
 		plotStart();
+		initEvent();
 });
 
+function initEvent(){
+	//liner button click event
+	document.getElementById("liner").addEventListener("click", function(){
+			plot2D.linerPlot();
+	});
+
+	//log button click event
+	document.getElementById("log").addEventListener("click", function(){
+			plot2D.logPlot(2);
+	});
+}
+	
 function plotStart(){
-	var data = [];
-	var plotDatas = [];
-	var N = 30;
-		 x_min = -2,
+	//create instance
+	plot2D = new Plot2D('canvas-frame');
+	var series = [];
+
+	var N = 20,
+		 x_min = 0,
 		 x_max = 2;
 
-	for(var a = 1; a <=5; a++){
+	//data
+	for(var a=1; a<=5; a++){
 		data = [];
-		for(var i = 0; i <= N; i++){
+		series.push({ label: ' = pow( ' + a + ' , x) '} );
+
+		for(var i=0; i<=N; i++){
 			var x = x_min + (x_max - x_min) * i / N;
-			var y = Math.sin(a * Math.PI * i/10);
+			var y = Math.pow(a, x);
 			data.push([x, y]);
 		}
-		plotDatas.push(data);
+		//pushData
+		plot2D.pushData(data);
 	}
 
-	var options = {
-		axes: {
-			xaxis: {
-				label: 'x',
-				min: -2,
-				max: 2,
-				tickInterval: 0.5
-			},
-			yaxis: {
-				label: 'y',
-				min: -2,
-				max: 2,
-				tickInterval: 1.0
-			}
-		},
-		legend: {
-			show: true,
-			labels: ['a=1', 'a=2', 'a=3', 'a=4', 'a=5'],
-			location: 'ne',
-			placement: 'insideGrid',
-			showSwatches: true
-		}
-	};
+	plot2D.options.series = series;
+	plot2D.options.legend.location = "nw";
+	plot2D.options.cursor.dblClickReset = true;
 
-	$.jqplot("canvas-frame", plotDatas, options);
+	plot2D.linerPlot();
 }
