@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>jQueryUI tabs</title>
+<style>
+@import "http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css"
+<!-- @import "../javascript/jquery-ui/jquery-ui.css"; -->
+</style>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+<!-- <script src="../javascript/jquery/jquery.js"></script> -->
+<!-- <script src="../javascript/jquery-ui/jquery-ui.js"></script> -->
+<script>
+	window.addEventListener("load", function () {
+		resizeTo(400, 300);
+		jQuery('#tabs').tabs();
+	});
+</script>
+</head>
+
+<body>
+<!--tabs-->
+<div style='clear:both;' id="tabs">
+	<ul>
+		<li><a href="#tab1">tab1</a></li>
+		<li><a href="#tab2">tab2</a></li>
+		<li><a href="#tab3">tab3</a></li>
+	</ul>
+
+	<div id="tab1">
+		tab
+	</div>
+
+	<div id="tab2">
+		tabtab
+	</div>
+	
+	<div id="tab3">
+		tabtabtab
+	</div>
+
+</div>
+</body>
+</html>

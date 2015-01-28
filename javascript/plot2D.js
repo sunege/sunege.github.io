@@ -117,3 +117,37 @@ var Plot2D = function (canvasDom){
 	}
 		
 }
+
+//////////////////////////////
+// Math class method define
+//////////////////////////////
+function sin(theta){
+	return Math.sin(theta);
+}
+function cos(theta){
+	return Math.cos(theta);
+}
+function tan(theta){
+	return Math.tan(theta);
+}
+function pow(a,x){
+	return Math.pow(a,x);
+}
+function exp(x){
+	return Math.exp(x);
+}
+function log(x){
+	return Math.log(x);
+}
+function asin(x){
+	return Math.asin(x);
+}
+function acos(x){
+	return Math.acos(x);
+}
+function atan(x){
+	return Math.atan(x);
+}
+function abs(x){
+	return Math.abs(x);
+}
