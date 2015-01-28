@@ -6,6 +6,7 @@
 <style>
 @import "../javascript/jqPlot/jquery.jqplot.css";
 div#canvas-frame{ width:500px; height:400px; }
+textarea#text_function{ width:500px; height:80px; } 
 </style>
 <script src="../javascript/jqPlot/jquery.js"></script>
 <script src="../javascript/jqPlot/jquery.jqplot.js"></script>
@@ -21,6 +22,7 @@ div#canvas-frame{ width:500px; height:400px; }
 <body>
 <!-- frame -->
 <div id="canvas-frame"></div>
+<textarea id="text_function">20*sin(x) &#13;&#10; 20*cos(x) &#13;&#10; -x*x+4*x+10 &#13;&#10; pow(x, 2)</textarea><br />
 <input type="BUTTON" value="liner axis" id="liner" />
 <input type="BUTTON" value="log axis" id="log" />
 </body>
