@@ -1,4 +1,5 @@
 var Plot2D = function (canvasDom){
+	var plot;
 	var plotDatas = [];
 
 	this.options = {
@@ -82,15 +83,23 @@ var Plot2D = function (canvasDom){
 
 	this.pushData = function (data){
 		plotDatas.push(data);
-	}
+	};
+
+	//draw plot 
+	this.Plot = function (){
+		this.clearCanvas();
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
 
 	//draw liner plot
 	this.linerPlot = function (){
 		this.clearCanvas();
-		$.jqplot(canvasDom, plotDatas, this.options);
-	}
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
+
 	//draw log plot
 	this.logPlot = function (base){
+		this.logPlotDataCheck();
 		var base = base || 10; //log_x (10, 2 or Math.E)
 		//default option
 		var oldYaxisOption = {
@@ -110,11 +119,38 @@ var Plot2D = function (canvasDom){
 		this.options.axes.yaxis.max = oldYaxisOption.max;
 		this.options.axes.yaxis.tickInterval = oldYaxisOption.tickInterval;
 		this.options.axes.yaxis.renderer = $.jqplot.LinerAxisRenderer;
-	}
+	};
+
+	//replot
+	this.replot = function (){
+		this.clearCanvas();
+
+		for(var i=0; i< plotDatas.length ; i++)
+			plot.series[i].data = plotDatas[i];
+		plot.replot();
+		plot.resetAxesScale();
+		plot.replot();
+	};
+
+	this.clearData = function (){
+		plotDatas = [];
+	};
+
+	this.logPlotDataCheck = function (){
+		delete y<0
+		for(var i=0; i< plotDatas.length; i++){
+			var _data = [];
+			for(var j=0; j< plotDatas[i].length; j++){
+				if(plotDatas[i][j][1] > 0)
+					_data.push(plotDatas[i][j]);
+			}
+			plotDatas[i] = _data;
+		}
+	};
 
 	this.clearCanvas = function (){
 		document.getElementById(canvasDom).innerHTML = null;
-	}
+	};
 		
 }
 
