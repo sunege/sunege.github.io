@@ -1,0 +1,50 @@
+/* init style */
+body, h1, h2, h3, h4, h5, h6, div, p, span, img, ul, ol, li, table, tr, th, td, a {
+	font-family : "メイリオ", Meiryo, "ヒラギノ角ゴPro W3", "Hiragino Kaku Gothic Pro", sans-serif;
+	margin : 0px;
+	padding : 0px;
+	border : 0px;
+	line-height : 150%;
+	font-size : small;
+	font-weight : normal;
+	color : black;
+	background-color : transparent;
+}
+
+a {
+	font-weight : bold;
+}
+
+br.clear {
+	line-height : 0;
+	clear : both;
+}
+
+div#tabs {
+	width : 800px;
+	margin : 0px auto;
+}
+
+div#tabs div.inner {
+	width : 780px;
+	height : 500px;
+	margin : 5px;
+	padding : 5px;
+	background-color : white;
+}
+
+div#tabs div#canvas-frame {
+	width : 500px;
+	height : 500px;
+	float : left;
+	background-color : #DDDDDD;
+}
+
+div#tabs div.inner div#controller {
+	width : 270px;
+	height : 490px;
+	padding : 5px;
+	float : right;
+	text-align : left;
+	background-color : #EEEEEE;
+}
