@@ -28,24 +28,24 @@ function initEvent(){
 // 	});
 
 	//jQueryUI slider
-	$("#slider_x").slider({
+	$("#slider_t").slider({
 			range: true,
-			min: -100,
+			min: 0,
 			max: 100,
 			step: 1,
-			values: [-5, 5],
+			values: [0, 5],
 			//slide ivent
 			slide: function(event, ui){
 				var values = ui.values;
-				document.getElementById("x_min").value = values[0];
-				document.getElementById("x_max").value = values[1];
+				document.getElementById("t_min").value = values[0];
+				document.getElementById("t_max").value = values[1];
 				calculate();
 				plot2D.replot();
 			}
 	});
 	$("#slider_N").slider({
 			min: 1,
-			max: 1000,
+			max: 100,
 			step: 1,
 			value: 20,
 			//slide ivent
@@ -73,19 +73,19 @@ function initEvent(){
 
 	//cordinate param
 	document.getElementById("N").value = 20;
-	document.getElementById("x_min").value = -5;
-	document.getElementById("x_max").value = 5;
+	document.getElementById("t_min").value = 0;
+	document.getElementById("t_max").value = 5;
 
 	//new value cordinate param event
 	document.getElementById("N").addEventListener("change", function(){
 			calculate();
 			plot2D.replot();
 	});
-	document.getElementById("x_min").addEventListener("change", function(){
+	document.getElementById("t_min").addEventListener("change", function(){
 			calculate();
 			plot2D.replot();
 	});
-	document.getElementById("x_max").addEventListener("change", function(){
+	document.getElementById("t_max").addEventListener("change", function(){
 			calculate();
 			plot2D.replot();
 	});
@@ -111,11 +111,11 @@ function calculate(){
 	plot2D.clearData();
 
 	//get input param
-	var x_min = parseFloat(document.getElementById("x_min").value);
-	var x_max = parseFloat(document.getElementById("x_max").value);
+	var t_min = parseFloat(document.getElementById("t_min").value);
+	var t_max = parseFloat(document.getElementById("t_max").value);
 	var N = parseFloat(document.getElementById("N").value);
 	//input param = slider value
-	$("#slider_x").slider({values: [x_min, x_max] });
+	$("#slider_t").slider({values: [t_min, t_max] });
 	$("#slider_N").slider({values: N});
 
 	//get checkbox param
@@ -123,29 +123,71 @@ function calculate(){
 	var showMark = document.getElementById("showMark").checked;
 	var useLegend = document.getElementById("useLegend").checked;
 
+	//get Analysis solution
+	var text_function = document.getElementById("text_function").value;
+	var functions = text_function.split("\n");
+
+	//get dt and init condition
+	var text_parameter = document.getElementById("text_parameter").value;
+	var parameters = text_parameter.split("\n");
+	eval("var " + parameters[0]);
+	var dts = parameters[1].split(",");
+
+	//get Algorithm
+	var text_algorithm = document.getElementById("text_algorithm").value;
+	var algorithms = text_algorithm.split("\n\n");
+	
 	//data option []
 	var series = [];
 
-	//get text
-	var text_function = document.getElementById("text_function").value;
-	var fs = text_function.split("\n");
-
-	for(var n=0; n<fs.length; n++){
+	////////////////////////////////////////
+	// plot analysis solution
+	////////////////////////////////////////
+	for(var n=0; n<functions.length; n++){
+		//space >> continue
+		if(functions[n] == "") continue;
+		var label;
+		if(n == 0) label = "Analysis Solution";
+		else label = "x(t)=" + functions[n];
 		series.push({
 				showLine: showLine,
-				label: "y=" + fs[n],
+				label: label,
 				markerOptions: { show: showMark }
 		});
-		//init plotdata
 		var data = [];
 		for(var i=0; i<=N; i++){
-			var x = x_min + (x_max - x_min) * i / N;
-			var y = eval(fs[n]);
-			data.push([x, y]);
+			var t = t_min + (t_max - t_min) * i / N;
+			var x = eval(functions[n]);
+			data.push([t, x]);
 		}
-		//add plotdata
 		plot2D.pushData(data);
 	}
+	////////////////////////////////////////
+	// plot numerical analysis
+	////////////////////////////////////////
+	for(var m=0; m<dts.length; m++){
+		var dt = parseFloat(dts[m]);
+		for(var n=0; n<algorithms.length; n++){
+			var as = algorithms[n].split("//");
+			var label = as[0];
+			var algorithm = as[1];
+			series.push({
+					showLine: false,
+					label: label + "(dt=" + dt + ")",
+					markerOptions: { show: true}
+			});
+			var data = [];
+			var t = t_min;
+			eval("var " + parameters[0]);
+			while(t <= t_max){
+				data.push([t, x]);
+				t += dt;
+				eval(algorithm);
+			}
+			plot2D.pushData(data);
+		}
+	}
+
 	//set options
 	plot2D.options.series = series;
 
