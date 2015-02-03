@@ -45,7 +45,7 @@ function initEvent(){
 	});
 	$("#slider_N").slider({
 			min: 1,
-			max: 100,
+			max: 1000,
 			step: 1,
 			value: 20,
 			//slide ivent
