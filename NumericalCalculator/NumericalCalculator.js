@@ -191,6 +191,10 @@ function calculate(){
 	//set options
 	plot2D.options.series = series;
 
+	//axis options
+	plot2D.options.axes.xaxis.label = "t";
+	plot2D.options.axes.yaxis.label = "x";
+
 	//legend options
 	if(useLegend){
 		plot2D.options.legend.show = true;
