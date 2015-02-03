@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>NumericalCalculator</title>
+		<title>Numerical Calculator Error</title>
 
 		<!-- style sheet -->
 		<link type="text/css" rel="stylesheet"
@@ -33,14 +33,14 @@
 		<script type="text/javascript" src="../js/Three/src/controls/TrackballControls.js"></script>
 
 		<!-- Main script -->
-		<script type="text/javascript" src="./NumericalCalculator.js"></script>
+		<script type="text/javascript" src="./NumericalCalculator_error.js"></script>
 	</head>
 	<body>
 		<!-- tab interface -->
 		<div id="tabs">
 			<!-- tab list -->
 			<ul id="tabList">
-				<li><a href="#tab1">NumericalCalculator</a></li>
+				<li><a href="#tab1">NumericalCalculator_error</a></li>
 			</ul>
 
 			<!-- tab1 content -->
@@ -61,7 +61,7 @@
 								<th colspan="3"><center>Legend<br />center:on/off</center></th>
 							</tr>
 							<tr>
-								<td><input type="radio" name="legend" value="nw" /></td>
+								<td><input type="radio" name="legend" value="nw" checked="checked" /></td>
 								<td><input type="radio" name="legend" value="n" /></td>
 								<td><input type="radio" name="legend" value="ne" /></td>
 							</tr>
@@ -73,7 +73,7 @@
 							<tr>
 								<td><input type="radio" name="legend" value="sw" /></td>
 								<td><input type="radio" name="legend" value="s" /></td>
-								<td><input type="radio" name="legend" value="se" checked="checked" /></td>
+								<td><input type="radio" name="legend" value="se" /></td>
 							</tr>
 						</table>
 						<br class="clear" />
@@ -97,7 +97,7 @@
 					<table>
 						<tr>
 							<!-- Plot analysis solution -->
-							<textarea id="text_function">1/2*a*t*t + v0*t + x0</textarea>
+							<textarea id="text_function">1/2*a*t*t + v0*t + x0;&#13;&#10;1.0*t/2;&#13;&#10;0.5*t/2;&#13;&#10;0.1*t/2</textarea>
 						</tr>
 						<tr>
 							<td><center>Drow<br />point</center></td>
@@ -113,7 +113,7 @@
 								<center>
 								<!-- draw lines mark on/off -->
 								Line : <input type="checkbox" id="showLine" checked="checked" /><br />
-								Mark : <input type="CHECKBOX" id="showMark" checked="checked" />
+								Mark : <input type="CHECKBOX" id="showMark" />
 								</center>
 							</td>
 							<td>

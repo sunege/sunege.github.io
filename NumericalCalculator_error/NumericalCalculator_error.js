@@ -143,12 +143,10 @@ function calculate(){
 	////////////////////////////////////////
 	// plot analysis solution
 	////////////////////////////////////////
-	for(var n=0; n<functions.length; n++){
+	for(var n=1; n<functions.length; n++){
 		//space >> continue
 		if(functions[n] == "") continue;
-		var label;
-		if(n == 0) label = "Analysis Solution";
-		else label = "x(t)=" + functions[n];
+		var label = "x(t)=" + functions[n];
 		series.push({
 				showLine: showLine,
 				label: label,
@@ -180,7 +178,8 @@ function calculate(){
 			var t = t_min;
 			eval("var " + parameters[0]);
 			while(t <= t_max){
-				data.push([t, x]);
+				var dx = x - eval(functions[0]);
+				data.push([t, dx]);
 				t += dt;
 				eval(algorithm);
 			}
@@ -191,9 +190,9 @@ function calculate(){
 	//set options
 	plot2D.options.series = series;
 
-	//axis options
+	//axes options
 	plot2D.options.axes.xaxis.label = "t";
-	plot2D.options.axes.yaxis.label = "x";
+	plot2D.options.axes.yaxis.label = "x_error";
 
 	//legend options
 	if(useLegend){
