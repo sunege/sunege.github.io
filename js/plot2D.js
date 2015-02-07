@@ -94,31 +94,43 @@ var Plot2D = function (canvasDom){
 	//draw liner plot
 	this.linerPlot = function (){
 		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LinerAxisRenderer;
+		this.options.axes.yaxis.renderer = $.jqplot.LinerAxisRenderer;
 		plot = $.jqplot(canvasDom, plotDatas, this.options);
 	};
 
-	//draw log plot
+	//draw y-log plot
 	this.logPlot = function (base){
 		this.logPlotDataCheck();
 		var base = base || 10; //log_x (10, 2 or Math.E)
-		//default option
-		var oldYaxisOption = {
-			min: this.options.axes.yaxis.min,
-			max: this.options.axes.yaxis.max,
-			tickInterval: this.options.axes.tickInterval
-		}
-
-		this.options.axes.yaxis.min = null;
-		this.options.axes.yaxis.max = null;
-		this.options.axes.yaxis.tickInterval = null;
+		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LinerAxisRenderer;
 		this.options.axes.yaxis.renderer = $.jqplot.LogAxisRenderer;
-		this.options.axes.yaxis.rendererOptions = {base: base};
-		this.linerPlot();
+		this.options.axes.yaxis.rendererOptions = { base: base };
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
 
-		this.options.axes.yaxis.min = oldYaxisOption.min;
-		this.options.axes.yaxis.max = oldYaxisOption.max;
-		this.options.axes.yaxis.tickInterval = oldYaxisOption.tickInterval;
+	//draw xy-log plot
+	this.loglogPlot = function (base){
+		this.logPlotDataCheck();
+		var base = base || 10; //log_x (10, 2 or Math.E)
+		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LogAxisRenderer;
+		this.options.axes.yaxis.renderer = $.jqplot.LogAxisRenderer;
+		this.options.axes.xaxis.rendererOptions = { base: base };
+		this.options.axes.yaxis.rendererOptions = { base: base };
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
+	
+	//draw x-log plot
+	this.loglinerPlot = function (base){
+		this.logPlotDataCheck();
+		var base = base || 10; //log_x (10, 2 or Math.E)
+		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LogAxisRenderer;
 		this.options.axes.yaxis.renderer = $.jqplot.LinerAxisRenderer;
+		this.options.axes.xaxis.rendererOptions = { base: base };
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
 	};
 
 	//replot
