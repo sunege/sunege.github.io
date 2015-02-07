@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Virtual Laboratory</title>
+
+		<!-- style sheet -->
+		<link type="text/css" rel="stylesheet"
+								href="../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet"
+								href="../css/jquery.jqplot.css"/>
+		<link type="text/css" rel="stylesheet"
+								href="../css/laboratory_r1.css"/>
+
+		<!-- Javascript -->
+
+		<!-- jQuery -->
+		<script type="text/javascript" src="../js/jquery/jquery.js"></script>
+		<script type="text/javascript" src="../js/jquery-ui/jquery-ui.js"></script>
+
+		<!-- jqPlot -->
+		<script type="text/javascript" src="../js/jqPlot/jquery.jqplot.js"></script>
+		<script type="text/javascript" src="../js/jqPlot/plugins/jqplot.canvasTextRenderer.js"></script>
+		<script type="text/javascript" src="../js/jqPlot/plugins/jqplot.canvasAxisTickRenderer.js"></script>
+		<script type="text/javascript" src="../js/jqPlot/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+		<script type="text/javascript" src="../js/jqPlot/plugins/jqplot.logAxisRenderer.js"></script>
+		<script type="text/javascript" src="../js/jqPlot/plugins/jqplot.highlighter.js"></script>
+		<script type="text/javascript" src="../js/jqPlot/plugins/jqplot.cursor.js"></script>
+		<script type="text/javascript" src="../js/plot2D.js"></script>
+
+		<!-- Three -->
+		<script type="text/javascript" src="../js/Three/build/three.js"></script>
+		<script type="text/javascript" src="../js/Three/src/controls/TrackballControls.js"></script>
+
+		<!-- Main script -->
+		<script type="text/javascript" src="./3DCG_basic1.js"> </script>
+	</head>
+	<body>
+		<!-- tab interface -->
+		<div id="tabs">
+			<!-- tab list -->
+			<ul id="tabList">
+				<li><a href="#tab1">3DCG</a></li>
+				<li><a href="#tab2">tab2</a></li>
+				<li><a href="#tab3">tab3</a></li>
+			</ul>
+
+			<!-- tab1 content -->
+			<div id="tab1" class="inner">
+				<!-- frame -->
+				<div id="canvas-frame"></div>
+
+				<!-- controller -->
+				<div id="controller">
+					<h2>Set Parameter</h2>
+					<h3>Position Vector</h3>
+					<table>
+						<tr>
+							<!-- x axis -->
+							<td>x</td>
+							<!-- set x axis slider -->
+							<td><div id="slider_x" class="slider"></div></td>
+							<!-- current x position -->
+							<td><input type="text" value="" id="input_x" class="number"></td>
+						</tr>
+						<tr>
+							<!-- y axis -->
+							<td>y</td>
+							<!-- set y axis slider -->
+							<td><div id="slider_y" class="slider"></div></td>
+							<!-- current y position -->
+							<td><input type="text" value="" id="input_y" class="number"></td>
+						</tr>
+						<tr>
+							<!-- z axis -->
+							<td>z</td>
+							<!-- set z axis slider -->
+							<td><div id="slider_z" class="slider"></div></td>
+							<!-- current z position -->
+							<td><input tyze="text" value="" id="input_z" class="number"></td>
+						</tr>
+					</table>
+				</div>
+
+			</div>
+
+			<!-- tab2 content -->
+			<div id="tab2">
+				<p>tab2</p>
+			</div>
+
+			<!-- tab3 content -->
+			<div id="tab3">
+				<!-- slider interface -->
+				<div id="slider"></div>
+				<p>current value: <span id="value"></span></p>
+				<p>tab3</p>
+			</div>
+		</div>
+
+
+	</body>
+</html>

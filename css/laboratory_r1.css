@@ -45,6 +45,39 @@ div#tabs div.inner div#controller {
 	height : 490px;
 	padding : 5px;
 	float : right;
-	text-align : left;
 	background-color : #EEEEEE;
+}
+
+div#tabs div.inner div#controller h2 {
+	margin : 0px, 0px, 10px, 0px;
+	padding: 2px, 0px, 2px, 0px;
+	text-align: center;
+	font-weight: bold;
+	background-color: white;
+	border: 1px solid gray;
+}
+
+div#tabs div.inner div#controller h3 {
+	padding: 2px, 0px, 2px, 5px;
+	font-weight: bold;
+}
+
+div#tabs div.inner div#controller table {
+	width: 270px;
+	border-collapse: collapse;
+	background-color: white;
+}
+
+div#tabs div.inner div#controller table td{
+	padding: 2px, 5px;
+	text-align: center;
+	border: 1px solid gray;
+}
+
+div#tabs div.inner div#controller div.slider {
+	width: 185px;
+}
+
+div#tabs div.inner div#controller input.number {
+	width: 30px;
 }
