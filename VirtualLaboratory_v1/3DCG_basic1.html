@@ -41,8 +41,9 @@
 			<!-- tab list -->
 			<ul id="tabList">
 				<li><a href="#tab1">3DCG</a></li>
-				<li><a href="#tab2">tab2</a></li>
-				<li><a href="#tab3">tab3</a></li>
+				<li><a href="#tab2">Time Plot Position</a></li>
+				<li><a href="#tab3">Time Plot Velocity</a></li>
+				<li><a href="#tab4">Time Plot Energy</a></li>
 			</ul>
 
 			<!-- tab1 content -->
@@ -53,13 +54,31 @@
 				<!-- controller -->
 				<div id="controller">
 					<h2>Set Parameter</h2>
+					<table>
+						<!-- output time -->
+						<tr>
+							<td>time</td>
+							<td colspan="2"><span id="time">0</span></td>
+						</tr>
+						<!-- input dt -->
+						<tr>
+							<td>dt</td>
+							<td colspan="2"><input type="text" value="" id="input_dt" class="number" style="width:180px"></td>
+						</tr>
+						<!-- input skip -->
+						<tr>
+							<td>skip</td>
+							<td><center><div id="slider_skip" class="slider" style="width:120px"></center></td>
+							<td><input type="text" value="" id="input_skip" class="number" ></td>
+						</tr>
+					</table>
 					<h3>Position Vector</h3>
 					<table>
 						<tr>
 							<!-- x axis -->
 							<td>x</td>
 							<!-- set x axis slider -->
-							<td><div id="slider_x" class="slider"></div></td>
+							<td><center><div id="slider_x" class="slider"></div></center></td>
 							<!-- current x position -->
 							<td><input type="text" value="" id="input_x" class="number"></td>
 						</tr>
@@ -67,7 +86,7 @@
 							<!-- y axis -->
 							<td>y</td>
 							<!-- set y axis slider -->
-							<td><div id="slider_y" class="slider"></div></td>
+							<td><center><div id="slider_y" class="slider"></div></center></td>
 							<!-- current y position -->
 							<td><input type="text" value="" id="input_y" class="number"></td>
 						</tr>
@@ -75,27 +94,89 @@
 							<!-- z axis -->
 							<td>z</td>
 							<!-- set z axis slider -->
-							<td><div id="slider_z" class="slider"></div></td>
+							<td><center><div id="slider_z" class="slider"></div></center></td>
 							<!-- current z position -->
-							<td><input tyze="text" value="" id="input_z" class="number"></td>
+							<td><input type="text" value="" id="input_z" class="number"></td>
 						</tr>
 					</table>
-				</div>
+					<h3>Vector Vector</h3>
+					<table>
+						<tr>
+							<!-- vx -->
+							<td>vx</td>
+							<!-- set vx slider -->
+							<td><center><div id="slider_vx" class="slider"></div></center></td>
+							<!-- current vx -->
+							<td><input type="text" value="" id="input_vx" class="number"></td>
+						</tr>
+						<tr>
+							<!-- vy -->
+							<td>vy</td>
+							<!-- set vy -->
+							<td><center><div id="slider_vy" class="slider"></div></center></td>
+							<!-- current vy -->
+							<td><input type="text" value="" id="input_vy" class="number"></td>
+						</tr>
+						<tr>
+							<!-- vz -->
+							<td>vz</td>
+							<!-- set vz -->
+							<td><center><div id="slider_vz" class="slider"></div></center></td>
+							<!-- current vz -->
+							<td><input type="text" value="" id="input_vz" class="number"></td>
+						</tr>
+					</table>
+					<h3>Acceleration Vector</h3>
+					<table>
+						<tr>
+							<!-- ax -->
+							<td>ax</td>
+							<!-- set ax slider -->
+							<td><center><div id="slider_ax" class="slider"></div></center></td>
+							<!-- current ax -->
+							<td><input type="text" value="" id="input_ax" class="number"></td>
+						</tr>
+						<tr>
+							<!-- ay -->
+							<td>ay</td>
+							<!-- set ay -->
+							<td><center><div id="slider_ay" class="slider"></div></center></td>
+							<!-- current ay -->
+							<td><input type="text" value="" id="input_ay" class="number"></td>
+						</tr>
+						<tr>
+							<!-- az -->
+							<td>az</td>
+							<!-- set az -->
+							<td><center><div id="slider_az" class="slider"></div></center></td>
+							<!-- current az -->
+							<td><input type="text" value="" id="input_az" class="number"></td>
+						</tr>
+					</table>
+					<!-- button -->
+					<div id="buttonFrame">
+						<input type="button" value="Start" id="startButton" />
+						<input type="button" value="Stop" id="stopButton" />
+					</div>
 
+				</div>
 			</div>
 
 			<!-- tab2 content -->
-			<div id="tab2">
-				<p>tab2</p>
+			<div id="tab2" class="inner">
+				<div id="canvas-frame_position" class="plotFrame" ></div>
 			</div>
 
-			<!-- tab3 content -->
-			<div id="tab3">
-				<!-- slider interface -->
-				<div id="slider"></div>
-				<p>current value: <span id="value"></span></p>
-				<p>tab3</p>
+			<!-- t3b3 content -->
+			<div id="tab3" class="inner">
+				<div id="canvas-frame_velocity" class="plotFrame" ></div>
 			</div>
+			
+			<!-- tab4 content -->
+			<div id="tab4" class="inner">
+				<div id="canvas-frame_energy" class="plotFrame" ></div>
+			</div>
+		</div>
 		</div>
 
 
