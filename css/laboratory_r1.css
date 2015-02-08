@@ -81,3 +81,22 @@ div#tabs div.inner div#controller div.slider {
 div#tabs div.inner div#controller input.number {
 	width: 30px;
 }
+
+div#tabs div.inner div.plotFrame {
+	width: 780px;
+	height: 500px;
+	background-color: #FFFFFF;
+}
+
+div#tabs div.inner div#controller div#buttonFrame {
+	text-align: center;
+	background-color: white;
+	padding: 5px, 5px;
+	margin: 5px, 0px;
+	border: 1px solid gray;
+}
+
+div#tabs div.inner div#controller div#buttonFrame input{
+	width: 120px;
+}
+
