@@ -7,19 +7,30 @@
 //System Parameter
 var time = 0;		// time
 var dt = 0.0001; // Delta t
-var N = 8;	   // number of particle
+var N = 20;	   // number of particle
 var L = 20;	   // System length
 var dl = L / (N-1);
 
+//oscillation
+var omega = 5.8201;
+var A = 0.1;
+
+var delta_omega = 0.0001;
+
+//eigen
+// var omega_cutoff=5.82;
+// var omega_max;
+// var time_max=5;
+// var flag_omega=true;
 
 var step = 0; //step count
 var skip = 500;
 
 //Particle parameter
 var MASS = 1;
-var RADIUS = 1*dl;
+var RADIUS = 0.45*dl;
 
-var spring = { k: 1000, l: 0.6*dl };
+var spring = { k: 1000, l: 0.7*dl };
 
 //particle class
 var Particle = function(parameter){
@@ -41,6 +52,8 @@ var Particle = function(parameter){
 	this.fx; 
 	this.fy; 
 	this.fz; 
+	//kinetic energy
+	this.kinetic = 0;
 };
 
 Particle.prototype = {
@@ -62,8 +75,6 @@ Calculation.prototype = {
 			p[i].z = 0;
 			this.calculateForce(p);
 		}
-		p[(N/4)].vz = 15;
-		p[3*N/4].vz = -15;
 	},
 	//calculation Force
 	calculateForce: function(p){
@@ -131,20 +142,12 @@ Calculation.prototype = {
 			p[i].vy = p[i].vy + ( old_fy[i] + p[i].fy )*dt/(2*p[i].mass); 
 			p[i].vz = p[i].vz + ( old_fz[i] + p[i].fz )*dt/(2*p[i].mass); 
 		}
-		p[0].x = 0;
-		p[0].y = 0;
-		p[0].z = 0;
-		p[0].vx = 0;
-		p[0].vy = 0;
-		p[0].vz = 0;
-		
-		p[N-1].x = 0;
-		p[N-1].y = L;
-		p[N-1].z = 0;
-		p[N-1].vx = 0;
-		p[N-1].vy = 0;
-		p[N-1].vz = 0;
 		//p[0] = { vx: 0, vy: 0, vz: 0};
+	},
+	calculateKinetic: function(p){
+		for(var i=0; i<p.length; i++){
+			p[i].kinetic = p[i].mass*(p[i].vx*p[i].vx + p[i].vy*p[i].vy + p[i].vz*p[i].vz)/2;
+		}
 	}
 };
 
@@ -278,12 +281,66 @@ function initLight(){
 
 function loop(){
 
+	/////////////////////////////////eigen
+	//if(flag_omega){
+// 		for(omega; omega<omega_cutoff; omega+=delta_omega){
+// 			var kinetic_max = 0;
+// 			var kinetic_max_= 0;
+// 			cal.initParticle(p);
+// 			for(time=0; time<time_max; time+= dt){
+
+// 				cal.timeDevelopment(p);
+// 				cal.calculateKinetic(p);
+
+// 				p[0].x = 0;
+// 				p[0].y = 0;
+// 				p[0].z = A * Math.sin(omega * time);
+// 				p[0].vx = 0;
+// 				p[0].vy = 0;
+// 				p[0].vz = A * omega * Math.cos(omega * time);
+
+// 				p[N-1].x = 0;
+// 				p[N-1].y = L;
+// 				p[N-1].z = 0;
+// 				p[N-1].vx = 0;
+// 				p[N-1].vy = 0;
+// 				p[N-1].vz = 0;
+// 				for(var i=0; i<p.length; i++){
+// 					if(p[i].kinetic > kinetic_max_)
+// 						kinetic_max_ = p[i].kinetic;
+// 				}
+// 			}
+// 			if(kinetic_max_ > kinetic_max)
+// 				omega_max = omega;
+// 		}
+// 		flag_omega = false;
+// 		alert("omega="+omega);
+// 		cal.initParticle(p);
+// 	}
+	//////////////////////////////////end
+
 	for(var n=0; n<skip; n++){
 		//increment of step
 		step++;
+		time += dt;
+
 		cal.timeDevelopment(p);
+
+		p[0].x = 0;
+		p[0].y = 0;
+		p[0].z = A * Math.sin(omega * time);
+		p[0].vx = 0;
+		p[0].vy = 0;
+		p[0].vz = A * omega * Math.cos(omega * time);
+
+		p[N-1].x = 0;
+		p[N-1].y = L;
+		p[N-1].z = 0;
+		p[N-1].vx = 0;
+		p[N-1].vy = 0;
+		p[N-1].vz = 0;
+
 	}
-	time = step * dt;
 
 	//set draw object
 	for(var i=0; i<N; i++){
