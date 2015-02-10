@@ -1,4 +1,5 @@
 var Plot2D = function (canvasDom){
+	var plot;
 	var plotDatas = [];
 
 	this.options = {
@@ -82,39 +83,86 @@ var Plot2D = function (canvasDom){
 
 	this.pushData = function (data){
 		plotDatas.push(data);
-	}
+	};
+
+	//draw plot 
+	this.Plot = function (){
+		this.clearCanvas();
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
 
 	//draw liner plot
 	this.linerPlot = function (){
 		this.clearCanvas();
-		$.jqplot(canvasDom, plotDatas, this.options);
-	}
-	//draw log plot
-	this.logPlot = function (base){
-		var base = base || 10; //log_x (10, 2 or Math.E)
-		//default option
-		var oldYaxisOption = {
-			min: this.options.axes.yaxis.min,
-			max: this.options.axes.yaxis.max,
-			tickInterval: this.options.axes.tickInterval
-		}
-
-		this.options.axes.yaxis.min = null;
-		this.options.axes.yaxis.max = null;
-		this.options.axes.yaxis.tickInterval = null;
-		this.options.axes.yaxis.renderer = $.jqplot.LogAxisRenderer;
-		this.options.axes.yaxis.rendererOptions = {base: base};
-		this.linerPlot();
-
-		this.options.axes.yaxis.min = oldYaxisOption.min;
-		this.options.axes.yaxis.max = oldYaxisOption.max;
-		this.options.axes.yaxis.tickInterval = oldYaxisOption.tickInterval;
+		this.options.axes.xaxis.renderer = $.jqplot.LinerAxisRenderer;
 		this.options.axes.yaxis.renderer = $.jqplot.LinerAxisRenderer;
-	}
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
+
+	//draw y-log plot
+	this.logPlot = function (base){
+		this.logPlotDataCheck();
+		var base = base || 10; //log_x (10, 2 or Math.E)
+		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LinerAxisRenderer;
+		this.options.axes.yaxis.renderer = $.jqplot.LogAxisRenderer;
+		this.options.axes.yaxis.rendererOptions = { base: base };
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
+
+	//draw xy-log plot
+	this.loglogPlot = function (base){
+		this.logPlotDataCheck();
+		var base = base || 10; //log_x (10, 2 or Math.E)
+		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LogAxisRenderer;
+		this.options.axes.yaxis.renderer = $.jqplot.LogAxisRenderer;
+		this.options.axes.xaxis.rendererOptions = { base: base };
+		this.options.axes.yaxis.rendererOptions = { base: base };
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
+	
+	//draw x-log plot
+	this.loglinerPlot = function (base){
+		this.logPlotDataCheck();
+		var base = base || 10; //log_x (10, 2 or Math.E)
+		this.clearCanvas();
+		this.options.axes.xaxis.renderer = $.jqplot.LogAxisRenderer;
+		this.options.axes.yaxis.renderer = $.jqplot.LinerAxisRenderer;
+		this.options.axes.xaxis.rendererOptions = { base: base };
+		plot = $.jqplot(canvasDom, plotDatas, this.options);
+	};
+
+	//replot
+	this.replot = function (){
+		this.clearCanvas();
+
+		for(var i=0; i< plotDatas.length ; i++)
+			plot.series[i].data = plotDatas[i];
+		plot.replot();
+		plot.resetAxesScale();
+		plot.replot();
+	};
+
+	this.clearData = function (){
+		plotDatas = [];
+	};
+
+	this.logPlotDataCheck = function (){
+		delete y<0
+		for(var i=0; i< plotDatas.length; i++){
+			var _data = [];
+			for(var j=0; j< plotDatas[i].length; j++){
+				if(plotDatas[i][j][1] > 0)
+					_data.push(plotDatas[i][j]);
+			}
+			plotDatas[i] = _data;
+		}
+	};
 
 	this.clearCanvas = function (){
 		document.getElementById(canvasDom).innerHTML = null;
-	}
+	};
 		
 }
 
