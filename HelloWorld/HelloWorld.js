@@ -7,13 +7,13 @@
 //System Parameter
 var time = 0;		// time
 var dt = 0.0001; // Delta t
-var N = 20;	   // number of particle
+var N = 50;	   // number of particle
 var L = 20;	   // System length
 var dl = L / (N-1);
 
 //oscillation
-var omega = 5.8201;
-var A = 0.1;
+var omega =5.8201;
+var A = 0.2;
 
 var delta_omega = 0.0001;
 
