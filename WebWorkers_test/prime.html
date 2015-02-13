@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>WebWorkers</title>
+		<script>
+window.addEventListener('load', function(){
+	calculateStart();
+});
+
+function prime(n){
+	var flag = true;
+	for(var i=3; i<n; i+=2){
+		if(n%i == 0){
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+
+function calculateStart(){
+	var startTime = new Date();
+	var N = 500000;
+	var str = "";
+	var primeNum = 1;
+	var str_prime = "素数:2 ";
+	for(var i=3; i<=N; i+=2){
+		var flag = prime(i);
+		if(flag){
+			str_prime += i+" ";
+			primeNum++;
+		}
+	}
+	var time = new Date() - startTime;
+	str += str_prime + "\n";
+	str += "計算結果: " + primeNum + "\n";
+	str += "計算時間: " + time + " [ms]";
+	console.log(str);
+}
+		</script>
+	</head>
+	<body></body>
+</html>
