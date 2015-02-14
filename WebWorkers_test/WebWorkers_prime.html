@@ -1,30 +1,45 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>WebWorkers</title>
-		<script>
+<head>
+<meta charset="utf-8">
+<title>WebWorkers</title>
+<script>
 window.addEventListener('load', function(){
-	calculateStart();
-});
+		calculateStart();
+		});
 
 function calculateStart(){
 	var startTime = new Date();
-	var N = 500000;
+	console.log("start");
+	var N = 300000;
 	var str = "";
-	
-	var worker = new Worker("worker_prime.js");
-	worker.postMessage(N);
-	worker.onmessage = function(event){
-		var primeNum = event.data;
-		var time = new Date() - startTime;
+	var workers = [];
+	var workerNum = 4;
+	var endWorkerNum = 0;
+	var primeNum = 1;
+	var str_prime = "素数:2 ";
 
-		str += "計算結果: " + primeNum + "\n";
-		str += "計算時間: " + time + " [ms]";
-		console.log(str);
+	for(var i=0; i<workerNum; i++){
+		workers[i] = new Worker("worker_prime.js");
+		workers[i].postMessage({N:N, wn: i, workerNum: workerNum});
+
+		workers[i].onmessage = function(event){
+			var result = event.data;
+			primeNum += result.primeNum;
+			str_prime += result.str;
+			endWorkerNum++;
+			if(endWorkerNum == workerNum){
+				var time = new Date() - startTime;
+				str += str_prime + "\n";
+				str += "計算結果: " + primeNum + "\n";
+				str += "計算時間: " + time + " [ms]";
+				console.log(str);
+			}
+		}
 	}
 }
-		</script>
-	</head>
-	<body></body>
+
+</script>
+</head>
+<body></body>
 </html>
