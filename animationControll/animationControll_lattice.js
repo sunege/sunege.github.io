@@ -6,27 +6,25 @@ window.addEventListener("load", function(){
 		threeStart();
 });
 
+
 ////////////////////////////////////////
 // define initEvent()
 ////////////////////////////////////////
+var stopFlag = true;
+var pngData;
+var pngName;
 function initEvent(){
 	document.getElementById("startButton").addEventListener("click", function(){
 			if(stopFlag){
 				stopFlag = false;
-// 				for(var i=0; i < Step; i++){
-// 					divs[i].style.display = "none";
-// 					imgs[i].style.display = "none";
-				}
-			}
 			else{
 				stopFlag = true;
 			}
-	})
+	});
 
 	document.getElementById("png").addEventListener("click", function(){
-// 			var n = step % Step;
-// 			document.getElementById("png").href = imgs[n].src;
-// 			document.getElementById("png").download = "png_" + n + ".png";
+			document.getElementById("png").href = pngData;
+			document.getElementById("png").download = pngName;
 	});
 };
 
@@ -147,12 +145,15 @@ function initLight(){
 ////////////////////////////////////////
 //global variables
 var axis; //axis object
-var lattice = []; //lattice object
+var lattice; //lattice object
 //number of object
-var N = 50;
+var N = 100;
 //edge length
 var l = 1;
 var Step = 100;
+
+//conservation z
+var f = new Array(Step);
 
 function initObject(){
 	//create axis object
@@ -166,48 +167,59 @@ function initObject(){
 	var R = 10;
 	var omega = 2 * Math.PI / Step;
 
-	for(var n=0; n < Step; n++){
+	for(var step=0; step < Step; step++){
+		f[step] = new Array(N + 1);
 		var geometry = new THREE.Geometry();
 		//gaussian
-		var x_ = R * Math.cos(omega * n); //x
-		var y_ = R * Math.sin(omega * n); //y
+		var x_ = R * Math.cos(omega * step); //x
+		var y_ = R * Math.sin(omega * step); //y
 		var sigma2 = 10; //sigma
 		var z0 = 50; //peak
 
-		for(var j=0; j <= N; j++){
-			for(var i=0; i <= N; i++){
+		for(var i=0; i <= N; i++){
+			f[step][i] = new Array(N + 1);
+			for(var j=0; j <= N; j++){
 				//calculate vartex
 				var x = (-N/2 + i) * l;
 				var y = (-N/2 + j) * l;
 				var z = z0 * Math.exp(-((x - x_) * (x -x_) + (y - y_) * (y -y_)) / (2 * sigma2)); 
-				var vertex = new THREE.Vector3(x, y, z);
-				//add vertex
-				geometry.vertices.push(vertex);
+				f[step][i][j] = z;
 			}
 		}
-		for(var j=0; j < N; j++){
-			for(var i=0; i < N; i++){
-				var face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
-				geometry.faces.push(face);
-				face = new THREE.Face3( (N+1)*j+i, (N+1)*(j+1)+i+1, (N+1)*(j+1)+i );
-				geometry.faces.push(face);
-			}
-		}
-		//calculate surface normal
-		geometry.computeFaceNormals();
-		//calculate vertex normal vector
-		geometry.computeVertexNormals();
-
-		//create material
-		var material = new THREE.MeshPhongMaterial({ color: 0xFF0000, ambient: 0xFF0000,
-				side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250 });
-
-		//create sphere object
-		lattice[n] = new THREE.Mesh(geometry, material);
-		//create shadow
-		lattice[n].castShadow = true;
 	}
+	var n=0;
+	for(var j=0; j <= N; j++){
+		for(var i=0; i <= N; i++){
+			var x = (-N/2 + i) * l;
+			var y = (-N/2 + j) * l;
+			var vertex = new THREE.Vector3(x, y, f[0][i][j]);
+			//add vertex
+			geometry.vertices[n] = vertex;
+			n++;
+		}
+	}
+	for(var j=0; j < N; j++){
+		for(var i=0; i < N; i++){
+			var face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
+			geometry.faces.push(face);
+			face = new THREE.Face3( (N+1)*j+i, (N+1)*(j+1)+i+1, (N+1)*(j+1)+i );
+			geometry.faces.push(face);
+		}
+	}
+	//calculate surface normal
+	geometry.computeFaceNormals();
+	//calculate vertex normal vector
+	geometry.computeVertexNormals();
 
+	//create material
+	var material = new THREE.MeshPhongMaterial({ color: 0xFF0000, ambient: 0xFF0000,
+			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250 });
+
+	//create sphere object
+	lattice = new THREE.Mesh(geometry, material);
+	scene.add(lattice);
+	//create shadow
+	lattice.castShadow = true;
 
 }
 
@@ -217,20 +229,46 @@ function initObject(){
 ////////////////////////////////////////
 var step = 0;
 function loop(){
-	step++;
 	//update trackball object
 	trackball.update();
 
-	var n = step%Step;
-	scene.add(lattice[n]);
+	if(stopFlag == false){
+
+		step++;
+		var n = 0;
+		for(var j=0; j<=N; j++){
+			for(var i=0; i<=N; i++){
+				var x = (-N/2 + i) * l;
+				var y = (-N/2 + j) * l;
+				var vertex = new THREE.Vector3(x, y, f[step%Step][i][j]);
+				lattice.geometry.vertices[n] = vertex;
+				n++;
+			}
+		}
+		lattice.geometry.verticesNeedUpdate = true;
+		lattice.geometry.normalsNeedUpdate = true;
+		lattice.geometry.computeFaceNormals();
+		lattice.geometry.computeVertexNormals();
+	}
+	else{
+		lattice.geometry.verticesNeedUpdate = false;
+		lattice.geometry.normalsNeedUpdate = false;
+	}
 
 	//init clear color
 	renderer.clear();
 
 	//rendering
 	renderer.render(scene, camera);
-	scene.remove(lattice[n]);
-	step++;
+
+	if(stopFlag){
+		document.getElementById("startButton").value = "start";
+		pngData = renderer.domElement.toDataURL("image/png");
+		pngName = "png_"+step%Step+".png";
+	}
+	else{
+		document.getElementById("startButton").value = "stop";
+	}
 
 	//call loop function
 	requestAnimationFrame(loop);
