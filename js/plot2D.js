@@ -71,7 +71,7 @@ var Plot2D = function (canvasDom){
 			showTooltipOutsideZoom : true
 		},
 		//high light option
-		hightlighter : {
+		highlighter : {
 			show : true,
 			showTooltip : true,
 			fadaTooltip : true,
@@ -137,10 +137,21 @@ var Plot2D = function (canvasDom){
 	this.replot = function (){
 		this.clearCanvas();
 
+		if(this.options.axes.yaxis.renderer == $.jqplot.LogAxisRenderer)
+			this.logPlotDataCheck();
+
 		for(var i=0; i< plotDatas.length ; i++)
 			plot.series[i].data = plotDatas[i];
 		plot.replot();
 		plot.resetAxesScale();
+		plot.replot();
+	};
+
+	//animation
+	this.animationPlot = function(){
+		this.clearCanvas();
+		for(var i=0; i < plotDatas.length; i++)
+			plot.series[i].data = plotDatas[i];
 		plot.replot();
 	};
 
