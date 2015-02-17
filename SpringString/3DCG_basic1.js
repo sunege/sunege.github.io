@@ -14,7 +14,6 @@ var step = 0; //step count
 var skip = 500;
 
 //oscillation
-var freq =5.8201/(2*Math.PI);
 var A = 0.2;
 
 
@@ -31,6 +30,8 @@ var nl = 0.7;
 
 var spring = { k: 1000, l: nl*dl };
 
+var freq = 0;
+var m=8; // mode
 //particle class
 var Particle = function(parameter){
 	//index
@@ -53,6 +54,7 @@ var Particle = function(parameter){
 	this.fz; 
 	//kinetic energy
 	this.kinetic = 0;
+	freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
 };
 
 Particle.prototype = {
@@ -104,20 +106,37 @@ Calculation.prototype = {
 				force01.y = -spring.k*(spring.l-d_r.norm)*d_r.y/d_r.norm;
 				force01.z = -spring.k*(spring.l-d_r.norm)*d_r.z/d_r.norm;
 			}
+////////		if( i == 0 ){
+////////			p[i].fx = force01.x;
+////////			p[i].fy = force01.y;
+////////			p[i].fz = force01.z;
+////////		}
+////////		else if( i == N-1 ){
+////////			p[i].fx = force10.x;
+////////			p[i].fy = force10.y;
+////////			p[i].fz = force10.z;
+////////		}
+////////		else{
+////////			p[i].fx = force01.x+force10.x;
+////////			p[i].fy = force01.y+force10.y;
+////////			p[i].fz = force01.z+force10.z;
+////////		}
+			//gravity and resistance
+			var gamma = 0.01;
 			if( i == 0 ){
-				p[i].fx = force01.x;
-				p[i].fy = force01.y;
-				p[i].fz = force01.z;
+				p[i].fx = force01.x-gamma*p[i].vx;
+				p[i].fy = force01.y-gamma*p[i].vy;
+				p[i].fz = force01.z-9.8*p[i].mass-gamma*p[i].vz;
 			}
 			else if( i == N-1 ){
-				p[i].fx = force10.x;
-				p[i].fy = force10.y;
-				p[i].fz = force10.z;
+				p[i].fx = force10.x-gamma*p[i].vx;
+				p[i].fy = force10.y-gamma*p[i].vy;
+				p[i].fz = force10.z-9.8*p[i].mass-gamma*p[i].vz;
 			}
 			else{
-				p[i].fx = force01.x+force10.x;
-				p[i].fy = force01.y+force10.y;
-				p[i].fz = force01.z+force10.z;
+				p[i].fx = force01.x+force10.x-gamma*p[i].vx;
+				p[i].fy = force01.y+force10.y-gamma*p[i].vy;
+				p[i].fz = force01.z+force10.z-9.8*p[i].mass-gamma*p[i].vz;
 			}
 		}
 	},
@@ -838,10 +857,10 @@ function loop(){
 
 			cal.timeDevelopment(p);
 
-			p[0].x = 0;
+			p[0].x = A * Math.cos(2*Math.PI*freq * time);
 			p[0].y = 0;
 			p[0].z = A * Math.sin(2*Math.PI*freq * time);
-			p[0].vx = 0;
+			p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
 			p[0].vy = 0;
 			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
 
