@@ -11,6 +11,7 @@ window.addEventListener("load", function(){
 // define initEvent()
 ////////////////////////////////////////
 var stopFlag = true;
+var restartFlag = false;
 var pngData;
 var pngName;
 function initEvent(){
@@ -27,6 +28,48 @@ function initEvent(){
 			document.getElementById("png").href = pngData;
 			document.getElementById("png").download = pngName;
 	});
+
+	document.getElementById("restartButton").addEventListener("click", function(){
+			restartFlag = true;
+	});
+	document.getElementById("restartButton").value = "restart";
+
+	//slider interface
+	$('#slider_Amp').slider({
+			min: 0,
+			max: 5,
+			step: 0.1,
+			value: Amp,
+			slide: function(event, ui){
+				var value = ui.value;
+				document.getElementById("input_Amp").value = value;
+			}
+	});
+	document.getElementById("input_Amp").value = Amp;
+
+	$('#slider_lambda').slider({
+			min: 1,
+			max: 20,
+			step: 1,
+			value: lambda,
+			slide: function(event, ui){
+				var value = ui.value;
+				document.getElementById("input_lambda").value = value;
+			}
+	});
+	document.getElementById("input_lambda").value = lambda;
+
+	$('#slider_space').slider({
+			min: 2,
+			max: 80,
+			step: 2,
+			value: space,
+			slide: function(event, ui){
+				var value = ui.value;
+				document.getElementById("input_space").value = value;
+			}
+	});
+	document.getElementById("input_space").value = space;
 };
 
 ////////////////////////////////////////
@@ -87,8 +130,8 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(40, 40, 120);
-	camera.up.set(0,0,1);
+	camera.position.set(0, 0, 120);
+	camera.up.set(0,1,0);
 	camera.lookAt({x: 0, y:0, z: 0});
 
 	//create trackball object
@@ -165,11 +208,12 @@ var dt = Time / Step;
 var time = 0;
 
 //wave param
-var lambda = 7; //wave length
-var Amp = 3; //ampritude
-var phi = Math.PI; //phase of source2
-var x1 = 25; //position of source1
-var x2 = -25; //position of source2
+var lambda = 6; //wave length
+var Amp = 0.5; //ampritude
+var phi = 0; //phase of source2
+var space = 20;
+var x1 = space/2; //position of source1
+var x2 = -space/2; //position of source2
 
 //rendering speed
 var Slow = 0;
@@ -183,11 +227,10 @@ function initObject(){
 	//add axis object to scene
 	scene.add(axis);
 	//set axis position
-	axis.position.set(0, 0, 0);
+	axis.position.set(0, 0, 0.3);
 
-	//create geometry
-	var R = 10;
-	var omega = 2 * Math.PI / Step;
+	x1 = space/2; //position of source1
+	x2 = -space/2; //position of source2
 
 	for(var step=0; step < Step; step++){
 		f[step] = new Array(N + 1);
@@ -264,6 +307,36 @@ var slow = 0;
 function loop(){
 	//update trackball object
 	trackball.update();
+	if(restartFlag == true){
+		time = 0;
+		Amp = parseFloat(document.getElementById("input_Amp").value);
+		lambda = parseInt(document.getElementById("input_lambda").value);
+		space = parseInt(document.getElementById("input_space").value);
+		var phaseList =document.getElementsByName("phase"); 
+		for(var i=0; i< phaseList.length; i++){
+			if(phaseList[i].checked && phaseList[i].value == "s")
+				phi = 0;
+			else if(phaseList[i].checked && phaseList[i].value == "r")
+				phi = Math.PI;
+		}
+		x1 = space / 2;
+		x2 = -space / 2;
+		for(var n=0; n < Step; n++){
+		for(var i=0; i <= N; i++){
+			for(var j=0; j <= N; j++){
+				//calculate vartex
+				var x = (-N/2 + i) * l;
+				var y = (-N/2 + j) * l;
+				var z = Amp * (Math.sin(2 * Math.PI * ((time/Time) - (Math.sqrt(Math.pow((x-x1),2) + y*y)/lambda))) + Math.sin(2 * Math.PI * ((time/Time) - Math.sqrt(Math.pow((x-x2),2) + y*y)/lambda) + phi) );
+				f[n][i][j] = z;
+			}
+		}
+		time += dt;
+	}
+		restartFlag = false;
+		stopFlag = false;
+		step = 0;
+	}
 
 	if(stopFlag == false){
 		
