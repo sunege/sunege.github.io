@@ -12,6 +12,8 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 var stopFlag = true;
 var restartFlag = false;
+var line1Flag = false;
+var line2Flag = false;
 var pngData;
 var pngName;
 function initEvent(){
@@ -33,6 +35,24 @@ function initEvent(){
 			restartFlag = true;
 	});
 	document.getElementById("restartButton").value = "restart";
+
+	//checkbox
+	$('#checkbox_line1').click(function(){
+			if($(this).prop('checked') == true){
+				line1Flag = true;
+			}
+			else{
+				line1Flag = false;
+			}
+	});
+	$('#checkbox_line2').click(function(){
+			if($(this).prop('checked') == true){
+				line2Flag = true;
+			}
+			else{
+				line2Flag = false;
+			}
+	});
 
 	//slider interface
 	$('#slider_Amp').slider({
@@ -197,6 +217,10 @@ var N = 80;
 var sphere1;
 var sphere2;
 
+var line0;
+var line1;
+var line2;
+
 /* Wave format */
 //edge length
 var l = 1;
@@ -211,7 +235,7 @@ var time = 0;
 var lambda = 6; //wave length
 var Amp = 0.5; //ampritude
 var phi = 0; //phase of source2
-var space = 20;
+var space = 21;
 var x1 = space/2; //position of source1
 var x2 = -space/2; //position of source2
 
@@ -223,11 +247,11 @@ var f = new Array(Step);
 
 function initObject(){
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+// 	axis = new THREE.AxisHelper(100);
 	//add axis object to scene
-	scene.add(axis);
+// 	scene.add(axis);
 	//set axis position
-	axis.position.set(0, 0, 0.3);
+// 	axis.position.set(0, 0, 0.3);
 
 	x1 = space/2; //position of source1
 	x2 = -space/2; //position of source2
@@ -296,8 +320,138 @@ function initObject(){
 	sphere2.position.set(x2, 0, 0);
 
 
+	//line object
+	DrawLine();
+
 }
 
+///////////////////
+// DrawLine
+///////////////////
+function DrawLine(){
+	var z_line = 0.10; //line position z
+	var m1 = 0;
+	var flag1 = false;
+	for(var i=0; m1*lambda/2 <= space/2; i++){
+		m1++;
+		if(m1*lambda/2 == space/2)
+			flag1 = true;
+
+	}
+	line1 = new Array(2*m1-1)
+	var num = 0;
+
+	var line1Material = new THREE.LineBasicMaterial({ color: 0xFF0000 });
+	for(var n=0; n<m1; n++){
+		var line1Geometry = new THREE.Geometry();
+		var a2 = Math.pow(n*lambda/2, 2);
+		var c2 = Math.pow(space/2, 2);
+
+		if(flag1 == true  && n == m1-1){
+			var vertex = new THREE.Vector3(space/2, 0, z_line);
+			line1Geometry.vertices.push(vertex);
+			var vertex = new THREE.Vector3(N/2, 0, z_line);
+			line1Geometry.vertices.push(vertex);
+			line1[num] = new THREE.Line(line1Geometry, line1Material);
+			scene.add(line1[num]);
+			num++;
+			var line1Geometry = new THREE.Geometry();
+			var vertex = new THREE.Vector3(-space/2, 0, z_line);
+			line1Geometry.vertices.push(vertex);
+			var vertex = new THREE.Vector3(-N/2, 0, z_line);
+			line1Geometry.vertices.push(vertex);
+			line1[num] = new THREE.Line(line1Geometry, line1Material);
+			scene.add(line1[num]);
+			num++;
+
+		}
+		for(var j=0; j<=N; j++){
+			var y = (-N/2 + j) * l;
+			if(n==0){
+				var x = 0;
+			}
+			else{
+				var x = Math.sqrt(a2*(1+y*y/(c2-a2)));
+			}
+			var vertex = new THREE.Vector3(x, y, z_line);
+			line1Geometry.vertices.push(vertex);
+		}
+		line1[num] = new THREE.Line(line1Geometry, line1Material);
+		scene.add(line1[num]);
+		num++;
+		if(n != 0){
+			var line1Geometry = new THREE.Geometry();
+			for(var j=0; j<=N; j++){
+				var y = (-N/2 + j) * l;
+				if(n==0){
+					var x = 0;
+				}
+				else{
+					var x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
+				}
+				var vertex = new THREE.Vector3(x, y, z_line);
+				line1Geometry.vertices.push(vertex);
+			}
+			line1[num] = new THREE.Line(line1Geometry, line1Material);
+			scene.add(line1[num]);
+			num++;
+		}
+	}
+
+	var m2 = 0;
+	var flag2 = false;
+	for(var i=0; (m2+1/2)*lambda/2 <= space/2; i++){
+		m2++;
+		if((m2+1/2)*lambda/2 == space/2)
+			flag2 = true;
+	}
+	line2 = new Array(2*m2);
+	num = 0;
+
+	var line2Material = new THREE.LineBasicMaterial({ color: 0x00FF00 });
+	for(var n=0; n<m2; n++){
+		var line2Geometry = new THREE.Geometry();
+		var a2 = Math.pow((n+1/2)*lambda/2, 2);
+		var c2 = Math.pow(space/2, 2);
+
+		if(flag2 == true  && n == m2-1){
+			var vertex = new THREE.Vector3(space/2, 0, z_line);
+			line2Geometry.vertices.push(vertex);
+			var vertex = new THREE.Vector3(N/2, 0, z_line);
+			line2Geometry.vertices.push(vertex);
+			line2[num] = new THREE.Line(line2Geometry, line2Material);
+			scene.add(line2[num]);
+			num++;
+			var line2Geometry = new THREE.Geometry();
+			var vertex = new THREE.Vector3(-space/2, 0, z_line);
+			line2Geometry.vertices.push(vertex);
+			var vertex = new THREE.Vector3(-N/2, 0, z_line);
+			line2Geometry.vertices.push(vertex);
+			line2[num] = new THREE.Line(line2Geometry, line2Material);
+			scene.add(line2[num]);
+			num++;
+		}
+		for(var j=0; j<=N; j++){
+			var y = (-N/2 + j) * l;
+			var x = Math.sqrt(a2*(1+y*y/(c2-a2)));
+			var vertex = new THREE.Vector3(x, y, z_line);
+			line2Geometry.vertices.push(vertex);
+		}
+		line2[num] = new THREE.Line(line2Geometry, line2Material);
+		scene.add(line2[num]);
+		num++;
+		var line2Geometry = new THREE.Geometry();
+		for(var j=0; j<=N; j++){
+			var y = (-N/2 + j) * l;
+			var x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
+			var vertex = new THREE.Vector3(x, y, z_line);
+			line2Geometry.vertices.push(vertex);
+		}
+		line2[num] = new THREE.Line(line2Geometry, line2Material);
+		scene.add(line2[num]);
+		num++;
+	}
+}
 
 ////////////////////////////////////////
 // define loop()
@@ -322,70 +476,99 @@ function loop(){
 		x1 = space / 2;
 		x2 = -space / 2;
 		for(var n=0; n < Step; n++){
-		for(var i=0; i <= N; i++){
-			for(var j=0; j <= N; j++){
-				//calculate vartex
-				var x = (-N/2 + i) * l;
-				var y = (-N/2 + j) * l;
-				var z = Amp * (Math.sin(2 * Math.PI * ((time/Time) - (Math.sqrt(Math.pow((x-x1),2) + y*y)/lambda))) + Math.sin(2 * Math.PI * ((time/Time) - Math.sqrt(Math.pow((x-x2),2) + y*y)/lambda) + phi) );
-				f[n][i][j] = z;
+			for(var i=0; i <= N; i++){
+				for(var j=0; j <= N; j++){
+					//calculate vartex
+					var x = (-N/2 + i) * l;
+					var y = (-N/2 + j) * l;
+					var z = Amp * (Math.sin(2 * Math.PI * ((time/Time) - (Math.sqrt(Math.pow((x-x1),2) + y*y)/lambda))) + Math.sin(2 * Math.PI * ((time/Time) - Math.sqrt(Math.pow((x-x2),2) + y*y)/lambda) + phi) );
+					f[n][i][j] = z;
+				}
 			}
+			time += dt;
 		}
-		time += dt;
-	}
+		for(var i=0; i<line1.length; i++){
+			scene.remove(line1[i]);
+		}
+		for(var i=0; i<line2.length; i++){
+			scene.remove(line2[i]);
+		}
+		DrawLine();
 		restartFlag = false;
 		stopFlag = false;
 		step = 0;
 	}
 
-	if(stopFlag == false){
-		
-		if(slow < Slow){
-			slow++;
+		if(stopFlag == false){
+
+			if(slow < Slow){
+				slow++;
+			}
+			else{
+
+				step++;
+				var n = 0;
+				for(var j=0; j<=N; j++){
+					for(var i=0; i<=N; i++){
+						var x = (-N/2 + i) * l;
+						var y = (-N/2 + j) * l;
+						var vertex = new THREE.Vector3(x, y, f[step%Step][i][j]);
+						lattice.geometry.vertices[n] = vertex;
+						n++;
+					}
+				}
+				sphere1.position.set(x1, 0, f[step%Step][Math.round(x1/l + N/2)][N/2]);
+				sphere2.position.set(x2, 0, f[step%Step][Math.round(x2/l + N/2)][N/2]);
+				lattice.geometry.verticesNeedUpdate = true;
+				lattice.geometry.normalsNeedUpdate = true;
+				lattice.geometry.computeFaceNormals();
+				lattice.geometry.computeVertexNormals();
+				slow = 0;
+			}
 		}
 		else{
-
-			step++;
-			var n = 0;
-			for(var j=0; j<=N; j++){
-				for(var i=0; i<=N; i++){
-					var x = (-N/2 + i) * l;
-					var y = (-N/2 + j) * l;
-					var vertex = new THREE.Vector3(x, y, f[step%Step][i][j]);
-					lattice.geometry.vertices[n] = vertex;
-					n++;
-				}
-			}
-			sphere1.position.set(x1, 0, f[step%Step][Math.round(x1/l + N/2)][N/2]);
-			sphere2.position.set(x2, 0, f[step%Step][Math.round(x2/l + N/2)][N/2]);
-			lattice.geometry.verticesNeedUpdate = true;
-			lattice.geometry.normalsNeedUpdate = true;
-			lattice.geometry.computeFaceNormals();
-			lattice.geometry.computeVertexNormals();
-			slow = 0;
+			lattice.geometry.verticesNeedUpdate = false;
+			lattice.geometry.normalsNeedUpdate = false;
 		}
-	}
-	else{
-		lattice.geometry.verticesNeedUpdate = false;
-		lattice.geometry.normalsNeedUpdate = false;
-	}
 
-	//init clear color
-	renderer.clear();
+		if(line1Flag == false){
+			for(var i=0; i<line1.length; i++){
+				scene.remove(line1[i]);
+			}
+		}
+		else{
+			for(var i=0; i<line1.length; i++){
+				scene.add(line1[i]);
+			}
+		}
 
-	//rendering
-	renderer.render(scene, camera);
 
-	if(stopFlag){
-		document.getElementById("startButton").value = "start";
-		pngData = renderer.domElement.toDataURL("image/png");
-		pngName = "png_"+step%Step+".png";
+		if(line2Flag == false){
+			for(var i=0; i<line2.length; i++){
+				scene.remove(line2[i]);
+			}
+		}
+		else{
+			for(var i=0; i<line2.length; i++){
+				scene.add(line2[i]);
+			}
+		}
+		//init clear color
+		renderer.clear();
+
+		//rendering
+		renderer.render(scene, camera);
+
+		if(stopFlag){
+			document.getElementById("startButton").value = "start";
+			pngData = renderer.domElement.toDataURL("image/png");
+			pngName = "png_"+step%Step+".png";
+		}
+		else{
+			document.getElementById("startButton").value = "stop";
+		}
+
+		//call loop function
+		requestAnimationFrame(loop);
 	}
-	else{
-		document.getElementById("startButton").value = "stop";
-	}
-
-	//call loop function
-	requestAnimationFrame(loop);
-}
 
