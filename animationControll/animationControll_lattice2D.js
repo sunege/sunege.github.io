@@ -189,6 +189,7 @@ function initObject(){
 			colors.push(new THREE.Color().setRGB(f[0][i][j]/z0, 0, 0));
 		}
 	}
+	console.log(colors[1500]);
 	for(var i=0; i < N; i++){
 		for(var j=0; j < N; j++){
 			var color1=[];
@@ -207,7 +208,7 @@ function initObject(){
 		}
 	}
 
-	geometry.computeFaceNormals();
+// 	geometry.computeFaceNormals();
 
 	//create material
 	var material = new THREE.MeshBasicMaterial({color: 0xFFFFFF, vertexColors: THREE.VertexColors});
