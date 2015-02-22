@@ -233,9 +233,9 @@ var time = 0;
 
 //wave param
 var lambda = 6; //wave length
-var Amp = 0.5; //ampritude
+var Amp = 2; //ampritude
 var phi = 0; //phase of source2
-var space = 21;
+var space = 20;
 var x1 = space/2; //position of source1
 var x2 = -space/2; //position of source2
 
@@ -517,12 +517,14 @@ function loop(){
 						n++;
 					}
 				}
-				sphere1.position.set(x1, 0, f[step%Step][Math.round(x1/l + N/2)][N/2]);
-				sphere2.position.set(x2, 0, f[step%Step][Math.round(x2/l + N/2)][N/2]);
+				sphere1.position.set(x1, 0, Amp*sin(2*Math.PI*time/Time));
+				sphere2.position.set(x2, 0, Amp*sin(2*Math.PI*time/Time + phi));
+// 				sphere2.position.set(x2, 0, f[step%Step][N/2 - space/2][N/2]);
 				lattice.geometry.verticesNeedUpdate = true;
 				lattice.geometry.normalsNeedUpdate = true;
 				lattice.geometry.computeFaceNormals();
 				lattice.geometry.computeVertexNormals();
+				time += dt;
 				slow = 0;
 			}
 		}
