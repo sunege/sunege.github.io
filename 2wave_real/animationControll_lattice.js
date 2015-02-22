@@ -57,8 +57,8 @@ function initEvent(){
 	//slider interface
 	$('#slider_Amp').slider({
 			min: 0,
-			max: 5,
-			step: 0.1,
+			max: 20,
+			step: 1,
 			value: Amp,
 			slide: function(event, ui){
 				var value = ui.value;
@@ -81,7 +81,7 @@ function initEvent(){
 
 	$('#slider_space').slider({
 			min: 2,
-			max: 80,
+			max: N,
 			step: 2,
 			value: space,
 			slide: function(event, ui){
@@ -90,6 +90,18 @@ function initEvent(){
 			}
 	});
 	document.getElementById("input_space").value = space;
+
+	$('#slider_vel').slider({
+			min: 1,
+			max: 10,
+			step: 1,
+			value: vel,
+			slide: function(event, ui){
+				var value = ui.value;
+				document.getElementById("input_vel").value = value;
+			}
+	});
+	document.getElementById("input_vel").value = vel;
 };
 
 ////////////////////////////////////////
@@ -128,7 +140,7 @@ function initThree(){
 
 	//set renderer options
 	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true;
+// 	renderer.shadowMapEnabled = true;
 
 	//create scene object
 	scene = new THREE.Scene();
@@ -190,7 +202,7 @@ function initLight(){
 	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
 
 	//set directionalLight options
-	directionalLight.position.set(30, 30, 100);
+	directionalLight.position.set(-30, -30, 100);
 
 	directionalLight.castShadow = true;
 
@@ -212,7 +224,7 @@ var axis; //axis object
 
 var lattice; //lattice object
 //number of object
-var N = 80;
+var N = 90;
 
 var sphere1;
 var sphere2;
@@ -226,15 +238,20 @@ var line2;
 var l = 1;
 var Step = 200;
 
+//discreat param
+var dx = 1;
+var dt = 0.01;
+
 //time param
-var Time = 0.5;
-var dt = Time / Step;
+var Time; //period 
 var time = 0;
+var skip = 5;
 
 //wave param
-var lambda = 6; //wave length
-var Amp = 2; //ampritude
+var lambda = 8; //wave length
+var Amp = 10; //ampritude
 var phi = 0; //phase of source2
+var vel = 4;
 var space = 20;
 var x1 = space/2; //position of source1
 var x2 = -space/2; //position of source2
@@ -242,42 +259,80 @@ var x2 = -space/2; //position of source2
 //rendering speed
 var Slow = 0;
 
-//conservation z
-var f = new Array(Step);
+//wave
+var u;
 
-function initObject(){
-	//create axis object
-// 	axis = new THREE.AxisHelper(100);
-	//add axis object to scene
-// 	scene.add(axis);
-	//set axis position
-// 	axis.position.set(0, 0, 0.3);
-
-	x1 = space/2; //position of source1
-	x2 = -space/2; //position of source2
-
-	for(var step=0; step < Step; step++){
-		f[step] = new Array(N + 1);
-		var geometry = new THREE.Geometry();
-
+//init param
+function initWave(){
+	Time = lambda / vel;
+	var nt = 3;
+	u = new Array(nt);
+	for(var n = 0; n < nt; n++){
+		u[n] = new Array(N + 1);
 		for(var i=0; i <= N; i++){
-			f[step][i] = new Array(N + 1);
-			for(var j=0; j <= N; j++){
-				//calculate vartex
-				var x = (-N/2 + i) * l;
-				var y = (-N/2 + j) * l;
-				var z = Amp * (Math.sin(2 * Math.PI * ((time/Time) - (Math.sqrt(Math.pow((x-x1),2) + y*y)/lambda))) + Math.sin(2 * Math.PI * ((time/Time) - Math.sqrt(Math.pow((x-x2),2) + y*y)/lambda) + phi) );
-				f[step][i][j] = z;
+			u[n][i] = new Array(N + 1);
+			for(var j=0; j<=N; j++){
+				u[n][i][j] = 0;
 			}
 		}
-		time += dt;
 	}
+	//past time wave distribution
+	u[0][N/2 + space/2][N/2] = Amp * Math.sin(2 * Math.PI * (-dt)/Time);
+	u[0][N/2 - space/2][N/2] = Amp * Math.sin(2 * Math.PI * (-dt)/Time + phi);
+}
+
+//numerical calculation of wave function
+function calculate(){
+	//source
+	u[1][N/2 + space/2][N/2] = Amp * Math.sin(2 * Math.PI * time/Time);
+	u[1][N/2 - space/2][N/2] = Amp * Math.sin(2 * Math.PI * time/Time + phi);
+
+	//calculate vartex
+	for(var i=1; i < N; i++){
+		for(var j=1; j < N; j++){
+			u[2][i][j] = 2.0 * u[1][i][j] - u[0][i][j] + vel * vel * dt * dt / (dx * dx) * (u[1][i + 1][j] + u[1][i - 1][j] + u[1][i][j + 1] + u[1][i][j - 1] - 4.0 * u[1][i][j]);
+		}
+	}
+	//dirichret condition
+// 	for (var i = 0; i <= N; i++) {
+// 		u[2][i][0] = u[2][i][N] = u[2][0][i] = u[2][N][i] = 0.0;
+// 	}
+	//Nuemmum
+	for (var i = 1; i <= N - 1; i++) {
+		u[2][i][0] = u[2][i][1];
+		u[2][i][N] = u[2][i][N - 1];
+		u[2][0][i] = u[2][1][i];
+		u[2][N][i] = u[2][N - 1][i];
+	}
+	//角の処理
+	u[2][0][0] = (u[2][0][1] + u[2][1][0]) / 2;
+	u[2][0][N] = (u[2][0][N - 1] + u[2][1][N]) / 2;
+	u[2][N][0] = (u[2][N - 1][0] + u[2][N][1]) / 2;
+	u[2][N][N] = (u[2][N - 1][N] + u[2][N][N - 1]) / 2;
+	for (var i = 0; i <= N; i++) {
+		for (var j = 0; j <= N; j++) {
+			u[0][i][j] = u[1][i][j];
+			u[1][i][j] = u[2][i][j];
+		}
+	}
+	time += dt;
+}
+
+function initObject(){
+	//initWave
+	initWave();
+
+	//time zero calculation
+	calculate();
+
+	//object create
+	var geometry = new THREE.Geometry();
 	var n=0;
 	for(var j=0; j <= N; j++){
 		for(var i=0; i <= N; i++){
 			var x = (-N/2 + i) * l;
 			var y = (-N/2 + j) * l;
-			var vertex = new THREE.Vector3(x, y, f[0][i][j]);
+			var vertex = new THREE.Vector3(x, y, u[1][i][j]);
 			//add vertex
 			geometry.vertices[n] = vertex;
 			n++;
@@ -297,7 +352,7 @@ function initObject(){
 	geometry.computeVertexNormals();
 
 	//create material
-	var material = new THREE.MeshPhongMaterial({ color: 0x0033E0, ambient: 0x000000,
+	var material = new THREE.MeshPhongMaterial({ color: 0x00FFFF, ambient: 0x000000,
 			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250 });
 
 	//create sphere object
@@ -307,7 +362,7 @@ function initObject(){
 	lattice.castShadow = true;
 
 	//source object
-	geometry = new THREE.SphereGeometry( lambda / 3, 20, 20 );
+	geometry = new THREE.SphereGeometry( 2, 20, 20 );
 	material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
 
 	sphere1 = new THREE.Mesh(geometry, material);
@@ -363,7 +418,6 @@ function DrawLine(){
 			line1[num] = new THREE.Line(line1Geometry, line1Material);
 			scene.add(line1[num]);
 			num++;
-
 		}
 		for(var j=0; j<=N; j++){
 			var y = (-N/2 + j) * l;
@@ -408,7 +462,7 @@ function DrawLine(){
 	line2 = new Array(2*m2);
 	num = 0;
 
-	var line2Material = new THREE.LineBasicMaterial({ color: 0x00FF00 });
+	var line2Material = new THREE.LineBasicMaterial({ color: 0xFF00FF });
 	for(var n=0; n<m2; n++){
 		var line2Geometry = new THREE.Geometry();
 		var a2 = Math.pow((n+1/2)*lambda/2, 2);
@@ -466,6 +520,7 @@ function loop(){
 		Amp = parseFloat(document.getElementById("input_Amp").value);
 		lambda = parseInt(document.getElementById("input_lambda").value);
 		space = parseInt(document.getElementById("input_space").value);
+		vel = parseInt(document.getElementById("input_vel").value);
 		var phaseList =document.getElementsByName("phase"); 
 		for(var i=0; i< phaseList.length; i++){
 			if(phaseList[i].checked && phaseList[i].value == "s")
@@ -475,18 +530,11 @@ function loop(){
 		}
 		x1 = space / 2;
 		x2 = -space / 2;
-		for(var n=0; n < Step; n++){
-			for(var i=0; i <= N; i++){
-				for(var j=0; j <= N; j++){
-					//calculate vartex
-					var x = (-N/2 + i) * l;
-					var y = (-N/2 + j) * l;
-					var z = Amp * (Math.sin(2 * Math.PI * ((time/Time) - (Math.sqrt(Math.pow((x-x1),2) + y*y)/lambda))) + Math.sin(2 * Math.PI * ((time/Time) - Math.sqrt(Math.pow((x-x2),2) + y*y)/lambda) + phi) );
-					f[n][i][j] = z;
-				}
-			}
-			time += dt;
-		}
+
+		//recalculate
+		initWave();
+		calculate();
+
 		for(var i=0; i<line1.length; i++){
 			scene.remove(line1[i]);
 		}
@@ -499,78 +547,79 @@ function loop(){
 		step = 0;
 	}
 
-		if(stopFlag == false){
+	if(stopFlag == false){
 
-			if(slow < Slow){
-				slow++;
-			}
-			else{
-
+		if(slow < Slow){
+			slow++;
+		}
+		else{
+			for(var i=0; i<skip; i++){
+				calculate();
 				step++;
-				var n = 0;
-				for(var j=0; j<=N; j++){
-					for(var i=0; i<=N; i++){
-						var x = (-N/2 + i) * l;
-						var y = (-N/2 + j) * l;
-						var vertex = new THREE.Vector3(x, y, f[step%Step][i][j]);
-						lattice.geometry.vertices[n] = vertex;
-						n++;
-					}
+			}
+
+			var n = 0;
+			for(var j=0; j<=N; j++){
+				for(var i=0; i<=N; i++){
+					var x = (-N/2 + i) * l;
+					var y = (-N/2 + j) * l;
+					var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+					lattice.geometry.vertices[n] = vertex;
+					n++;
 				}
-				sphere1.position.set(x1, 0, Amp*sin(2*Math.PI*time/Time));
-				sphere2.position.set(x2, 0, Amp*sin(2*Math.PI*time/Time + phi));
-// 				sphere2.position.set(x2, 0, f[step%Step][N/2 - space/2][N/2]);
-				lattice.geometry.verticesNeedUpdate = true;
-				lattice.geometry.normalsNeedUpdate = true;
-				lattice.geometry.computeFaceNormals();
-				lattice.geometry.computeVertexNormals();
-				time += dt;
-				slow = 0;
 			}
+			sphere1.position.set(x1, 0, u[1][N/2 + space/2][N/2]);
+			sphere2.position.set(x2, 0, u[1][N/2 - space/2][N/2]);
+			lattice.geometry.verticesNeedUpdate = true;
+			lattice.geometry.normalsNeedUpdate = true;
+			lattice.geometry.computeFaceNormals();
+			lattice.geometry.computeVertexNormals();
+			slow = 0;
 		}
-		else{
-			lattice.geometry.verticesNeedUpdate = false;
-			lattice.geometry.normalsNeedUpdate = false;
-		}
-
-		if(line1Flag == false){
-			for(var i=0; i<line1.length; i++){
-				scene.remove(line1[i]);
-			}
-		}
-		else{
-			for(var i=0; i<line1.length; i++){
-				scene.add(line1[i]);
-			}
-		}
-
-
-		if(line2Flag == false){
-			for(var i=0; i<line2.length; i++){
-				scene.remove(line2[i]);
-			}
-		}
-		else{
-			for(var i=0; i<line2.length; i++){
-				scene.add(line2[i]);
-			}
-		}
-		//init clear color
-		renderer.clear();
-
-		//rendering
-		renderer.render(scene, camera);
-
-		if(stopFlag){
-			document.getElementById("startButton").value = "start";
-			pngData = renderer.domElement.toDataURL("image/png");
-			pngName = "png_"+step%Step+".png";
-		}
-		else{
-			document.getElementById("startButton").value = "stop";
-		}
-
-		//call loop function
-		requestAnimationFrame(loop);
 	}
+	else{
+		lattice.geometry.verticesNeedUpdate = false;
+		lattice.geometry.normalsNeedUpdate = false;
+	}
+
+	if(line1Flag == false){
+		for(var i=0; i<line1.length; i++){
+			scene.remove(line1[i]);
+		}
+	}
+	else{
+		for(var i=0; i<line1.length; i++){
+			scene.add(line1[i]);
+		}
+	}
+
+
+	if(line2Flag == false){
+		for(var i=0; i<line2.length; i++){
+			scene.remove(line2[i]);
+		}
+	}
+	else{
+		for(var i=0; i<line2.length; i++){
+			scene.add(line2[i]);
+		}
+	}
+	//init clear color
+	renderer.clear();
+
+	//rendering
+	renderer.render(scene, camera);
+
+	if(stopFlag){
+		document.getElementById("startButton").value = "start";
+		pngData = renderer.domElement.toDataURL("image/png");
+		pngName = "png_"+step%Step+".png";
+	}
+	else{
+		document.getElementById("startButton").value = "stop";
+	}
+
+	//call loop function
+	requestAnimationFrame(loop);
+}
 
