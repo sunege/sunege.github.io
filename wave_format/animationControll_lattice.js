@@ -2,8 +2,12 @@
 // define window event 
 ////////////////////////////////////////
 window.addEventListener("load", function(){
+		initThree();
 		initEvent();
-		threeStart();
+		initCamera();
+		initLight();
+		initObject();
+		loop();
 });
 
 
@@ -23,6 +27,9 @@ var nonreflectiveFlag = true;
 var pngData;
 var pngName;
 function initEvent(){
+
+	mouseEvent();
+
 	document.getElementById("startButton").addEventListener("click", function(){
 			if(stopFlag){
 				stopFlag = false;
@@ -73,45 +80,45 @@ function initEvent(){
 			}
 	});
 	document.getElementById("input_alpha").value = alpha;
-	$('#slider_Amp').slider({
-			min: 0,
-			max: 20,
-			step: 1,
-			value: Amp,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_Amp").value = value;
-			}
-	});
-	document.getElementById("input_Amp").value = Amp;
+	//$('#slider_Amp').slider({
+			//min: 0,
+			//max: 20,
+			//step: 1,
+			//value: Amp,
+			//slide: function(event, ui){
+				//var value = ui.value;
+				//document.getElementById("input_Amp").value = value;
+			//}
+	//});
+	//document.getElementById("input_Amp").value = Amp;
 
-	$('#slider_lambda').slider({
-			min: 1,
-			max: 20,
-			step: 1,
-			value: _lambda,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_lambda").value = value;
-			}
-	});
-	document.getElementById("input_lambda").value = _lambda;
+	//$('#slider_lambda').slider({
+			//min: 1,
+			//max: 20,
+			//step: 1,
+			//value: _lambda,
+			//slide: function(event, ui){
+				//var value = ui.value;
+				//document.getElementById("input_lambda").value = value;
+			//}
+	//});
+	//document.getElementById("input_lambda").value = _lambda;
 
-	$('#slider_space').slider({
-			min: 0,
-			max: N,
-			step: 2,
-			value: space,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_space").value = value;
-			}
-	});
-	document.getElementById("input_space").value = space;
+	//$('#slider_space').slider({
+			//min: 0,
+			//max: N,
+			//step: 2,
+			//value: space,
+			//slide: function(event, ui){
+				//var value = ui.value;
+				//document.getElementById("input_space").value = value;
+			//}
+	//});
+	//document.getElementById("input_space").value = space;
 
 	$('#slider_vel').slider({
 			min: 1,
-			max: 20,
+			max: 50,
 			step: 1,
 			value: vel,
 			slide: function(event, ui){
@@ -122,15 +129,47 @@ function initEvent(){
 	document.getElementById("input_vel").value = vel;
 };
 
+function mouseEvent(){
+	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
+	function onDocumentMouseDown( event ){
+// 		var rect = event.target.getBoundingClientRect();
+// 		var mx = event.clientX - rect.left;
+// 		var my = event.clientY - rect.top;
+
+// 		mx = (mx / window.innerWidth) * 2 - 1;
+// 		my = (my / window.innerHeight) * 2 + 1;
+
+		var mx = (event.clientX / canvasFrame.clientWidth) * 2 - 1;
+		var my = -(event.clientY / canvasFrame.clientHeight) * 2 + 1;
+		var pos = new THREE.Vector3(mx, my, 0.5);
+
+		pos.unproject(camera);
+		
+		pos = pos.sub(camera.position).normalize();
+		var ray = new THREE.Raycaster( camera.position, pos );
+		var objs = ray.intersectObjects(targetLists);
+
+		if(objs.length > 0){
+			var amp = 3;
+			var sigma = 2;
+			for(var n = 0; n < 3; n++){
+				for(var i=0; i <= N; i++){
+					for(var j=0; j<=N; j++){
+						var x = (-N/2 + i) * l;
+						var y = (-N/2 + j) * l;
+						u[n][i][j] += gaussian(x,y,objs[0].point.x,objs[0].point.y,amp,sigma);
+					}
+				}
+			}
+		}
+
+	}
+};
+
 ////////////////////////////////////////
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
-	initThree();
-	initCamera();
-	initLight();
-	initObject();
-	loop();
 }
 
 /*  init Three functions  */
@@ -222,7 +261,7 @@ function initLight(){
 	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
 
 	//set directionalLight options
-	directionalLight.position.set(-30, -30, 100);
+	directionalLight.position.set(10, -10, 100);
 
 	directionalLight.castShadow = true;
 
@@ -257,12 +296,12 @@ var lattice; //lattice object
 //number of object
 var N = 80;
 
-var sphere1;
-var sphere2;
+//var sphere1;
+//var sphere2;
 
-var line0;
-var line1;
-var line2;
+//var line0;
+//var line1;
+//var line2;
 
 /* Wave format */
 //edge length
@@ -279,14 +318,14 @@ var time = 0;
 var skip = 3;
 
 //wave param
-var lambda = 1.0; //wave length
-var _lambda = lambda*(l/dx);
-var Amp = 11; //ampritude
-var phi = 0; //phase of source2
-var vel = 7;
-var space = 20;
-var x1 = space/2; //position of source1
-var x2 = -space/2; //position of source2
+//var lambda = 1.0; //wave length
+//var _lambda = lambda*(l/dx);
+//var Amp = 11; //ampritude
+//var phi = 0; //phase of source2
+var vel = 15;
+//var space = 20;
+//var x1 = space/2; //position of source1
+//var x2 = -space/2; //position of source2
 // var d = 15;
 // var rho = 0.0007;
 
@@ -299,9 +338,16 @@ var u;
 //wave opacity
 var alpha = 0.7;
 
+//click object lists
+var targetLists = new Array();
+
 //init param
 function initWave(){
-	Time = lambda / vel;
+	var amp = 40;
+	var x0 = -20;
+	var y0 = -20;
+	var sigma = 10;
+	//Time = lambda / vel;
 	var nt = 3;
 	u = new Array(nt);
 	for(var n = 0; n < nt; n++){
@@ -313,16 +359,32 @@ function initWave(){
 			}
 		}
 	}
+// 	for(var n = 0; n < nt; n++){
+// 		for(var i=0; i <= N; i++){
+// 			for(var j=0; j<=N; j++){
+// 				var x = (-N/2 + i) * l;
+// 				var y = (-N/2 + j) * l;
+// 				u[n][i][j] = gaussian(x,y,x0,y0,amp,sigma);
+// 			}
+// 		}
+// 	}
 	//past time wave distribution
-	u[0][N/2 + space/2][N/2] = Amp * Math.sin(2 * Math.PI * (-dt)/Time);
-	u[0][N/2 - space/2][N/2] = Amp * Math.sin(2 * Math.PI * (-dt)/Time + phi);
+	//u[0][N/2 + space/2][N/2] = Amp * Math.sin(2 * Math.PI * (-dt)/Time);
+	//u[0][N/2 - space/2][N/2] = Amp * Math.sin(2 * Math.PI * (-dt)/Time + phi);
+}
+
+//gaussian distribution
+function gaussian(x,y,x0,y0,amp,sigma){
+	var f = amp * Math.exp(-(x-x0)*(x-x0)/(2*sigma*sigma)) * Math.exp(-(y-y0)*(y-y0)/(2*sigma*sigma))
+	return f;
 }
 
 //numerical calculation of wave function
 function calculate(){
 	//source
-	u[1][N/2 + space/2][N/2] = Amp * Math.sin(2 * Math.PI * time/Time);
-	u[1][N/2 - space/2][N/2] = Amp * Math.sin(2 * Math.PI * time/Time + phi);
+	//u[1][N/2 + space/2][N/2] = Amp * Math.sin(2 * Math.PI * time/Time);
+	//u[1][N/2 - space/2][N/2] = Amp * Math.sin(2 * Math.PI * time/Time + phi);
+	
 
 	//calculate vartex
 	var gamma2 = Math.pow(vel*dt/dx, 2);
@@ -436,32 +498,11 @@ function initObject(){
 	geometry.computeFaceNormals();
 	//calculate vertex normal vector
 	geometry.computeVertexNormals();
-	
-// 	for(var n=0; n < geometry.faces.length/2; n++){
-// 		for(var i=0; i<N; i++){
-// 			for(var j=0; j<N; j++){
-// 				geometry.faceVertexUvs[0].push([
-// 					new THREE.Vector2(i/N,j+1/N),
-// 					new THREE.Vector2(i+1/N,j+1/N),
-// 					new THREE.Vector2(i+1/N,j/N)
-// 				]);
-// 				geometry.faceVertexUvs[0].push([
-// 					new THREE.Vector2(i/N,j+1/N),
-// 					new THREE.Vector2(i+1/N,j/N),
-// 					new THREE.Vector2(i/N,j/N)
-// 				]);
-// 			}
-// 		}
-// 	}
 
 	//create material
-	var material = new THREE.MeshPhongMaterial({
-		color: 0xBFFFFF, ambient: 0x000050,
-		side: THREE.DoubleSide,
-		specular: 0xFFFFFF, shininess: 190, 
-// 		map: THREE.ImageUtils.loadTexture('0014.jpg'),
-		transparent: true, opacity: alpha
-	});
+	var material = new THREE.MeshPhongMaterial({ color: 0xBFFFFF, ambient: 0x000050,
+			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250,
+			transparent:true, opacity: alpha});
 
 	//create sphere object
 	lattice = new THREE.Mesh(geometry, material);
@@ -469,22 +510,25 @@ function initObject(){
 	//create shadow
 	lattice.castShadow = true;
 
-	//source object
-	geometry = new THREE.SphereGeometry( 2, 20, 20 );
-	material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
+	targetLists[0] = lattice;
 
-	sphere1 = new THREE.Mesh(geometry, material);
-	sphere2 = new THREE.Mesh(geometry, material);
-	scene.add(sphere1);
-	sphere1.castShadow = true;
-	sphere1.position.set(x1, 0, 0);
-	scene.add(sphere2);
-	sphere2.castShadow = true;
-	sphere2.position.set(x2, 0, 0);
+	//source object
+// 	geometry = new THREE.SphereGeometry( 2, 20, 20 );
+// 	material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
+
+// 	sphere1 = new THREE.Mesh(geometry, material);
+	//sphere2 = new THREE.Mesh(geometry, material);
+// 	scene.add(sphere1);
+// 	targetLists[1] = sphere1;
+	//sphere1.castShadow = true;
+	//sphere1.position.set(x1, 0, 0);
+	//scene.add(sphere2);
+	//sphere2.castShadow = true;
+	//sphere2.position.set(x2, 0, 0);
 
 
 	//line object
-	DrawLine();
+	//DrawLine();
 
 	/*  floar drow  */
 	var yuka_n = 10,
@@ -645,17 +689,17 @@ function loop(){
 	trackball.update();
 	if(restartFlag == true){
 		time = 0;
-		Amp = parseFloat(document.getElementById("input_Amp").value);
-		_lambda = parseFloat(document.getElementById("input_lambda").value);
-		space = parseInt(document.getElementById("input_space").value);
+		//Amp = parseFloat(document.getElementById("input_Amp").value);
+		//_lambda = parseFloat(document.getElementById("input_lambda").value);
+		//space = parseInt(document.getElementById("input_space").value);
 		vel = parseInt(document.getElementById("input_vel").value);
-		var phaseList =document.getElementsByName("phase"); 
-		for(var i=0; i< phaseList.length; i++){
-			if(phaseList[i].checked && phaseList[i].value == "s")
-				phi = 0;
-			else if(phaseList[i].checked && phaseList[i].value == "r")
-				phi = Math.PI;
-		}
+		//var phaseList =document.getElementsByName("phase"); 
+		//for(var i=0; i< phaseList.length; i++){
+			//if(phaseList[i].checked && phaseList[i].value == "s")
+				//phi = 0;
+			//else if(phaseList[i].checked && phaseList[i].value == "r")
+				//phi = Math.PI;
+		//}
 		var boundList =document.getElementsByName("bound"); 
 		for(var i=0; i< boundList.length; i++){
 			if(boundList[i].checked && boundList[i].value == "Dir"){
@@ -674,23 +718,23 @@ function loop(){
 				nonreflectiveFlag = true;
 			}
 		}
-		lambda = _lambda*(dx/l);
-		x1 = space / 2;
-		x2 = -space / 2;
+		//lambda = _lambda*(dx/l);
+		//x1 = space / 2;
+		//x2 = -space / 2;
 
 		//recalculate
 		initWave();
 		calculate();
 
-		for(var i=0; i<line1.length; i++){
-			scene.remove(line1[i]);
-		}
-		for(var i=0; i<line2.length; i++){
-			scene.remove(line2[i]);
-		}
-		DrawLine();
+		//for(var i=0; i<line1.length; i++){
+			//scene.remove(line1[i]);
+		//}
+		//for(var i=0; i<line2.length; i++){
+			//scene.remove(line2[i]);
+		//}
+		//DrawLine();
 		restartFlag = false;
-		stopFlag = false;
+		stopFlag = true;
 		step = 0;
 	}
 
@@ -715,8 +759,8 @@ function loop(){
 					n++;
 				}
 			}
-			sphere1.position.set(x1, 0, u[1][N/2 + space/2][N/2]);
-			sphere2.position.set(x2, 0, u[1][N/2 - space/2][N/2]);
+			//sphere1.position.set(x1, 0, u[1][N/2 + space/2][N/2]);
+			//sphere2.position.set(x2, 0, u[1][N/2 - space/2][N/2]);
 			lattice.geometry.verticesNeedUpdate = true;
 			lattice.geometry.normalsNeedUpdate = true;
 			lattice.geometry.computeFaceNormals();
@@ -726,32 +770,47 @@ function loop(){
 		}
 	}
 	else{
-		lattice.geometry.verticesNeedUpdate = false;
-		lattice.geometry.normalsNeedUpdate = false;
+		var n = 0;
+		for(var j=0; j<=N; j++){
+			for(var i=0; i<=N; i++){
+				var x = (-N/2 + i) * l;
+				var y = (-N/2 + j) * l;
+				var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+				lattice.geometry.vertices[n] = vertex;
+				n++;
+			}
+		}
+		lattice.geometry.verticesNeedUpdate = true;
+		lattice.geometry.normalsNeedUpdate = true;
+		lattice.geometry.computeFaceNormals();
+		lattice.geometry.computeVertexNormals();
+		lattice.material.opacity = alpha;
+		// 		lattice.geometry.verticesNeedUpdate = false;
+		// 		lattice.geometry.normalsNeedUpdate = false;
 	}
 
-	if(line1Flag == false){
-		for(var i=0; i<line1.length; i++){
-			scene.remove(line1[i]);
-		}
-	}
-	else{
-		for(var i=0; i<line1.length; i++){
-			scene.add(line1[i]);
-		}
-	}
+	//if(line1Flag == false){
+	//for(var i=0; i<line1.length; i++){
+	//scene.remove(line1[i]);
+	//}
+	//}
+	//else{
+	//for(var i=0; i<line1.length; i++){
+	//scene.add(line1[i]);
+	//}
+	//}
 
 
-	if(line2Flag == false){
-		for(var i=0; i<line2.length; i++){
-			scene.remove(line2[i]);
-		}
-	}
-	else{
-		for(var i=0; i<line2.length; i++){
-			scene.add(line2[i]);
-		}
-	}
+	//if(line2Flag == false){
+	//for(var i=0; i<line2.length; i++){
+	//scene.remove(line2[i]);
+	//}
+	//}
+	//else{
+	//for(var i=0; i<line2.length; i++){
+	//scene.add(line2[i]);
+	//}
+	//}
 	//init clear color
 	renderer.clear();
 
