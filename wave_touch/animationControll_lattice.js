@@ -132,16 +132,16 @@ function initEvent(){
 function mouseEvent(){
 	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
 	function onDocumentMouseDown( event ){
-// 		var rect = event.target.getBoundingClientRect();
-// 		var mx = event.clientX - rect.left;
-// 		var my = event.clientY - rect.top;
+		var rect = event.target.getBoundingClientRect();
+		var mx = event.clientX - rect.left;
+		var my = event.clientY - rect.top;
 
-// 		mx = (mx / window.innerWidth) * 2 - 1;
-// 		my = (my / window.innerHeight) * 2 + 1;
+		mx = (mx / renderer.domElement.width) * 2 - 1;
+		my = -(my /renderer.domElement.height) * 2 + 1;
 
-		var mx = (event.clientX / canvasFrame.clientWidth) * 2 - 1;
-		var my = -(event.clientY / canvasFrame.clientHeight) * 2 + 1;
-		var pos = new THREE.Vector3(mx, my, 0.5);
+// 		var mx = (event.clientX / canvasFrame.clientWidth) * 2 - 1;
+// 		var my = -(event.clientY / canvasFrame.clientHeight) * 2 + 1;
+		var pos = new THREE.Vector3(mx, my, 1);
 
 		pos.unproject(camera);
 		
