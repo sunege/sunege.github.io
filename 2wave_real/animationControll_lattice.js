@@ -436,11 +436,32 @@ function initObject(){
 	geometry.computeFaceNormals();
 	//calculate vertex normal vector
 	geometry.computeVertexNormals();
+	
+// 	for(var n=0; n < geometry.faces.length/2; n++){
+// 		for(var i=0; i<N; i++){
+// 			for(var j=0; j<N; j++){
+// 				geometry.faceVertexUvs[0].push([
+// 					new THREE.Vector2(i/N,j+1/N),
+// 					new THREE.Vector2(i+1/N,j+1/N),
+// 					new THREE.Vector2(i+1/N,j/N)
+// 				]);
+// 				geometry.faceVertexUvs[0].push([
+// 					new THREE.Vector2(i/N,j+1/N),
+// 					new THREE.Vector2(i+1/N,j/N),
+// 					new THREE.Vector2(i/N,j/N)
+// 				]);
+// 			}
+// 		}
+// 	}
 
 	//create material
-	var material = new THREE.MeshPhongMaterial({ color: 0xBFFFFF, ambient: 0x000050,
-			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250,
-			transparent:true, opacity: alpha});
+	var material = new THREE.MeshPhongMaterial({
+		color: 0xBFFFFF, ambient: 0x000050,
+		side: THREE.DoubleSide,
+		specular: 0xFFFFFF, shininess: 190, 
+// 		map: THREE.ImageUtils.loadTexture('0014.jpg'),
+		transparent: true, opacity: alpha
+	});
 
 	//create sphere object
 	lattice = new THREE.Mesh(geometry, material);
