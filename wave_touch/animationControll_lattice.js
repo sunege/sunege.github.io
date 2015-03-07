@@ -88,6 +88,7 @@ function initEvent(){
 			value: amp,
 			slide: function(event, ui){
 				var value = ui.value;
+				amp = value;
 				document.getElementById("input_amp").value = value;
 			}
 	});
@@ -100,6 +101,7 @@ function initEvent(){
 			value: sigma,
 			slide: function(event, ui){
 				var value = ui.value;
+				sigma = value;
 				document.getElementById("input_sigma").value = value;
 			}
 	});
