@@ -82,8 +82,8 @@ function initEvent(){
 	document.getElementById("input_alpha").value = alpha;
 
 	$('#slider_amp').slider({
-			min: 0,
-			max: 20,
+			min: 1,
+			max: 100,
 			step: 1,
 			value: amp,
 			slide: function(event, ui){
@@ -95,8 +95,8 @@ function initEvent(){
 	document.getElementById("input_amp").value = amp;
 
 	$('#slider_sigma').slider({
-			min: 0,
-			max: 20,
+			min: 1,
+			max: 40,
 			step: 1,
 			value: sigma,
 			slide: function(event, ui){
