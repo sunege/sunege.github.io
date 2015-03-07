@@ -80,17 +80,30 @@ function initEvent(){
 			}
 	});
 	document.getElementById("input_alpha").value = alpha;
-	//$('#slider_Amp').slider({
-			//min: 0,
-			//max: 20,
-			//step: 1,
-			//value: Amp,
-			//slide: function(event, ui){
-				//var value = ui.value;
-				//document.getElementById("input_Amp").value = value;
-			//}
-	//});
-	//document.getElementById("input_Amp").value = Amp;
+
+	$('#slider_amp').slider({
+			min: 0,
+			max: 20,
+			step: 1,
+			value: amp,
+			slide: function(event, ui){
+				var value = ui.value;
+				document.getElementById("input_amp").value = value;
+			}
+	});
+	document.getElementById("input_amp").value = amp;
+
+	$('#slider_sigma').slider({
+			min: 0,
+			max: 20,
+			step: 1,
+			value: sigma,
+			slide: function(event, ui){
+				var value = ui.value;
+				document.getElementById("input_sigma").value = value;
+			}
+	});
+	document.getElementById("input_sigma").value = sigma;
 
 	//$('#slider_lambda').slider({
 			//min: 1,
@@ -150,8 +163,6 @@ function mouseEvent(){
 		var objs = ray.intersectObjects(targetLists);
 
 		if(objs.length > 0){
-			var amp = 3;
-			var sigma = 2;
 			for(var n = 0; n < 3; n++){
 				for(var i=0; i <= N; i++){
 					for(var j=0; j<=N; j++){
@@ -323,6 +334,8 @@ var skip = 3;
 //var Amp = 11; //ampritude
 //var phi = 0; //phase of source2
 var vel = 15;
+var amp = 4;
+var sigma = 3;
 //var space = 20;
 //var x1 = space/2; //position of source1
 //var x2 = -space/2; //position of source2
@@ -343,10 +356,8 @@ var targetLists = new Array();
 
 //init param
 function initWave(){
-	var amp = 40;
 	var x0 = -20;
 	var y0 = -20;
-	var sigma = 10;
 	//Time = lambda / vel;
 	var nt = 3;
 	u = new Array(nt);
