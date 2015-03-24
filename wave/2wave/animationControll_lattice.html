@@ -5,7 +5,52 @@
 <title>Common Interface</title>
 
 <style>
-div#canvas-frame{ width:800px; height:700px; }
+h2{
+    font-size: 18px !important;
+    margin: 5px 0px !important; 
+    padding: 5px 15px !important;
+    border-left: 7px solid #00a8ff !important;
+    background-color: #fdffff !important; 
+}
+h3{
+	position:relative;
+	padding-left:30px;
+	font-weight: bold;
+	font-size: 14px;
+	line-height: 38px;
+}
+h3:before{
+	content:''; 
+	border-radius:30px;
+	-webkit-border-radius:30px;
+	-moz-border-radius:30px; 
+	height:12px; 
+	width:12px; 
+	display:block; 
+	position:absolute; 
+	top:13px; 
+	left:5px; 
+	background-color:#00A8FF;
+	box-shadow: 0 0 2px 2px rgba(255,255,255,0.2) inset
+}
+div#canvas-frame{
+	margin: 10px;
+	width:700px;
+	height:600px;
+	float: left;
+}
+div#controller{
+	margin: 10px;
+	float: left;
+}
+.number{
+	margin: 5px;
+	width: 30px;
+	float: right;
+}
+.output{
+	clear: both;
+}
 </style>
 <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
@@ -35,38 +80,36 @@ div#canvas-frame{ width:800px; height:700px; }
 <script type="text/javascript" src="animationControll_lattice.js"></script>
 </head>
 <body>
-<!-- frame -->
-<div id="canvas-frame"></div>
-<input type="button" value="" id="startButton"/>
-<a href="" id="png" target="_blank">Output PNG</a>
-<input type="button" value="" id="restartButton"/>
-Line1<input type="CHECKBOX" id="checkbox_line1" />
-Line2<input type="CHECKBOX" id="checkbox_line2" />
-<table>
-	<!-- input A -->
-	<tr>
-		<td>Ampritude</td>
-		<td><div id="slider_Amp" class="slider" style="width:320px;"></td>
-			<td><input type="text" value="" id="input_Amp" class="number" ></td>
-		</tr>
+	<!-- frame -->
+	<div id="canvas-frame"></div>
+	<!-- controller -->
+	<div id="controller">
+		<h2>Controller</h2>
+		<input type="button" value="" id="startButton"/>
+		<input type="button" value="" id="restartButton"/>
+		Line1<input type="CHECKBOX" id="checkbox_line1" />
+		Line2<input type="CHECKBOX" id="checkbox_line2" />
+		<!-- input A -->
+		<h3>Ampritude</h3>
+		<div id="slider_Amp" class="slider" ></div>
+		<input type="text" value="" id="input_Amp" class="number" >
 		<!-- input lambda -->
-		<tr>
-			<td>Wave Length</td>
-			<td><center><div id="slider_lambda" class="slider" style="width:320px"></center></td>
-				<td><input type="text" value="" id="input_lambda" class="number" ></td>
-			</tr>
-			<!-- space -->
-			<tr>
-				<td>Space</td>
-				<td><center><div id="slider_space" class="slider" style="width:320px"></center></td>
-					<td><input type="text" value="" id="input_space" class="number" ></td>
-				</tr>
-				<!-- phase -->
-				<tr>
-					<td>Phase</td>
-					<td>Same<input type="radio" name="phase" value="s" checked="checked"/></td>
-					<td>Reverse<input type="radio" name="phase" value="r" /></td>
-				</tr>
-			</table>
-			</body>
-			</html>
+		<h3>Wave Length</h3>
+		<div id="slider_lambda" class="slider"></div>
+		<input type="text" value="" id="input_lambda" class="number" ></input>
+		<!-- space -->
+		<h3>Space</h3>
+		<div id="slider_space" class="slider" ></div>
+		<input type="text" value="" id="input_space" class="number" ></input>
+		<!-- phase -->
+		<h3>Phase</h3>
+		<div class="check" style="margin:0px 20px;">
+			Same<input type="radio" name="phase" value="s" checked="checked"/>
+			Reverse<input type="radio" name="phase" value="r" />
+		</div>
+		<div id="output" style="margin: 40px 0px 0px 0px;float: right;">
+			<a href="" id="png" target="_blank" >Output PNG</a>
+		</div>
+	</div>
+</body>
+</html>

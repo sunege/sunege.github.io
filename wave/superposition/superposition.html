@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Common Interface</title>
+
+<style>
+h2{
+    font-size: 18px !important;
+    margin: 5px 0px !important; 
+    padding: 5px 15px !important;
+    border-left: 7px solid #00a8ff !important;
+    background-color: #fdffff !important; 
+}
+h3{
+	position:relative;
+	padding-left:30px;
+	font-weight: bold;
+	font-size: 14px;
+	line-height: 38px;
+}
+h3:before{
+	content:''; 
+	border-radius:30px;
+	-webkit-border-radius:30px;
+	-moz-border-radius:30px; 
+	height:12px; 
+	width:12px; 
+	display:block; 
+	position:absolute; 
+	top:13px; 
+	left:5px; 
+	background-color:#00A8FF;
+	box-shadow: 0 0 2px 2px rgba(255,255,255,0.2) inset
+}
+div#canvas-frame{
+	margin: 10px;
+	width:700px;
+	height:600px;
+	float: left;
+}
+div#controller{
+	margin: 10px;
+	float: left;
+}
+div#controller div#button{
+	margin: 5px;
+}
+div#controller div#wave1{
+	margin: 10px;
+	float:left;
+}
+div#controller div#wave2{
+	margin: 10px;
+	float:left;
+}
+div#controller div#wave3{
+	margin: 10px;
+	clear: both;
+}
+input.number{
+	margin: 5px;
+	width: 30px;
+	float: right;
+}
+div#controller div.slider{
+	margin: -10px 0px 0px 0px;
+	width: 250px;
+}
+.output{
+	clear: both;
+}
+</style>
+<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
+
+<!-- Javascript -->
+
+<!-- jQuery -->
+<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+
+<!-- jqPlot -->
+<script type="text/javascript" src="../../js/jqPlot/jquery.jqplot.js"></script>
+<script type="text/javascript" src="../../js/jqPlot/plugins/jqplot.canvasTextRenderer.js"></script>
+<script type="text/javascript" src="../../js/jqPlot/plugins/jqplot.canvasAxisTickRenderer.js"></script>
+<script type="text/javascript" src="../../js/jqPlot/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+<script type="text/javascript" src="../../js/jqPlot/plugins/jqplot.logAxisRenderer.js"></script>
+<script type="text/javascript" src="../../js/jqPlot/plugins/jqplot.highlighter.js"></script>
+<script type="text/javascript" src="../../js/jqPlot/plugins/jqplot.cursor.js"></script>
+<script type="text/javascript" src="../../js/plot2D.js"></script>
+
+<!-- Three -->
+<script type="text/javascript" src="../../js/Three/build/three.js"></script>
+<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+
+<!-- Main script -->
+<script type="text/javascript" src="superposition.js"></script>
+</head>
+<body>
+	<!-- frame -->
+	<div id="canvas-frame"></div>
+	<!-- controller -->
+	<div id="controller">
+		<div id="button">
+			<h2>Controller</h2>
+			<input type="button" value="" id="startButton"/>
+			<input type="button" value="" id="resetButton"/>
+		</div>
+
+		<div id="wave1">
+			<!-- wave1 -->
+			<h2>Wave1</h2>
+			表示<input type="CHECKBOX" checked="checked" id="checkbox_wave1" />
+			<!-- input A -->
+			<h3>Ampritude</h3>
+			<div id="slider_amp1" class="slider" ></div>
+			<input type="text" value="" id="input_amp1" class="number" >
+			<!-- input f -->
+			<h3>Frequency</h3>
+			<div id="slider_freq1" class="slider"></div>
+			<input type="text" value="" id="input_freq1" class="number" ></input>
+			<!-- input vel -->
+			<h3>Velocity</h3>
+			<div id="slider_vel1" class="slider"></div>
+			<input type="text" value="" id="input_vel1" class="number" ></input>
+		</div>
+
+		<div id="wave2">
+			<!-- wave2 -->
+			<h2>Wave2</h2>
+			表示<input type="CHECKBOX" id="checkbox_wave2" />
+			<!-- input A -->
+			<h3>Ampritude</h3>
+			<div id="slider_amp2" class="slider" ></div>
+			<input type="text" value="" id="input_amp2" class="number" >
+			<!-- input f -->
+			<h3>Frequency</h3>
+			<div id="slider_freq2" class="slider"></div>
+			<input type="text" value="" id="input_freq2" class="number" ></input>
+			<!-- input vel -->
+			<h3>Velocity</h3>
+			<div id="slider_vel2" class="slider"></div>
+			<input type="text" value="" id="input_vel2" class="number" ></input>
+		</div>
+
+		<div id="wave3">
+			<!-- wave3 -->
+			<h2>Superposition</h2>
+			表示<input type="CHECKBOX" id="checkbox_wave3" />
+		</div>
+
+		<div id="output" style="margin: 40px 0px 0px 0px;float: right;">
+			<a href="" id="png" target="_blank" >Output PNG</a>
+		</div>
+	</div>
+</body>
+</html>
