@@ -43,10 +43,29 @@ div#controller{
 	margin: 10px;
 	float: left;
 }
-.number{
+div#controller div#button{
+	margin: 5px;
+}
+div#controller div#wave1{
+	margin: 10px;
+	float:left;
+}
+div#controller div#wave2{
+	margin: 10px;
+	float:left;
+}
+div#controller div#wave3{
+	margin: 10px;
+	clear: both;
+}
+input.number{
 	margin: 5px;
 	width: 30px;
 	float: right;
+}
+div#controller div.slider{
+	margin: -10px 0px 0px 0px;
+	width: 250px;
 }
 .output{
 	clear: both;
@@ -77,36 +96,61 @@ div#controller{
 <script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
 
 <!-- Main script -->
-<script type="text/javascript" src="animationControll_lattice.js"></script>
+<script type="text/javascript" src="superposition.js"></script>
 </head>
 <body>
 	<!-- frame -->
 	<div id="canvas-frame"></div>
 	<!-- controller -->
 	<div id="controller">
-		<h2>Controller</h2>
-		<input type="button" value="" id="startButton"/>
-		<input type="button" value="" id="restartButton"/>
-		Line1<input type="CHECKBOX" id="checkbox_line1" />
-		Line2<input type="CHECKBOX" id="checkbox_line2" />
-		<!-- input A -->
-		<h3>Ampritude</h3>
-		<div id="slider_Amp" class="slider" ></div>
-		<input type="text" value="" id="input_Amp" class="number" >
-		<!-- input lambda -->
-		<h3>Wave Length</h3>
-		<div id="slider_lambda" class="slider"></div>
-		<input type="text" value="" id="input_lambda" class="number" ></input>
-		<!-- space -->
-		<h3>Space</h3>
-		<div id="slider_space" class="slider" ></div>
-		<input type="text" value="" id="input_space" class="number" ></input>
-		<!-- phase -->
-		<h3>Phase</h3>
-		<div class="check" style="margin:0px 20px;">
-			Same<input type="radio" name="phase" value="s" checked="checked"/>
-			Reverse<input type="radio" name="phase" value="r" />
+		<div id="button">
+			<h2>Controller</h2>
+			<input type="button" value="" id="startButton"/>
+			<input type="button" value="" id="resetButton"/>
 		</div>
+
+		<div id="wave1">
+			<!-- wave1 -->
+			<h2>Wave1</h2>
+			表示<input type="CHECKBOX" checked="checked" id="checkbox_wave1" />
+			<!-- input A -->
+			<h3>Ampritude</h3>
+			<div id="slider_amp1" class="slider" ></div>
+			<input type="text" value="" id="input_amp1" class="number" >
+			<!-- input f -->
+			<h3>Frequency</h3>
+			<div id="slider_freq1" class="slider"></div>
+			<input type="text" value="" id="input_freq1" class="number" ></input>
+			<!-- input vel -->
+			<h3>Velocity</h3>
+			<div id="slider_vel1" class="slider"></div>
+			<input type="text" value="" id="input_vel1" class="number" ></input>
+		</div>
+
+		<div id="wave2">
+			<!-- wave2 -->
+			<h2>Wave2</h2>
+			表示<input type="CHECKBOX" id="checkbox_wave2" />
+			<!-- input A -->
+			<h3>Ampritude</h3>
+			<div id="slider_amp2" class="slider" ></div>
+			<input type="text" value="" id="input_amp2" class="number" >
+			<!-- input f -->
+			<h3>Frequency</h3>
+			<div id="slider_freq2" class="slider"></div>
+			<input type="text" value="" id="input_freq2" class="number" ></input>
+			<!-- input vel -->
+			<h3>Velocity</h3>
+			<div id="slider_vel2" class="slider"></div>
+			<input type="text" value="" id="input_vel2" class="number" ></input>
+		</div>
+
+		<div id="wave3">
+			<!-- wave3 -->
+			<h2>Superposition</h2>
+			表示<input type="CHECKBOX" id="checkbox_wave3" />
+		</div>
+
 		<div id="output" style="margin: 40px 0px 0px 0px;float: right;">
 			<a href="" id="png" target="_blank" >Output PNG</a>
 		</div>
