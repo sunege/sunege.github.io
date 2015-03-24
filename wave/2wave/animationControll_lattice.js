@@ -232,8 +232,8 @@ var dt = Time / Step;
 var time = 0;
 
 //wave param
-var lambda = 6; //wave length
-var Amp = 2; //ampritude
+var lambda = 10; //wave length
+var Amp = 1.5; //ampritude
 var phi = 0; //phase of source2
 var space = 20;
 var x1 = space/2; //position of source1
