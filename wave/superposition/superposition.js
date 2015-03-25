@@ -64,6 +64,26 @@ function initEvent(){
 	});
 
 	//slider interface
+	$('#slider_direction1').slider({
+			min: -1,
+			max: 1,
+			step: 2,
+			value: direction1,
+			slide: function(event, ui){
+				var value = ui.value;
+				direction1 = value;
+			}
+	});
+	$('#slider_direction2').slider({
+			min: -1,
+			max: 1,
+			step: 2,
+			value: direction2,
+			slide: function(event, ui){
+				var value = ui.value;
+				direction2 = value;
+			}
+	});
 	$('#slider_amp1').slider({
 			min: 0,
 			max: 5,
@@ -77,31 +97,31 @@ function initEvent(){
 	});
 	document.getElementById("input_amp1").value = amp1;
 
-	$('#slider_freq1').slider({
+	$('#slider_lambda1').slider({
 			min: 0.01,
 			max: 20,
 			step: 0.01,
-			value: freq1,
+			value: lambda1,
 			slide: function(event, ui){
 				var value = ui.value;
-				freq1 = value;
-				document.getElementById("input_freq1").value = value;
+				lambda1 = value;
+				document.getElementById("input_lambda1").value = value;
 			}
 	});
-	document.getElementById("input_freq1").value = freq1;
+	document.getElementById("input_lambda1").value = lambda1;
 
-	$('#slider_vel1').slider({
+	$('#slider_vel').slider({
 			min: 0,
 			max: 10,
 			step: 0.1,
-			value: vel1,
+			value: vel,
 			slide: function(event, ui){
 				var value = ui.value;
-				vel1 = value;
-				document.getElementById("input_vel1").value = value;
+				vel = value;
+				document.getElementById("input_vel").value = value;
 			}
 	});
-	document.getElementById("input_vel1").value = vel1;
+	document.getElementById("input_vel").value = vel;
 
 	$('#slider_amp2').slider({
 			min: 0,
@@ -116,31 +136,19 @@ function initEvent(){
 	});
 	document.getElementById("input_amp2").value = amp2;
 
-	$('#slider_freq2').slider({
+	$('#slider_lambda2').slider({
 			min: 0.01,
 			max: 20,
 			step: 0.01,
-			value: freq2,
+			value: lambda2,
 			slide: function(event, ui){
 				var value = ui.value;
-				freq2 = value;
-				document.getElementById("input_freq2").value = value;
+				lambda2 = value;
+				document.getElementById("input_lambda2").value = value;
 			}
 	});
-	document.getElementById("input_freq2").value = freq2;
+	document.getElementById("input_lambda2").value = lambda2;
 
-	$('#slider_vel2').slider({
-			min: 0,
-			max: 10,
-			step: 0.1,
-			value: vel2,
-			slide: function(event, ui){
-				var value = ui.value;
-				vel2 = value;
-				document.getElementById("input_vel2").value = value;
-			}
-	});
-	document.getElementById("input_vel2").value = vel1;
 };
 ////////////////////////////////////////
 // define threeStart()
@@ -272,27 +280,26 @@ var u2 = new Array(N+1);
 var u3 = new Array(N+1);
 
 //length param
-var l = 15;
+var l = 10;
 var dx = l/N;
 
 //time param
-var Step = 100;
+var Step = 300;
 var Time = 1;
 var dt = Time / Step;
 var time = 0;
 
 //wave param
+var vel = 3;
 //wave1
-var freq1 = 5; //wave length
+var lambda1 = 2; //wave length
 var amp1 = 1; //ampritude
-var vel1 = 3; //velocity
-var direction1 = -1; //wave direction right:-1
+var direction1 = 1; //wave direction right:1
 
 //wave2
-var freq2 = 5; //wave length
+var lambda2 = 2; //wave length
 var amp2 = 1; //ampritude
-var vel2 = 3; //velocity
-var direction2 = 1; //wave direction left:1
+var direction2 = -1; //wave direction left:-1
 
 
 function initObject(){
@@ -307,14 +314,14 @@ function calculate(){
 	var geometry3 = new THREE.Geometry(); //geometry object
 	var n=0;
 	for(var i=0; i<=N; i++){
-		var omega1 = 2*Math.PI*freq1;
-		var omega2 = 2*Math.PI*freq2;
-		var k1 = 2*Math.PI*freq1/vel1;
-		var k2 = 2*Math.PI*freq2/vel2;
+		var omega1 = 2*Math.PI*vel/lambda1;
+		var omega2 = 2*Math.PI*vel/lambda2;
+		var k1 = 2*Math.PI/lambda1;
+		var k2 = 2*Math.PI/lambda2;
 
 		var x = i*dx;
-		u1[i] = amp1 * Math.sin(omega1*time + direction1*k1*x);
-		u2[i] = amp2 * Math.sin(omega2*time + direction2*k2*x);
+		u1[i] = amp1 * Math.sin(omega1*time - direction1*k1*x);
+		u2[i] = amp2 * Math.sin(omega2*time - direction2*k2*x);
 		u3[i] = u1[i] + u2[i];
 		var vertex1 = new THREE.Vector3(x, u1[i], 0);
 		var vertex2 = new THREE.Vector3(x, u2[i], 0);
@@ -349,15 +356,13 @@ function loop(){
 		time = 0;
 		png_count = 0;
 		//wave1
-		var freq1 = 5; //wave length
+		var lambda1 = 5; //wave length
 		var amp1 = 1; //ampritude
-		var vel1 = 3; //velocity
 		var direction1 = -1; //wave direction right:-1
 
 		//wave2
-		var freq2 = 5; //wave length
+		var lambda2 = 5; //wave length
 		var amp2 = 1; //ampritude
-		var vel2 = 3; //velocity
 		var direction2 = 1; //wave direction left:1
 
 		document.getElementById("input_amp1").value = amp1;

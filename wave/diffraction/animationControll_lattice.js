@@ -260,6 +260,9 @@ var N = 80;
 var sphere1;
 var sphere2;
 
+var box1;
+var box2;
+
 var line0;
 var line1;
 var line2;
@@ -281,10 +284,10 @@ var skip = 3;
 //wave param
 var lambda = 1.0; //wave length
 var _lambda = lambda*(l/dx);
-var Amp = 11; //ampritude
+var Amp = 2; //ampritude
 var phi = 0; //phase of source2
 var vel = 7;
-var space = 20;
+var space = 10;
 var box_width = 10;
 var x1 = space/2; //position of source1
 var x2 = -space/2; //position of source2
@@ -486,6 +489,18 @@ function initObject(){
 	sphere2.castShadow = true;
 	sphere2.position.set(x2, 0, 0);
 
+	//box object
+	var box_length = (l*N-space)/2;
+	geometry = new THREE.BoxGeometry(box_width,box_length, 30);
+	material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+
+	box1 = new THREE.Mesh(geometry, material);
+	box2 = new THREE.Mesh(geometry, material);
+	box1.position.set(0, (box_length+space)/2, -5);
+	box2.position.set(0, -(box_length+space)/2, -5);
+	scene.add(box1);
+	scene.add(box2);
+	
 
 	//line object
 // 	DrawLine();
@@ -512,138 +527,13 @@ function initObject(){
 	}
 }
 
-///////////////////
-// DrawLine
-///////////////////
-function DrawLine(){
-	var z_line = 1; //line position z
-	var m1 = 0;
-	var flag1 = false;
-	for(var i=0; m1*lambda/2 <= (dx/l)*space/2; i+=dx){
-		m1++;
-		if(m1*lambda/2 == (dx/l)*space/2)
-			flag1 = true;
-
-	}
-	line1 = new Array(2*m1-1)
-	var num = 0;
-
-	var line1Material = new THREE.LineBasicMaterial({ color: 0xFF0000, linewidth: 4 });
-	for(var n=0; n<m1; n++){
-		var line1Geometry = new THREE.Geometry();
-		var a2 = Math.pow(n*(l/dx)*lambda/2, 2);
-		var c2 = Math.pow(space/2, 2);
-
-		if(flag1 == true  && n == m1-1){
-			var vertex = new THREE.Vector3(space/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(N/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
-			line1[num] = new THREE.Line(line1Geometry, line1Material);
-			scene.add(line1[num]);
-			num++;
-			var line1Geometry = new THREE.Geometry();
-			var vertex = new THREE.Vector3(-space/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(-N/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
-			line1[num] = new THREE.Line(line1Geometry, line1Material);
-			scene.add(line1[num]);
-			num++;
-		}
-		for(var j=0; j<=N; j++){
-			var y = (-N/2 + j) * l;
-			if(n==0){
-				var x = 0;
-			}
-			else{
-				var x = Math.sqrt(a2*(1+y*y/(c2-a2)));
-			}
-			var vertex = new THREE.Vector3(x, y, z_line);
-			line1Geometry.vertices.push(vertex);
-		}
-		line1[num] = new THREE.Line(line1Geometry, line1Material);
-		scene.add(line1[num]);
-		num++;
-		if(n != 0){
-			var line1Geometry = new THREE.Geometry();
-			for(var j=0; j<=N; j++){
-				var y = (-N/2 + j) * l;
-				if(n==0){
-					var x = 0;
-				}
-				else{
-					var x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
-				}
-				var vertex = new THREE.Vector3(x, y, z_line);
-				line1Geometry.vertices.push(vertex);
-			}
-			line1[num] = new THREE.Line(line1Geometry, line1Material);
-			scene.add(line1[num]);
-			num++;
-		}
-	}
-
-	var m2 = 0;
-	var flag2 = false;
-	for(var i=0; (m2+1/2)*lambda/2 <= (dx/l)*space/2; i+=dx){
-		m2++;
-		if((m2+1/2)*lambda/2 == (dx/l)*space/2)
-			flag2 = true;
-	}
-	line2 = new Array(2*m2);
-	num = 0;
-
-	var line2Material = new THREE.LineBasicMaterial({ color: 0x0000FF, linewidth:4 });
-	for(var n=0; n<m2; n++){
-		var line2Geometry = new THREE.Geometry();
-		var a2 = Math.pow((n+1/2)*(l/dx)*lambda/2, 2);
-		var c2 = Math.pow(space/2, 2);
-
-		if(flag2 == true  && n == m2-1){
-			var vertex = new THREE.Vector3(space/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(N/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
-			line2[num] = new THREE.Line(line2Geometry, line2Material);
-			scene.add(line2[num]);
-			num++;
-			var line2Geometry = new THREE.Geometry();
-			var vertex = new THREE.Vector3(-space/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(-N/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
-			line2[num] = new THREE.Line(line2Geometry, line2Material);
-			scene.add(line2[num]);
-			num++;
-		}
-		for(var j=0; j<=N; j++){
-			var y = (-N/2 + j) * l;
-			var x = Math.sqrt(a2*(1+y*y/(c2-a2)));
-			var vertex = new THREE.Vector3(x, y, z_line);
-			line2Geometry.vertices.push(vertex);
-		}
-		line2[num] = new THREE.Line(line2Geometry, line2Material);
-		scene.add(line2[num]);
-		num++;
-		var line2Geometry = new THREE.Geometry();
-		for(var j=0; j<=N; j++){
-			var y = (-N/2 + j) * l;
-			var x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
-			var vertex = new THREE.Vector3(x, y, z_line);
-			line2Geometry.vertices.push(vertex);
-		}
-		line2[num] = new THREE.Line(line2Geometry, line2Material);
-		scene.add(line2[num]);
-		num++;
-	}
-}
 
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
 var step = 0;
 var slow = 0;
+var png_count = 0;
 function loop(){
 	//update trackball object
 	trackball.update();
@@ -682,17 +572,23 @@ function loop(){
 		x1 = space / 2;
 		x2 = -space / 2;
 
+		scene.remove(box1);
+		scene.remove(box2);
+		var box_length = (l*N-space)/2;
+		geometry = new THREE.BoxGeometry(box_width,box_length, 30);
+		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+
+		box1 = new THREE.Mesh(geometry, material);
+		box2 = new THREE.Mesh(geometry, material);
+		box1.position.set(0, (box_length+space)/2, -5);
+		box2.position.set(0, -(box_length+space)/2, -5);
+		scene.add(box1);
+		scene.add(box2);
+
 		//recalculate
 		initWave();
 		calculate();
 
-// 		for(var i=0; i<line1.length; i++){
-// 			scene.remove(line1[i]);
-// 		}
-// 		for(var i=0; i<line2.length; i++){
-// 			scene.remove(line2[i]);
-// 		}
-// 		DrawLine();
 		restartFlag = false;
 		stopFlag = false;
 		step = 0;
@@ -734,38 +630,21 @@ function loop(){
 		lattice.geometry.normalsNeedUpdate = false;
 	}
 
-// 	if(line1Flag == false){
-// 		for(var i=0; i<line1.length; i++){
-// 			scene.remove(line1[i]);
-// 		}
-// 	}
-// 	else{
-// 		for(var i=0; i<line1.length; i++){
-// 			scene.add(line1[i]);
-// 		}
-// 	}
-
-
-// 	if(line2Flag == false){
-// 		for(var i=0; i<line2.length; i++){
-// 			scene.remove(line2[i]);
-// 		}
-// 	}
-// 	else{
-// 		for(var i=0; i<line2.length; i++){
-// 			scene.add(line2[i]);
-// 		}
-// 	}
 	//init clear color
 	renderer.clear();
 
 	//rendering
 	renderer.render(scene, camera);
 
+	
 	if(stopFlag){
-		document.getElementById("startButton").value = "start";
-		pngData = renderer.domElement.toDataURL("image/png");
-		pngName = "png_"+step%Step+".png";
+		png_count++
+		if(png_count > 30){
+			document.getElementById("startButton").value = "start";
+			pngData = renderer.domElement.toDataURL("image/png");
+			pngName = "png_"+step%Step+".png";
+			png_count = 0;
+		}
 	}
 	else{
 		document.getElementById("startButton").value = "stop";
