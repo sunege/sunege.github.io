@@ -14,7 +14,11 @@ var step = 0; //step count
 var skip = 500;
 
 //oscillation
-var A = 0.2;
+var A = 0;
+
+//Field parameter
+var gamma = 0.5; // air resistance param
+var gravity = 0; // gravitational accelaration
 
 
 //Particle parameter
@@ -30,7 +34,7 @@ var nl = 0.7;
 
 var spring = { k: 1000, l: nl*dl };
 
-var freq = 0;
+var freq = 1;
 var m=8; // mode
 //particle class
 var Particle = function(parameter){
@@ -54,7 +58,7 @@ var Particle = function(parameter){
 	this.fz; 
 	//kinetic energy
 	this.kinetic = 0;
-	freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
+	//freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
 };
 
 Particle.prototype = {
@@ -122,21 +126,20 @@ Calculation.prototype = {
 ////////			p[i].fz = force01.z+force10.z;
 ////////		}
 			//gravity and resistance
-			var gamma = 0.01;
 			if( i == 0 ){
 				p[i].fx = force01.x-gamma*p[i].vx;
 				p[i].fy = force01.y-gamma*p[i].vy;
-				p[i].fz = force01.z-9.8*p[i].mass-gamma*p[i].vz;
+				p[i].fz = force01.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
 			else if( i == N-1 ){
 				p[i].fx = force10.x-gamma*p[i].vx;
 				p[i].fy = force10.y-gamma*p[i].vy;
-				p[i].fz = force10.z-9.8*p[i].mass-gamma*p[i].vz;
+				p[i].fz = force10.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
 			else{
 				p[i].fx = force01.x+force10.x-gamma*p[i].vx;
 				p[i].fy = force01.y+force10.y-gamma*p[i].vy;
-				p[i].fz = force01.z+force10.z-9.8*p[i].mass-gamma*p[i].vz;
+				p[i].fz = force01.z+force10.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
 		}
 	},
@@ -304,7 +307,7 @@ var plot2D_energy; // energy plot object
 
 //stop flag
 var restartFlag = false; // restert flag
-var stopFlag = false; // stop flag
+var stopFlag = true; // stop flag
 
 
 ////////////////////////////////////////
@@ -323,40 +326,6 @@ window.addEventListener("load", function(){
 // define initEvent()
 ////////////////////////////////////////
 function initEvent(){
-	//tab interface
-	$('#tabs').tabs({ heightStyle: 'content'});
-
-	//click tab1
-	document.getElementById("tabList").getElementsByTagName("a").item(0).addEventListener("click", function(){
-			stopFlag = false;
-	});
-	//click tab2
-	document.getElementById("tabList").getElementsByTagName("a").item(1).addEventListener("click", function(){
-			plot2D_position.clearData();
-			plot2D_position.pushData(data_x);
-			plot2D_position.pushData(data_y);
-			plot2D_position.pushData(data_z);
-			plot2D_position.linerPlot();
-			stopFlag = true;
-	});
-	//click tab3
-	document.getElementById("tabList").getElementsByTagName("a").item(2).addEventListener("click", function(){
-			plot2D_velocity.clearData();
-			plot2D_velocity.pushData(data_vx);
-			plot2D_velocity.pushData(data_vy);
-			plot2D_velocity.pushData(data_vz);
-			plot2D_velocity.linerPlot();
-			stopFlag = true;
-	});
-	//click tab4
-	document.getElementById("tabList").getElementsByTagName("a").item(3).addEventListener("click", function(){
-			plot2D_energy.clearData();
-			plot2D_energy.pushData(data_kinetic);
-			plot2D_energy.pushData(data_potential);
-			plot2D_energy.pushData(data_energy);
-			plot2D_energy.linerPlot();
-			stopFlag = true;
-	});
 
 	//slider interface
 	$('#slider_skip').slider({
@@ -366,6 +335,7 @@ function initEvent(){
 			value: skip,
 			slide: function(event, ui){
 				var value = ui.value;
+				skip = value;
 				document.getElementById("input_skip").value = value;
 			}
 	});
@@ -396,16 +366,18 @@ function initEvent(){
 			value: freq,
 			slide: function(event, ui){
 				var value = ui.value;
+				freq = value;
 				document.getElementById("input_freq").value = value;
 			}
 	});
 	$('#slider_A').slider({
 			min: 0,
-			max: 1,
+			max: 5,
 			step: 0.1,
 			value: A,
 			slide: function(event, ui){
 				var value = ui.value;
+				A = value;
 				document.getElementById("input_A").value = value;
 			}
 	});
@@ -427,6 +399,27 @@ function initEvent(){
 			slide: function(event, ui){
 				var value = ui.value;
 				document.getElementById("input_nl").value = value;
+			}
+	});
+	$('#slider_gamma').slider({
+			min: 0,
+			max: 1,
+			step: 0.01,
+			value: gamma,
+			slide: function(event, ui){
+				var value = ui.value;
+				gamma = value;
+				document.getElementById("input_gamma").value = value;
+			}
+	});
+	
+	//checkbox
+	$('#checkbox_gravity').click(function(){
+			if($(this).prop('checked') == true){
+				gravity = 9.8;
+			}
+			else{
+				gravity = 0;
 			}
 	});
 
@@ -481,6 +474,7 @@ function initEvent(){
 	document.getElementById("input_A").value = A;
 	document.getElementById("input_k").value = spring.k;
 	document.getElementById("input_nl").value = nl;
+	document.getElementById("input_gamma").value = gamma;
 
 // 	document.getElementById("input_g").value = g;
 
@@ -501,11 +495,18 @@ function initEvent(){
 
 }
 
+function mouseEvent(){
+	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
+	function onDocumentMouseDown( event ){
+		p[5].vz = 15;
+	}
+};
 ////////////////////////////////////////
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
 	initThree();
+	mouseEvent();
 	initCamera();
 	initLight();
 	initObject();
@@ -536,7 +537,7 @@ function initThree(){
 	canvasFrame.appendChild(renderer.domElement);
 
 	//set renderer options
-	renderer.setClearColor(0xE1FCFF, 1.0);
+	renderer.setClearColor(0x000000, 1.0);
 	renderer.shadowMapEnabled = true;
 
 	//create scene object
@@ -553,9 +554,9 @@ var camera, // camera object
 function initCamera(){
 	//create camera object
 	var fov = 45,
-		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
-		 near = 1,
-		 far = 10000;
+	aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
+		near = 1,
+		far = 10000;
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
@@ -667,7 +668,7 @@ function initObject(){
 		//create geometry
 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//create material
-		var material = new THREE.MeshLambertMaterial({color: 0xFF0000, ambient: 0x880000 });
+		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
 		//create object
 		sphere[i] = new THREE.Mesh(geometry, material);
 		//add object
@@ -681,95 +682,6 @@ function initObject(){
 // define plotStart()
 ////////////////////////////////////////
 function plotStart(){
-	//draw position graph
-	plot2D_position = new Plot2D("canvas-frame_position");
-
-	//set options
-	plot2D_position.options.axesDefaults.tickOptions.formatString = '';
-	plot2D_position.options.axes.xaxis.label = "time[s]";
-	plot2D_position.options.axes.yaxis.label = "position[m]";
-	plot2D_position.options.axes.yaxis.labelOptions = {angle: -90};
-	plot2D_position.options.axes.xaxis.min = 0;
-	plot2D_position.options.legend.show = true;
-	plot2D_position.options.legend.location = 'ne';
-
-	var series = [];
-	series.push({
-			showLine: true,
-			label: "x position",
-			markerOptions: {show: true}
-	});
-	series.push({
-			showLine: false,
-			label: "y position",
-			markerOptions: {show: true}
-	});
-	series.push({
-			showLine: true,
-			label: "z position",
-			markerOptions: {show: false}
-	});
-	plot2D_position.options.series = series;
-
-	//draw velocity graph
-	plot2D_velocity = new Plot2D("canvas-frame_velocity");
-
-	//set options
-	plot2D_velocity.options.axesDefaults.tickOptions.formatString = '';
-	plot2D_velocity.options.axes.xaxis.label = "time[s]";
-	plot2D_velocity.options.axes.yaxis.label = "velocity[m]";
-	plot2D_velocity.options.axes.yaxis.labelOptions = {angle: -90};
-	plot2D_velocity.options.axes.xaxis.min = 0;
-	plot2D_velocity.options.legend.show = true;
-	plot2D_velocity.options.legend.location = 'ne';
-
-	var series = [];
-	series.push({
-			showLine: true,
-			label: "x velocity",
-			markerOptions: {show: true}
-	});
-	series.push({
-			showLine: false,
-			label: "y velocity",
-			markerOptions: {show: true}
-	});
-	series.push({
-			showLine: true,
-			label: "z velocity",
-			markerOptions: {show: false}
-	});
-	plot2D_velocity.options.series = series;
-
-	//draw energy graph
-	plot2D_energy = new Plot2D("canvas-frame_energy");
-
-	//set options
-	plot2D_energy.options.axesDefaults.tickOptions.formatString = '';
-	plot2D_energy.options.axes.xaxis.label = "time[s]";
-	plot2D_energy.options.axes.yaxis.label = "energy[J]";
-	plot2D_energy.options.axes.yaxis.labelOptions = {angle: -90};
-	plot2D_energy.options.axes.xaxis.min = 0;
-	plot2D_energy.options.legend.show = true;
-	plot2D_energy.options.legend.location = 'ne';
-
-	var series = [];
-	series.push({
-			showLine: true,
-			label: "kinetic energy",
-			markerOptions: {show: true}
-	});
-	series.push({
-			showLine: false,
-			label: "potential energy",
-			markerOptions: {show: true}
-	});
-	series.push({
-			showLine: true,
-			label: "total energy",
-			markerOptions: {show: false}
-	});
-	plot2D_energy.options.series = series;
 }
 
 ////////////////////////////////////////
@@ -798,6 +710,7 @@ function loop(){
 		A = parseFloat(document.getElementById("input_A").value);
 		spring.k = parseFloat(document.getElementById("input_k").value);
 		nl = parseFloat(document.getElementById("input_nl").value);
+		gamma = parseFloat(document.getElementById("input_gamma").value);
 
 		//update boundary condition
 		var radioList = document.getElementsByName("boundary");
@@ -806,7 +719,7 @@ function loop(){
 				boundary = radioList[i].value;
 			}
 		}
-		
+
 		//update discreat space
 		dl = L / (N-1);
 		//update natural length
@@ -857,10 +770,12 @@ function loop(){
 
 			cal.timeDevelopment(p);
 
-			p[0].x = A * Math.cos(2*Math.PI*freq * time);
+			//p[0].x = A * Math.cos(2*Math.PI*freq * time);
+			p[0].x = 0;
 			p[0].y = 0;
 			p[0].z = A * Math.sin(2*Math.PI*freq * time);
-			p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
+			//p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
+			p[0].vx = 0;
 			p[0].vy = 0;
 			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
 
