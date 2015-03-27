@@ -11,19 +11,23 @@ var N = 50;	   // number of particle
 var L = 20;	   // System length
 var dl = L / (N-1); //discreat space
 var step = 0; //step count
-var skip = 500;
+var skip = 5;
+var _skip = 0.1;
 
 //oscillation
 var A = 0;
 
 //Field parameter
+var T = 300; // temp
+var k_B = 1.38e-23;
 var gamma = 0.5; // air resistance param
 var gravity = 0; // gravitational accelaration
 
 
 //Particle parameter
-var MASS = 1;
-var RADIUS = 0.45*dl;
+var MASS = 4.67e-26;
+var RADIUS = 0.45;
+var vel = 0; // avg vel
 
 //boundary condition
 var boundary="d";
@@ -74,21 +78,73 @@ Calculation.prototype = {
 	constructor: Calculation,
 	//init Particles
 	initParticle: function(p){
-		for(var i=0; i<p.length; i++){
-			p[i].mass = MASS;
-			p[i].x = 0;
-			p[i].y = i * dl;
-			p[i].z = 0;
-			p[i].vx = 0;
-			p[i].vy = 0;
-			p[i].vz = 0;
-			p[i].fx = 0;
-			p[i].fy = 0;
-			p[i].fz = 0;
-			this.calculateForce(p);
+		for(var i=0; i<N; i++){
+			//カットオフv_maxの設定
+			var v=0.0;		//計算用の変数
+			var dv=30;		//計算用のステップ
+			var f=0.0;		//分布関数の保存用
+			var f_max=0.0;	//分布関数の最大値
+			var v_max;	//速度のカットオフ
+			var loop_flag = true;	//ループを抜けるフラグ
+
+			//値が最大値の1/1000倍になったらその時のvをv_maxに記録してループを抜ける
+			while(loop_flag == true){
+				f = this.maxwell_distribution(v);
+				if(f >= f_max){
+					f_max = f;
+				}
+				else if(f < f_max){
+					v_max = v;
+					if(f <= f_max/1000.0){
+						loop_flag=false;
+					}
+				}
+				v+=dv;
+			}
+
+			//モンテカルロ法（分布関数内に入っていたらその数値を採用する）
+			for(var i=0; i<N; i++){
+				loop_flag=true;
+				while(loop_flag == true){
+					var v_rand = this.rand(v_max, 1.0);
+					var f_rand = this.rand(f_max, 0.0);
+					var f_flag = this.maxwell_distribution(v_rand);
+					if(f_rand <= f_flag){
+						var theta = this.rand(Math.PI,0.0);
+						var phi = this.rand(2*Math.PI, 0.0);
+						var vx = v_rand*Math.sin(theta)*Math.cos(phi);
+						var vy = v_rand*Math.sin(theta)*Math.sin(phi);
+						var vz = v_rand*Math.cos(theta);
+						p[i].mass = MASS;
+						p[i].x = this.rand(RADIUS, L-RADIUS);
+						p[i].y = this.rand(RADIUS, L-RADIUS);
+						p[i].z = this.rand(RADIUS, L-RADIUS);
+						p[i].fx = 0;
+						p[i].fy = 0;
+						p[i].fz = 0;
+						p[i].vx = vx;
+						p[i].vy = vy;
+						p[i].vz = vz;
+						loop_flag=false;
+					}
+				}
+			}
+			//this.calculateForce(p);
 		}
+		vel = 0;
+		for(var i=0; i<N; i++){
+			vel += Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
+		}
+		vel = vel/N;
 	},
-	//calculation Force
+	rand: function(min, max){
+		return Math.random()*(max-min)+min;
+	},
+	maxwell_distribution: function(v){
+		var f = 4*Math.PI*v*v*Math.pow(MASS/(2*Math.PI*k_B*T),1.5)*Math.exp(-MASS*v*v/(2*k_B*T));
+		return f;
+	},
+		//calculation Force
 	calculateForce: function(p){
 		var force01,force10;
 		var d_r;
@@ -110,21 +166,21 @@ Calculation.prototype = {
 				force01.y = -spring.k*(spring.l-d_r.norm)*d_r.y/d_r.norm;
 				force01.z = -spring.k*(spring.l-d_r.norm)*d_r.z/d_r.norm;
 			}
-////////		if( i == 0 ){
-////////			p[i].fx = force01.x;
-////////			p[i].fy = force01.y;
-////////			p[i].fz = force01.z;
-////////		}
-////////		else if( i == N-1 ){
-////////			p[i].fx = force10.x;
-////////			p[i].fy = force10.y;
-////////			p[i].fz = force10.z;
-////////		}
-////////		else{
-////////			p[i].fx = force01.x+force10.x;
-////////			p[i].fy = force01.y+force10.y;
-////////			p[i].fz = force01.z+force10.z;
-////////		}
+			////////		if( i == 0 ){
+			////////			p[i].fx = force01.x;
+			////////			p[i].fy = force01.y;
+			////////			p[i].fz = force01.z;
+			////////		}
+			////////		else if( i == N-1 ){
+			////////			p[i].fx = force10.x;
+			////////			p[i].fy = force10.y;
+			////////			p[i].fz = force10.z;
+			////////		}
+			////////		else{
+			////////			p[i].fx = force01.x+force10.x;
+			////////			p[i].fy = force01.y+force10.y;
+			////////			p[i].fz = force01.z+force10.z;
+			////////		}
 			//gravity and resistance
 			if( i == 0 ){
 				p[i].fx = force01.x-gamma*p[i].vx;
@@ -143,14 +199,14 @@ Calculation.prototype = {
 			}
 		}
 	},
-	//Velocity Verlet method
+		//Velocity Verlet method
 	timeDevelopment: function(p){
 		// conserve f(t)
 		var old_fx = [];
 		var old_fy = [];
 		var old_fz = [];
 
-		for(var i=0; i<p.length; i++){
+		for(var i=0; i<N; i++){
 			//x(t+dt) = x(t) + v(t)*dt + f(t)*dt*dt/2m
 			p[i].x = p[i].x + p[i].vx*dt + p[i].fx*dt*dt/(2*p[i].mass);
 			p[i].y = p[i].y + p[i].vy*dt + p[i].fy*dt*dt/(2*p[i].mass);
@@ -162,15 +218,44 @@ Calculation.prototype = {
 		}
 
 		// f(t+dt)
-		this.calculateForce(p);
+		//this.calculateForce(p);
 
 		//v(t+dt) = v(t) + (f(t) + f(t+dt))*dt/2m
-		for(var i=0; i<p.length; i++){
+		for(var i=0; i<N; i++){
 			p[i].vx = p[i].vx + ( old_fx[i] + p[i].fx )*dt/(2*p[i].mass); 
 			p[i].vy = p[i].vy + ( old_fy[i] + p[i].fy )*dt/(2*p[i].mass); 
 			p[i].vz = p[i].vz + ( old_fz[i] + p[i].fz )*dt/(2*p[i].mass); 
 		}
 		//p[0] = { vx: 0, vy: 0, vz: 0};
+		this.border(p);
+	},
+	border: function(p){
+		for(var i=0; i<N; i++){
+			if(p[i].x < RADIUS){
+				p[i].x = RADIUS;
+				p[i].vx = -p[i].vx;
+			}
+			else if(p[i].x > L-RADIUS){
+				p[i].x = L-RADIUS;
+				p[i].vx = -p[i].vx;
+			}
+			if(p[i].y < RADIUS){
+				p[i].y = RADIUS;
+				p[i].vy = -p[i].vy;
+			}
+			else if(p[i].y > L-RADIUS){
+				p[i].y = L-RADIUS;
+				p[i].vy = -p[i].vy;
+			}
+			if(p[i].z < RADIUS){
+				p[i].z = RADIUS;
+				p[i].vz = -p[i].vz;
+			}
+			else if(p[i].z > L-RADIUS){
+				p[i].z = L-RADIUS;
+				p[i].vz = -p[i].vz;
+			}
+		}
 	},
 	calculateKinetic: function(p){
 		for(var i=0; i<p.length; i++){
@@ -267,7 +352,7 @@ Ball.prototype = {
 		return { x: fx, y: fy, z: fz };
 	},
 
-	//calculateEnergy
+		//calculateEnergy
 	calculateEnergy: function(){
 		var v2 = this.vx*this.vx + this.vy*this.vy + this.vz*this.vz;
 		var kinetic = 1/2 * this.mass * v2;
@@ -314,12 +399,12 @@ var stopFlag = true; // stop flag
 // define window event 
 ////////////////////////////////////////
 window.addEventListener("load", function(){
-		for(var i=0; i<N; i++)
-			p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
-		cal = new Calculation(p);
-		initEvent();
-		plotStart();
-		threeStart();
+	for(var i=0; i<N; i++)
+		p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
+	cal = new Calculation(p);
+	initEvent();
+	plotStart();
+	threeStart();
 });
 
 ////////////////////////////////////////
@@ -329,184 +414,78 @@ function initEvent(){
 
 	//slider interface
 	$('#slider_skip').slider({
-			min: 1,
-			max: 1000,
-			step: 1,
-			value: skip,
-			slide: function(event, ui){
-				var value = ui.value;
-				skip = value;
-				document.getElementById("input_skip").value = value;
-			}
+		min: 0.01,
+		max: 1.01,
+		step: 0.01,
+		value: _skip,
+		slide: function(event, ui){
+			var value = ui.value;
+			_skip = value;
+			skip = 1/(60*dt)*_skip;
+			document.getElementById("input_skip").value = value;
+		}
 	});
 	$('#slider_mass').slider({
-			min: 0.01,
-			max: 10,
-			step: 0.01,
-			value: MASS,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_mass").value = value;
-			}
+		min: 0.01,
+		max: 10,
+		step: 0.01,
+		value: MASS,
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input_mass").value = value;
+		}
 	});
 	$('#slider_N').slider({
-			min: 3,
-			max: 200,
-			step: 1,
-			value: N,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_N").value = value;
-			}
+		min: 3,
+		max: 200,
+		step: 1,
+		value: N,
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input_N").value = value;
+		}
 	});
-	$('#slider_freq').slider({
-			min: 0,
-			max: 2,
-			step: 0.0001,
-			value: freq,
-			slide: function(event, ui){
-				var value = ui.value;
-				freq = value;
-				document.getElementById("input_freq").value = value;
-			}
+	$('#slider_temp').slider({
+		min: 1,
+		max: 1000,
+		step: 1,
+		value: T,
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input_temp").value = value;
+		}
 	});
-	$('#slider_A').slider({
-			min: 0,
-			max: 5,
-			step: 0.1,
-			value: A,
-			slide: function(event, ui){
-				var value = ui.value;
-				A = value;
-				document.getElementById("input_A").value = value;
-			}
-	});
-	$('#slider_k').slider({
-			min: 0,
-			max: 5000,
-			step: 10,
-			value: spring.k,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_k").value = value;
-			}
-	});
-	$('#slider_nl').slider({
-			min: 0.01,
-			max: 1.1,
-			step: 0.01,
-			value: nl,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_nl").value = value;
-			}
-	});
-	$('#slider_gamma').slider({
-			min: 0,
-			max: 1,
-			step: 0.01,
-			value: gamma,
-			slide: function(event, ui){
-				var value = ui.value;
-				gamma = value;
-				document.getElementById("input_gamma").value = value;
-			}
-	});
-	
-	//checkbox
-	$('#checkbox_gravity').click(function(){
-			if($(this).prop('checked') == true){
-				gravity = 9.8;
-			}
-			else{
-				gravity = 0;
-			}
-	});
-
-	// 	$('#slider_g').slider({
-	// 			min: 0,
-	// 			max: 30,
-	// 			step: 0.1,
-	// 			value: g,
-	// 			slide: function(event, ui){
-	// 				var value = ui.value;
-	// 				document.getElementById("input_g").value = value;
-	// 			}
-	// 	});
-	// 	var strs = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'mass'];
-	// 	for(var i=0; i < strs.length; i++){
-	// 		var param = strs[i];
-	// 		var value = ball[param];
-	// 		document.getElementById("input_" + param).value = value;
-	// 		$('#slider_' + strs[i]).slider({
-	// 				min: -100,
-	// 				max: 100,
-	// 				step: 1,
-	// 				value: value,
-	// 				slide: function(event, ui){
-	// 					var value = ui.value;
-	// 					var param = this.id.replace("slider_", "");
-	// 					ball[param] = value;
-
-	// 					var id = this.id.replace("slider_", "input_");
-	// 					document.getElementById(id).value = value;
-	// 				}
-	// 		})
-
-	// 		document.getElementById("input_" + param).addEventListener("change", function(){
-	// 				var value = parseFloat(this.value) || 0;
-	// 				var param = this.id.replace("input_", "");
-	// 				ball[param] = value;
-
-	// 				var id = this.id.replace("input_", "slider_");
-	// 				$('#' + id).slider({ value: value });
-	// 		});
-	// }
-	// 	$('#slider_z').slider({ min: 0, max: 500 });
-
 
 	//input interface
-	document.getElementById("input_skip").value = skip;
+	document.getElementById("input_skip").value = _skip;
 	document.getElementById("input_dt").value = dt;
 	document.getElementById("input_mass").value = MASS;
 	document.getElementById("input_N").value = N;
-	document.getElementById("input_freq").value = freq;
-	document.getElementById("input_A").value = A;
-	document.getElementById("input_k").value = spring.k;
-	document.getElementById("input_nl").value = nl;
-	document.getElementById("input_gamma").value = gamma;
+	document.getElementById("input_temp").value = T;
 
-// 	document.getElementById("input_g").value = g;
 
 	//button interface
 	//start button
 	document.getElementById("startButton").addEventListener("click", function(){
-			restartFlag = true;
+		restartFlag = true;
 	});
 
 	//stop button
 	document.getElementById("stopButton").addEventListener("click", function(){
-			if(stopFlag){
-				stopFlag = false;
-			}else{
-				stopFlag = true;
-			}
+		if(stopFlag){
+			stopFlag = false;
+		}else{
+			stopFlag = true;
+		}
 	});
 
 }
 
-function mouseEvent(){
-	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
-	function onDocumentMouseDown( event ){
-		p[5].vz = 15;
-	}
-};
 ////////////////////////////////////////
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
 	initThree();
-	mouseEvent();
 	initCamera();
 	initLight();
 	initObject();
@@ -560,9 +539,9 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(24*1.1, L/2, 0);
+	camera.position.set(L*2.5,L*0.8,L*0.7);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: 0, y:L/2, z: 0});
+	camera.lookAt({x: L/2, y:L/2, z: L/2});
 
 	//create trackball object
 	trackball = new THREE.TrackballControls(camera, canvasFrame);
@@ -581,7 +560,7 @@ function initCamera(){
 
 	trackball.noPan = false;
 	trackball.panSpeed = 0.6;
-	trackball.target = new THREE.Vector3(0, L/2, 0);
+	trackball.target = new THREE.Vector3(L/2, L/2, L/2);
 
 	trackball.staticMoving = true;
 
@@ -600,7 +579,7 @@ function initLight(){
 	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
 
 	//set directionalLight options
-	directionalLight.position.set(100, 100, 100);
+	directionalLight.position.set(40, 80, 100);
 
 	directionalLight.castShadow = true;
 
@@ -620,6 +599,7 @@ function initLight(){
 //global variables
 var axis;
 var sphere=[]; //sphere object
+var wall1;
 
 function initObject(){
 	//create geometry
@@ -668,14 +648,77 @@ function initObject(){
 		//create geometry
 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//create material
-		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
+		//var material = new THREE.MeshPhongMaterial({ color: 0xBFFFFF, ambient: 0x000050,
+			//side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250});
+		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x228888 });
 		//create object
 		sphere[i] = new THREE.Mesh(geometry, material);
 		//add object
 		scene.add(sphere[i]);
 		//position
 		sphere[i].position.set(p[i].x, p[i].y, p[i].z);
+		sphere[i].castShadow = true;
 	}
+
+	var v1 = { x: 0, y: 0, z:0 };
+	var v2 = { x: 0, y: L, z:0 };
+	var v3 = { x: 0, y: L, z:L };
+	var v4 = { x: 0, y: 0, z:L };
+	var v5 = { x: L, y: 0, z:0 };
+	var v6 = { x: L, y: L, z:0 };
+	var v7 = { x: L, y: L, z:L };
+	var v8 = { x: L, y: 0, z:L };
+	//far
+	wall1 = wall(v1, v2, v3, v4);
+	scene.add(wall1);
+	//near
+	wall2 = wall(v6, v5, v8, v7);
+	scene.add(wall2);
+	//left
+	wall3 = wall(v5, v1, v4, v8);
+	scene.add(wall3);
+	//right
+	wall4 = wall(v2, v6, v7, v3);
+	scene.add(wall4);
+	//top
+	wall5 = wall(v4, v3, v7, v8);
+	scene.add(wall5);
+	//bottom
+	wall6 = wall(v5, v6, v2, v1);
+	scene.add(wall6);
+	//create shadow
+	wall1.castShadow = true;
+	wall2.castShadow = true;
+	wall3.castShadow = true;
+	wall4.castShadow = true;
+	wall5.castShadow = true;
+	wall6.castShadow = true;
+}
+
+function wall(v1, v2, v3, v4){
+	var vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
+	var vertex2 = new THREE.Vector3(v2.x, v2.y, v2.z);
+	var vertex3 = new THREE.Vector3(v3.x, v3.y, v3.z);
+	var vertex4 = new THREE.Vector3(v4.x, v4.y, v4.z);
+	var geometry = new THREE.Geometry();
+	geometry.vertices.push(vertex1);
+	geometry.vertices.push(vertex2);
+	geometry.vertices.push(vertex3);
+	geometry.vertices.push(vertex4);
+	var face = new THREE.Face3(0, 1, 2);
+	console.log(face);
+	geometry.faces.push(face);
+	face = new THREE.Face3(0, 2, 3);
+	geometry.faces.push(face);
+	//calculate surface normal
+	geometry.computeFaceNormals();
+	//calculate vertex normal vector
+	geometry.computeVertexNormals();
+
+	//create material
+	var material = new THREE.MeshLambertMaterial({color: 0x888888, ambient: 0x222222 });
+	//create sphere object
+	return new THREE.Mesh(geometry, material);
 }
 
 ////////////////////////////////////////
@@ -702,28 +745,11 @@ function loop(){
 
 		//init time param
 		step = 0;
-		skip = parseInt(document.getElementById("input_skip").value);
+		_skip = parseInt(document.getElementById("input_skip").value);
 		dt = parseFloat(document.getElementById("input_dt").value);
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
-		freq = parseFloat(document.getElementById("input_freq").value);
-		A = parseFloat(document.getElementById("input_A").value);
-		spring.k = parseFloat(document.getElementById("input_k").value);
-		nl = parseFloat(document.getElementById("input_nl").value);
-		gamma = parseFloat(document.getElementById("input_gamma").value);
-
-		//update boundary condition
-		var radioList = document.getElementsByName("boundary");
-		for(var i=0; i<radioList.length; i++){
-			if(radioList[i].checked){
-				boundary = radioList[i].value;
-			}
-		}
-
-		//update discreat space
-		dl = L / (N-1);
-		//update natural length
-		spring.l = nl*dl;
+		T = parseFloat(document.getElementById("input_temp").value);
 
 		//init particle and calculation class
 		for(var i=0; i<N; i++){
@@ -770,29 +796,6 @@ function loop(){
 
 			cal.timeDevelopment(p);
 
-			//p[0].x = A * Math.cos(2*Math.PI*freq * time);
-			p[0].x = 0;
-			p[0].y = 0;
-			p[0].z = A * Math.sin(2*Math.PI*freq * time);
-			//p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
-			p[0].vx = 0;
-			p[0].vy = 0;
-			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
-
-			if(boundary == "d"){
-				p[N-1].x = 0;
-				p[N-1].y = L;
-				p[N-1].z = 0;
-				p[N-1].vx = 0;
-				p[N-1].vy = 0;
-				p[N-1].vz = 0;
-			}else if(boundary == "n"){
-				p[N-1].x = 0;
-				p[N-1].y = L;
-				p[N-1].vx = 0;
-				p[N-1].vy = 0;
-			}
-
 		}
 	}
 	//set draw object
@@ -801,6 +804,8 @@ function loop(){
 	}
 
 	document.getElementById("time").innerHTML = time.toFixed(2);
+	document.getElementById("L").innerHTML = L.toFixed(0);
+	document.getElementById("vel").innerHTML = vel.toFixed(2);
 
 	//init clear color
 	renderer.clear();
