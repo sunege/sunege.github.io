@@ -77,7 +77,6 @@ div#controller div.slider{
 				<!-- mass -->
 				<tr>
 					<td>質量</td>
-					<td><center><div id="slider_mass" class="slider" style="width:180px"></div></center></td>
 					<td><input type="text" value="" id="input_mass" class="number" />kg</td>
 				</tr>
 				<!-- N -->
@@ -95,7 +94,7 @@ div#controller div.slider{
 					<td colspan="2"><span id="L">0</span>m</td>
 				</tr>
 				<tr>
-					<td>v</td>
+					<td>v平均</td>
 					<td colspan="2"><span id="vel">0</span>m/s</td>
 				</tr>
 				<!-- input skip -->
@@ -112,5 +111,6 @@ div#controller div.slider{
 			</div>
 
 		</div>
+		<p style="clear: both;">マックスウェル分布を用いて粒子の速度を割り振っています。そのため速さの平均値が毎回少し異なります。</p>
 	</body>
 </html>
