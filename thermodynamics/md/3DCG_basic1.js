@@ -716,7 +716,7 @@ function wall(v1, v2, v3, v4){
 	geometry.computeVertexNormals();
 
 	//create material
-	var material = new THREE.MeshLambertMaterial({color: 0x888888, ambient: 0x222222 });
+	var material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
 	//create sphere object
 	return new THREE.Mesh(geometry, material);
 }
