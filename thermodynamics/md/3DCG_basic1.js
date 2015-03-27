@@ -26,7 +26,7 @@ var gravity = 0; // gravitational accelaration
 
 //Particle parameter
 var MASS = 4.67e-26;
-var RADIUS = 0.45;
+var RADIUS = 0.3;
 var vel = 0; // avg vel
 
 //boundary condition
@@ -425,6 +425,17 @@ function initEvent(){
 			document.getElementById("input_skip").value = value;
 		}
 	});
+
+	$('#slider_radius').slider({
+		min: 0.01,
+		max: 5,
+		step: 0.01,
+		value: RADIUS,
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input_radius").value = value;
+		}
+	});
 // 	$('#slider_mass').slider({
 // 		min: 0.01,
 // 		max: 10,
@@ -458,6 +469,7 @@ function initEvent(){
 
 	//input interface
 	document.getElementById("input_skip").value = _skip;
+	document.getElementById("input_radius").value = RADIUS;
 	document.getElementById("input_dt").value = dt;
 	document.getElementById("input_mass").value = MASS;
 	document.getElementById("input_N").value = N;
@@ -695,7 +707,6 @@ function initObject(){
 		else{
 			var blue_hex = blue.toString(16);
 		}
-		console.log(blue_hex);
 
 		var color_code = red_hex + green_hex + blue_hex;
 		var material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
@@ -803,6 +814,7 @@ function loop(){
 		//init time param
 		step = 0;
 		_skip = parseInt(document.getElementById("input_skip").value);
+		RADIUS = parseFloat(document.getElementById("input_radius").value);
 		dt = parseFloat(document.getElementById("input_dt").value);
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
