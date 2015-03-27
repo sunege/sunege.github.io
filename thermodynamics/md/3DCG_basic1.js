@@ -425,16 +425,16 @@ function initEvent(){
 			document.getElementById("input_skip").value = value;
 		}
 	});
-	$('#slider_mass').slider({
-		min: 0.01,
-		max: 10,
-		step: 0.01,
-		value: MASS,
-		slide: function(event, ui){
-			var value = ui.value;
-			document.getElementById("input_mass").value = value;
-		}
-	});
+// 	$('#slider_mass').slider({
+// 		min: 0.01,
+// 		max: 10,
+// 		step: 0.01,
+// 		value: MASS,
+// 		slide: function(event, ui){
+// 			var value = ui.value;
+// 			document.getElementById("input_mass").value = value;
+// 		}
+// 	});
 	$('#slider_N').slider({
 		min: 3,
 		max: 200,
@@ -648,9 +648,60 @@ function initObject(){
 		//create geometry
 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//create material
-		//var material = new THREE.MeshPhongMaterial({ color: 0xBFFFFF, ambient: 0x000050,
-			//side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250});
-		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x228888 });
+		//
+		/*	
+		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
+		var v_center = 400;
+		var v_ratio = parseFloat(velocity / v_center, 10);
+		if(v_ratio > 1){
+			v_ratio = 1;
+		}
+		var shine = parseInt(255*v_ratio, 10);
+
+		var red = parseInt(255 * v_ratio, 10);
+		var red_hex = red.toString(16);
+
+		var green_hex = "88";
+
+		var blue = parseInt(255 * (1-v_ratio), 10);
+		var blue_hex = blue.toString(16);
+
+		var color_code = red_hex + green_hex + blue_hex;
+		var material = new THREE.MeshPhongMaterial({ color: color_code, ambient: color_code, side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: shine});
+
+		*/
+	  //速度によって色変化
+		
+		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
+		var v_center = 1500;
+		var v_ratio = parseFloat(velocity / v_center, 10);
+		if(v_ratio > 1){
+			v_ratio = 1;
+		}
+		var red = parseInt(254 * v_ratio, 10);
+		if(red < 16){
+			var red_hex = "0" + red.toString(16);
+		}
+		else{
+			var red_hex = red.toString(16);
+		}
+
+		var green_hex = "ff";
+
+		var blue = parseInt(254 * (1-v_ratio), 10);
+		if(blue < 16){
+			var blue_hex = "0" + blue.toString(16);
+		}
+		else{
+			var blue_hex = blue.toString(16);
+		}
+		console.log(blue_hex);
+
+		var color_code = red_hex + green_hex + blue_hex;
+		var material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
+		
+
+
 		//create object
 		sphere[i] = new THREE.Mesh(geometry, material);
 		//add object
@@ -693,6 +744,13 @@ function initObject(){
 	wall4.castShadow = true;
 	wall5.castShadow = true;
 	wall6.castShadow = true;
+
+	geometry = new THREE.BoxGeometry(L,L,L);
+	material = new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true});
+	var box = new THREE.Mesh(geometry, material);
+	scene.add(box);
+	box.position.set(L/2, L/2, L/2);
+
 }
 
 function wall(v1, v2, v3, v4){
@@ -706,7 +764,6 @@ function wall(v1, v2, v3, v4){
 	geometry.vertices.push(vertex3);
 	geometry.vertices.push(vertex4);
 	var face = new THREE.Face3(0, 1, 2);
-	console.log(face);
 	geometry.faces.push(face);
 	face = new THREE.Face3(0, 2, 3);
 	geometry.faces.push(face);
