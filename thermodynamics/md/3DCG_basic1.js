@@ -52,10 +52,15 @@ var Particle = function(parameter){
 	this.x = parameter.x || 0;
 	this.y = parameter.y || 0;
 	this.z = parameter.z || 0;
+	//temp position vector
+	this.tempx = parameter.x || 0;
+	this.tempy = parameter.y || 0;
+	this.tempz = parameter.z || 0;
 	//velocity vector
 	this.vx = parameter.vx || 0;
 	this.vy = parameter.vy || 0;
 	this.vz = parameter.vz || 0;
+	this.v = 0;
 	//force vector
 	this.fx; 
 	this.fy; 
@@ -125,6 +130,7 @@ Calculation.prototype = {
 						p[i].vx = vx;
 						p[i].vy = vy;
 						p[i].vz = vz;
+						p[i].v = Math.sqrt(vx*vx+vy*vy+vz*vz);
 						loop_flag=false;
 					}
 				}
@@ -136,6 +142,7 @@ Calculation.prototype = {
 			vel += Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
 		}
 		vel = vel/N;
+
 	},
 	rand: function(min, max){
 		return Math.random()*(max-min)+min;
@@ -260,6 +267,30 @@ Calculation.prototype = {
 	calculateKinetic: function(p){
 		for(var i=0; i<p.length; i++){
 			p[i].kinetic = p[i].mass*(p[i].vx*p[i].vx + p[i].vy*p[i].vy + p[i].vz*p[i].vz)/2;
+		}
+	},
+	histgram: function(p){
+		var delta_v = 100;
+		var v_max = 2000;
+		var hist = [];
+		var n_max = parseInt(v_max/delta_v, 10)
+		for(var n=0; n < n_max; n++){
+			hist[n] = { v: n*delta_v, particle_id: new Array() };
+			for(var i=0; i<N; i++){
+				if(p[i].v > n*delta_v && p[i].v < (n+1)*delta_v){
+					hist[n].particle_id.push(i);
+				}
+			}
+			console.log(hist[n].v);
+			console.log(hist[n].particle_id);
+		}
+		var _delta_v = 1.5*L/n_max;
+		for(var n=0; n < n_max; n++){
+			for(var m=0; m < hist[n].particle_id.length; m++){
+				p[hist[n].particle_id[m]].tempx = L+2;
+				p[hist[n].particle_id[m]].tempy = _delta_v*(n+1);
+				p[hist[n].particle_id[m]].tempz = (m+1)*2.1*RADIUS;
+			}
 		}
 	}
 };
@@ -392,7 +423,7 @@ var plot2D_energy; // energy plot object
 
 //stop flag
 var restartFlag = false; // restert flag
-var stopFlag = true; // stop flag
+var stopFlag = false; // stop flag
 
 
 ////////////////////////////////////////
@@ -833,6 +864,11 @@ function loop(){
 	}
 
 	if(stopFlag){
+		cal.histgram(p);
+		//set draw object
+		for(var i=0; i<N; i++){
+			sphere[i].position.set(p[i].tempx, p[i].tempy, p[i].tempz);
+		}
 		document.getElementById("stopButton").value = "start";
 	}else{
 		document.getElementById("stopButton").value = "stop";
@@ -841,35 +877,17 @@ function loop(){
 	//time development
 	// 	var time = step * dt;
 	if(stopFlag == false){
-		// 		for(var k=0; k<skip; k++){
-		// 			step++;
-		// 			time = step * dt;
-		// 			ball.timeEvolution(dt);
-		// 			if(step % (skip*skip_data) == 0){
-		// 				data_x.push([time, ball.x]);
-		// 				data_y.push([time, ball.y]);
-		// 				data_z.push([time, ball.z]);
-		// 				data_vx.push([time, ball.vx]);
-		// 				data_vy.push([time, ball.vy]);
-		// 			data_vz.push([time, ball.vz]);
-		// 				var energy = ball.calculateEnergy();
-		// 				data_kinetic.push([time, energy.kinetic]);
-		// 				data_potential.push([time, energy.potential]);
-		// 				data_energy.push([time, energy.kinetic + energy.potential]);
-		// 			}
-		// 		}
 		for(var n=0; n<skip; n++){
 			//increment of step
 			step++;
 			time = dt * step;
 
 			cal.timeDevelopment(p);
-
 		}
-	}
-	//set draw object
-	for(var i=0; i<N; i++){
-		sphere[i].position.set(p[i].x, p[i].y, p[i].z);
+		//set draw object
+		for(var i=0; i<N; i++){
+			sphere[i].position.set(p[i].x, p[i].y, p[i].z);
+		}
 	}
 
 	document.getElementById("time").innerHTML = time.toFixed(2);
