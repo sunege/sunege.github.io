@@ -301,12 +301,52 @@ var lambda2 = 2; //wave length
 var amp2 = 1; //ampritude
 var direction2 = -1; //wave direction left:-1
 
+//grid
+var grid;
+var grid_diff = 0.5; //グリッドの間隔
+var num_grid_x = 21; //x方向の本数 奇数を入力
+var num_grid_y = parseInt(l/grid_diff + 1); //y方向の本数
+
 
 function initObject(){
+	//calculate wave and create wave
 	calculate();
 	scene.add(line1);
 	scene.add(line2);
 	scene.add(line3);
+
+	//create grid
+	grid = new Array(num_grid_x + num_grid_y);
+	//pallarel x axial
+	for(var i=0; i<num_grid_x; i++){
+		var gridGeometry = new THREE.Geometry();
+		var y = (i-(num_grid_x - 1) / 2) * grid_diff
+		var v1 = new THREE.Vector3(0, y, -0.05);  
+		var v2 = new THREE.Vector3(l, y, -0.05);  
+		gridGeometry.vertices.push(v1);
+		gridGeometry.vertices.push(v2);
+		if(i==(num_grid_x - 1) / 2){
+			var gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 2});
+		}
+		else{
+			var gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
+		}
+		grid[i] = new THREE.Line(gridGeometry, gridMaterial);
+		scene.add(grid[i]);
+	}
+	//pallarel y axial
+	for(var i=0; i<num_grid_y; i++){
+		var gridGeometry = new THREE.Geometry();
+		var x = i * grid_diff
+		var v1 = new THREE.Vector3(x, (-1)*((num_grid_x - 1) / 2) * grid_diff, -0.05);  
+		var v2 = new THREE.Vector3(x, ((num_grid_x - 1) / 2) * grid_diff, -0.05);  
+		gridGeometry.vertices.push(v1);
+		gridGeometry.vertices.push(v2);
+		var gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
+		grid[i + num_grid_x] = new THREE.Line(gridGeometry, gridMaterial);
+		scene.add(grid[i + num_grid_x]);
+	}
+	
 }
 function calculate(){
 	var geometry1 = new THREE.Geometry(); //geometry object
@@ -339,6 +379,8 @@ function calculate(){
 	line1 = new THREE.Line(geometry1, line1Material);
 	line2 = new THREE.Line(geometry2, line2Material);
 	line3 = new THREE.Line(geometry3, line3Material);
+
+	
 
 	
 }
