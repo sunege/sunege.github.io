@@ -498,7 +498,7 @@ function initEvent(){
 function mouseEvent(){
 	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
 	function onDocumentMouseDown( event ){
-		p[5].vz = 15;
+		p[parseInt(N/2)].vz = 40;
 	}
 };
 ////////////////////////////////////////
