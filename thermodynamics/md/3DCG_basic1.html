@@ -6,21 +6,86 @@
 
 		<!-- style sheet -->
 		<link type="text/css" rel="stylesheet"
-								href="../../css/jquery-ui.css"/>
+		href="../../css/jquery-ui.css"/>
 		<link type="text/css" rel="stylesheet"
-								href="../../css/jquery.jqplot.css"/>
+		href="../../css/jquery.jqplot.css"/>
 		<style>
-div#canvas-frame{
-	width: 600px;
-	height: 600px;
-	float: left;
-}
-div#controller{
-	float: right;
-}
-div#controller div.slider{
-	width: 200px
-}
+			div#canvas-frame{
+				width: 900px;
+				height: 600px;
+				float: left;
+			}
+			div.slider{
+				width: 200px
+			}
+			input#number{
+				width: 30px;
+			}
+			.dropmenu{
+				*zoom: 1;
+				list-style-type: none;
+				width: 960px;
+				margin: 5px auto 30px;
+				padding: 0;
+			}
+			.dropmenu:before, .dropmenu:after{
+				content: "";
+				display: table;
+			}
+			.dropmenu:after{
+				clear: both;
+			}
+			.dropmenu li{
+				position: relative;
+				width: 20%;
+				float: left;
+				margin: 0;
+				padding: 0;
+				text-align: center;
+			}
+			.dropmenu li a{
+				display: block;
+				margin: 0;
+				padding: 15px 0 11px;
+				background: #8a9b0f;
+				color: #fff;
+				font-size: 14px;
+				line-height: 1;
+				text-decoration: none;
+			}
+			.dropmenu li ul{
+				list-style: none;
+				position: absolute;
+				z-index: 9999;
+				top: 100%;
+				left: 0;
+				margin: 0;
+				padding: 0;
+			}
+			.dropmenu li ul li{
+				width: 100%;
+			}
+			.dropmenu li ul li a{
+				padding: 13px 15px;
+				border-top: 1px solid #7c8c0e;
+				background: #6e7c0c;
+				text-align: left;
+			}
+			.dropmenu li:hover > a{
+				background: #6e7c0c;
+			}
+			.dropmenu li a:hover{
+				background: #616d0b;
+			}
+			#normal li ul li{
+				overflow: hidden;
+				height: 0;
+				transition: .2s;
+			}
+			#normal li:hover ul li{
+				overflow: visible;
+				height: 38px;
+			}
 		</style>
 
 		<!-- Javascript -->
@@ -48,73 +113,108 @@ div#controller div.slider{
 		<script type="text/javascript" src="./3DCG_basic1.js"> </script>
 	</head>
 	<body>
+		<ul id="normal" class="dropmenu">
+			<!-- button -->
+			<div id="buttonFrame">
+				<li><a href="#">
+					<input type="button" value="Restart" id="startButton" />
+				</a>
+				</li>
+				<li><a href="#">
+					<input type="button" value="Stop" id="stopButton" />
+				</a>
+				</li>
+			</div>
+			<li><a href="#">粒子の設定</a>
+			<ul>
+				<li>
+				<!-- radius -->
+				<a href="#">
+					<table>
+						<tr>
+							<td>半径</td>
+							<td><div id="slider_radius" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_radius" class="number" style="width:20px"/>m</td>
+						</tr>
+					</table>
+				</a>
+				</li>
+				<li>
+				<!-- mass -->
+				<a href="#">質量
+					<input type="text" value="" id="input_mass" class="number" />kg
+				</a>
+				</li>
+				<li>
+				<!-- N -->
+				<a href="#">
+					<table>
+						<tr>
+							<td>粒子数</td>
+							<td><div id="slider_N" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
+						</tr>
+					</table>
+				</a>
+				</li>
+			</ul>
+			</li>
+			<li><a href="#">温度</a>
+			<ul>
+				<li>
+				<a href="#">一辺
+					<span id="L">0</span>m
+				</a>
+				</li>
+				<li>
+				<a href="#">v平均
+					<span id="vel">0</span>m/s
+				</a>
+				</li>
+				<li>
+				<a href="#" >
+					<table>
+						<tr>
+							<td>温度</td>
+							<td><div id="slider_temp" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_temp" class="number" style="width:25px"/>K</td>
+						</tr>
+					</table>
+				</a>
+				</li>
+			</ul>
+			</li>
+			<li><a href="#">時間</a>
+			<ul>
+				<li>
+				<a href="#" >時間
+					<span id="time">0</span>s
+				</a>
+				</li>
+				<li>
+				<a href="#"> dt
+					<input type="text" value="" id="input_dt" class="number" style="width:180px"/>
+				</a>
+				</li>
+				<li>
+				<a href="#">
+					<table>
+						<tr>
+							<td>描画間隔</td>
+							<td><center><div id="slider_skip" class="slider" style="width:180px"></div></center></td>
+							<td><input type="text" value="" id="input_skip" class="number" /></td>
+						</tr>
+					</table>
+				</a>
+				</li>
+			</ul>
+			</li>
+		</ul>
 		<!-- frame -->
 		<div id="canvas-frame"></div>
 
 		<!-- controller -->
-		<div id="controller">
-			<h3>時間</h3>
-			<table>
-				<!-- output time -->
-				<tr>
-					<td>時間</td>
-					<td colspan="2"><span id="time">0</span>s</td>
-				</tr>
-				<!-- input dt -->
-				<tr>
-					<td>dt</td>
-					<td colspan="2"><input type="text" value="" id="input_dt" class="number" style="width:180px"/></td>
-				</tr>
-				<!-- input skip -->
-				<tr>
-					<td>描画間隔</td>
-					<td><center><div id="slider_skip" class="slider" style="width:180px"></div></center></td>
-					<td><input type="text" value="" id="input_skip" class="number" /></td>
-				</tr>
-			</table>
-			<h3>粒子の設定</h3>
-			<table>
-				<!-- radius -->
-				<tr>
-					<td>半径</td>
-					<td><center><div id="slider_radius" class="slider" style="width:180px"></div></center></td>
-					<td><input type="text" value="" id="input_radius" class="number" />m</td>
-				</tr>
-				<!-- mass -->
-				<tr>
-					<td>質量</td>
-					<td><input type="text" value="" id="input_mass" class="number" />kg</td>
-				</tr>
-				<!-- N -->
-				<tr>
-					<td>粒子数</td>
-					<td><center><div id="slider_N" class="slider" style="width:180px"></div></center></td>
-					<td><input type="text" value="" id="input_N" class="number" />個</td>
-				</tr>
-			</table>
-			<h3>parameter</h3>
-			<table>
-				<!-- output time -->
-				<tr>
-					<td>一辺</td>
-					<td colspan="2"><span id="L">0</span>m</td>
-				</tr>
-				<tr>
-					<td>v平均</td>
-					<td colspan="2"><span id="vel">0</span>m/s</td>
-				</tr>
-				<!-- input skip -->
-				<tr>
-					<td>温度</td>
-					<td><center><div id="slider_temp" class="slider" style="width:180px"></div></center></td>
-					<td><input type="text" value="" id="input_temp" class="number" />K</td>
-				</tr>
-			</table>
-			<!-- button -->
-			<div id="buttonFrame">
-				<input type="button" value="Restart" id="startButton" />
-				<input type="button" value="Stop" id="stopButton" />
-			</div>
+		<div id="controller" >
 
 		</div>
 		<p style="clear: both;">マックスウェル分布を用いて粒子の速度を割り振っています。そのため速さの平均値が毎回少し異なります。<br/>stopボタンで速度分布を表示します。</p>
