@@ -271,7 +271,7 @@ Calculation.prototype = {
 	},
 	histgram: function(p){
 		var delta_v = 100;
-		var v_max = 2000;
+		var v_max = 3000;
 		var hist = [];
 		var n_max = parseInt(v_max/delta_v, 10)
 		for(var n=0; n < n_max; n++){
@@ -281,15 +281,13 @@ Calculation.prototype = {
 					hist[n].particle_id.push(i);
 				}
 			}
-			console.log(hist[n].v);
-			console.log(hist[n].particle_id);
 		}
 		var _delta_v = 1.5*L/n_max;
 		for(var n=0; n < n_max; n++){
 			for(var m=0; m < hist[n].particle_id.length; m++){
 				p[hist[n].particle_id[m]].tempx = L+2;
 				p[hist[n].particle_id[m]].tempy = _delta_v*(n+1);
-				p[hist[n].particle_id[m]].tempz = (m+1)*2.1*RADIUS;
+				p[hist[n].particle_id[m]].tempz = m*2.1*RADIUS;
 			}
 		}
 	}
