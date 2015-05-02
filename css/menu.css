@@ -6,95 +6,99 @@
 	margin: 0px 10px 0px 0px;
 	padding: 0;
 	float: left;
-		}
-		.dropmenu:before, .dropmenu:after{
-			content: "";
-			display: table;
-		}
-		.dropmenu:after{
-			clear: both;
-		}
-		.dropmenu li{
-			position: relative;
-			width: 20%;
-			float: left;
-			margin: 0;
-			padding: 0;
-			text-align: center;
-		}
-		.dropmenu li a{
-			display: block;
-			margin: 0;
-			padding: 25px 0 25px;
-			background: #8a9b0f;
-			color: #fff;
-			font-size: 14px;
-			line-height: 2;
-			text-decoration: none;
-		}
-		.dropmenu li ul{
-			list-style: none;
-			position: absolute;
-			z-index: 9999;
-			top: 100%;
-			left: 0;
-			margin: 0;
-			padding: 0;
-		}
-		.dropmenu li:last-child ul{
-			left: -100%;
-			width: 100%;
-		}
-		.dropmenu li ul li{
-			overflow: hidden;
-			width: 200%;
-			height: 0;
-			color: #fff;
-		}
-		.dropmenu li ul li a{
-			padding: 13px 15px;
-			border-top: 1px solid #7c8c0e;
-			background: #6e7c0c;
-			text-align: left;
-		}
-		.dropmenu li:hover > a{
-			background: #6e7c0c;
-		}
-		.dropmenu li a:hover{
-			background: #616d0b;
-		}
-		#normal li ul li{
-			overflow: hidden;
-			height: 0;
-			transition: .2s;
-		}
-		#normal li:hover ul li{
-			overflow: visible;
-			height: 50px;
-		}
+}
+.dropmenu:before, .dropmenu:after{
+	content: "";
+	display: table;
+}
+.dropmenu:after{
+	clear: both;
+}
+.dropmenu li{
+	position: relative;
+	width: 20%;
+	float: left;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+.dropmenu li a{
+	display: block;
+	margin: 0;
+	padding: 25px 0 25px;
+	background: #00a8ff;
+	color: #fff;
+	font-size: 14px;
+	line-height: 2;
+	text-decoration: none;
+}
+.dropmenu li ul{
+	list-style: none;
+	position: absolute;
+	z-index: 9999;
+	top: 100%;
+	left: 0;
+	margin: 0;
+	padding: 0;
+}
+.dropmenu li:last-child ul{
+	left: -100%;
+	width: 100%;
+}
+.dropmenu li ul{
+	left: 0%;
+	width: 100%;
+}
+.dropmenu li ul li{
+	overflow: hidden;
+	width: 200%;
+	height: 0;
+	color: #fff;
+}
+.dropmenu li ul li a{
+	padding: 13px 15px;
+	border-top: 1px solid #00a8ff;
+	background: #0092dd;
+	text-align: left;
+}
+.dropmenu li:hover > a{
+	background: #0086cc;
+}
+.dropmenu li a:hover{
+	background: #0086cc;
+}
+#normal li ul li{
+	overflow: hidden;
+	height: 0;
+	transition: .2s;
+}
+#normal li:hover ul li{
+	overflow: visible;
+	height: 50px;
+}
 
-		/* ボタンのスタイル*/
-		.button{
-			font-size: 14px;
-			margin: -25px;
-			padding: 30px 50px;
-			background: #8a9b0f;
-			color: #fff;
-			border-style: none;
-		}
-		
-		/* ラジオボックスのスタイル*/
-		input[ type=radio ]{
-			-moz-transform-origin: left;
-			-moz-transform: scale(3, 3);
-			-webkit-transform-origin: left;
-			-webkit-transform: scale(3, 3);
-		}
+/* ボタンのスタイル*/
+.button{
+	font-size: 14px;
+	margin: -25px;
+	padding: 30px 50px;
+	background: #00a8ff;
+	color: #fff;
+	border-style: none;
+}
 
-		/* チェックボックスのスタイル*/
-		input[ type=checkbox ]{
-			-moz-transform-origin: left;
-			-moz-transform: scale(3, 3);
-			-webkit-transform-origin: left;
-			-webkit-transform: scale(3, 3);
-		}
+/* ラジオボックスのスタイル*/
+input[ type=radio ]{
+	-moz-transform-origin: left;
+	-moz-transform: scale(3, 3);
+	-webkit-transform-origin: left;
+	-webkit-transform: scale(3, 3);
+}
+
+/* チェックボックスのスタイル*/
+input[ type=checkbox ]{
+	-moz-transform-origin: left;
+	-moz-transform: scale(3, 3);
+	-webkit-transform-origin: left;
+	-webkit-transform: scale(3, 3);
+}
