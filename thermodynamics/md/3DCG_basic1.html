@@ -13,7 +13,6 @@
 			div#canvas-frame{
 				width: 900px;
 				height: 600px;
-				float: left;
 			}
 			div.slider{
 				width: 200px
@@ -27,6 +26,7 @@
 				width: 960px;
 				margin: 5px auto 30px;
 				padding: 0;
+				float: left;
 			}
 			.dropmenu:before, .dropmenu:after{
 				content: "";
@@ -50,7 +50,7 @@
 				background: #8a9b0f;
 				color: #fff;
 				font-size: 14px;
-				line-height: 1;
+				line-height: 2;
 				text-decoration: none;
 			}
 			.dropmenu li ul{
@@ -62,8 +62,15 @@
 				margin: 0;
 				padding: 0;
 			}
-			.dropmenu li ul li{
+			.dropmenu li:last-child ul{
+				left: -100%;
 				width: 100%;
+			}
+			.dropmenu li ul li{
+				overflow: hidden;
+				width: 200%;
+				height: 0;
+				color: #fff;
 			}
 			.dropmenu li ul li a{
 				padding: 13px 15px;
@@ -84,7 +91,7 @@
 			}
 			#normal li:hover ul li{
 				overflow: visible;
-				height: 38px;
+				height: 50px;
 			}
 		</style>
 
@@ -117,97 +124,97 @@
 			<!-- button -->
 			<div id="buttonFrame">
 				<li><a href="#">
-					<input type="button" value="Restart" id="startButton" />
-				</a>
+						<input type="button" value="Restart" id="startButton" />
+					</a>
 				</li>
 				<li><a href="#">
-					<input type="button" value="Stop" id="stopButton" />
-				</a>
+						<input type="button" value="Stop" id="stopButton" />
+					</a>
 				</li>
 			</div>
 			<li><a href="#">粒子の設定</a>
-			<ul>
-				<li>
-				<!-- radius -->
-				<a href="#">
-					<table>
-						<tr>
-							<td>半径</td>
-							<td><div id="slider_radius" class="slider" style="width:180px"></div></td>
-							<td><input type="text" value="" id="input_radius" class="number" style="width:20px"/>m</td>
-						</tr>
-					</table>
-				</a>
-				</li>
-				<li>
-				<!-- mass -->
-				<a href="#">質量
-					<input type="text" value="" id="input_mass" class="number" />kg
-				</a>
-				</li>
-				<li>
-				<!-- N -->
-				<a href="#">
-					<table>
-						<tr>
-							<td>粒子数</td>
-							<td><div id="slider_N" class="slider" style="width:180px"></div></td>
-							<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
-						</tr>
-					</table>
-				</a>
-				</li>
-			</ul>
+				<ul>
+					<li>
+						<!-- radius -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>半径</td>
+									<td><div id="slider_radius" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_radius" class="number" style="width:20px"/>m</td>
+								</tr>
+							</table>
+						</a>
+					</li>
+					<li>
+						<!-- mass -->
+						<a href="#">質量
+							<input type="text" value="" id="input_mass" class="number" />kg
+						</a>
+					</li>
+					<li>
+						<!-- N -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>粒子数</td>
+									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
+								</tr>
+							</table>
+						</a>
+					</li>
+				</ul>
 			</li>
 			<li><a href="#">温度</a>
-			<ul>
-				<li>
-				<a href="#">一辺
-					<span id="L">0</span>m
-				</a>
-				</li>
-				<li>
-				<a href="#">v平均
-					<span id="vel">0</span>m/s
-				</a>
-				</li>
-				<li>
-				<a href="#" >
-					<table>
-						<tr>
-							<td>温度</td>
-							<td><div id="slider_temp" class="slider" style="width:180px"></div></td>
-							<td><input type="text" value="" id="input_temp" class="number" style="width:25px"/>K</td>
-						</tr>
-					</table>
-				</a>
-				</li>
-			</ul>
+				<ul>
+					<li>
+						<a href="#">一辺
+							<span id="L">0</span>m
+						</a>
+					</li>
+					<li>
+						<a href="#">v平均
+							<span id="vel">0</span>m/s
+						</a>
+					</li>
+					<li>
+						<a href="#" >
+							<table>
+								<tr>
+									<td>温度</td>
+									<td><div id="slider_temp" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_temp" class="number" style="width:25px"/>K</td>
+								</tr>
+							</table>
+						</a>
+					</li>
+				</ul>
 			</li>
 			<li><a href="#">時間</a>
-			<ul>
-				<li>
-				<a href="#" >時間
-					<span id="time">0</span>s
-				</a>
-				</li>
-				<li>
-				<a href="#"> dt
-					<input type="text" value="" id="input_dt" class="number" style="width:180px"/>
-				</a>
-				</li>
-				<li>
-				<a href="#">
-					<table>
-						<tr>
-							<td>描画間隔</td>
-							<td><center><div id="slider_skip" class="slider" style="width:180px"></div></center></td>
-							<td><input type="text" value="" id="input_skip" class="number" /></td>
-						</tr>
-					</table>
-				</a>
-				</li>
-			</ul>
+				<ul>
+					<li>
+						<a href="#" >時間
+							<span id="time">0</span>s
+						</a>
+					</li>
+					<li>
+						<a href="#"> dt
+							<input type="text" value="" id="input_dt" class="number" style="width:180px"/>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<table>
+								<tr>
+									<td>描画間隔</td>
+									<td><center><div id="slider_skip" class="slider" style="width:180px"></div></center></td>
+									<td><input type="text" value="" id="input_skip" class="number" style="width:25px"/></td>
+								</tr>
+							</table>
+						</a>
+					</li>
+				</ul>
 			</li>
 		</ul>
 		<!-- frame -->
@@ -217,6 +224,6 @@
 		<div id="controller" >
 
 		</div>
-		<p style="clear: both;">マックスウェル分布を用いて粒子の速度を割り振っています。そのため速さの平均値が毎回少し異なります。<br/>stopボタンで速度分布を表示します。</p>
+			<p style="clear: both;">マックスウェル分布を用いて粒子の速度を割り振っています。そのため速さの平均値が毎回少し異なります。<br/>stopボタンで速度分布を表示します。</p>
 	</body>
 </html>
