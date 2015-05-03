@@ -5,75 +5,21 @@
 <title>Common Interface</title>
 
 <style>
-h2{
-    font-size: 18px !important;
-    margin: 5px 0px !important; 
-    padding: 5px 15px !important;
-    border-left: 7px solid #00a8ff !important;
-    background-color: #fdffff !important; 
-}
-h3{
-	position:relative;
-	padding-left:30px;
-	font-weight: bold;
-	font-size: 14px;
-	line-height: 38px;
-}
-h3:before{
-	content:''; 
-	border-radius:30px;
-	-webkit-border-radius:30px;
-	-moz-border-radius:30px; 
-	height:12px; 
-	width:12px; 
-	display:block; 
-	position:absolute; 
-	top:13px; 
-	left:5px; 
-	background-color:#00A8FF;
-	box-shadow: 0 0 2px 2px rgba(255,255,255,0.2) inset
-}
 div#canvas-frame{
-	margin: 10px;
-	width:700px;
+	width:900px;
 	height:600px;
-	float: left;
-}
-div#controller{
-	margin: 10px;
-	float: left;
-}
-div#controller div#button{
-	margin: 5px;
-}
-div#controller div#wave1{
-	margin: 10px;
-	float:left;
-}
-div#controller div#wave2{
-	margin: 10px;
-	float:left;
-}
-div#controller div#wave3{
-	margin: 10px;
-	clear: both;
 }
 input.number{
-	margin: 5px;
 	width: 30px;
-	float: right;
 }
 div#controller div.slider{
-	margin: -10px 0px 0px 0px;
-	width: 250px;
+	width: 150px;
 }
 div#controller div.slider#slider_direction1{
-	margin: -10px 0px 0px 0px;
 	width: 150px;
 }
 
 div#controller div.slider#slider_direction2{
-	margin: -10px 0px 0px 0px;
 	width: 150px;
 }
 .output{
@@ -82,6 +28,7 @@ div#controller div.slider#slider_direction2{
 </style>
 <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
 
 <!-- Javascript -->
 
@@ -108,88 +55,115 @@ div#controller div.slider#slider_direction2{
 <script type="text/javascript" src="superposition.js"></script>
 </head>
 <body>
-	<!-- frame -->
-	<div id="canvas-frame"></div>
 	<!-- controller -->
 	<div id="controller">
-		<div id="button">
-			<h2>Controller</h2>
-			<input type="button" value="" id="startButton"/>
-			<input type="button" value="" id="resetButton"/>
-		</div>
-		<!-- input vel -->
-		<div id="button">
-			<table>
-				<tr>
-					<th>Velocity</th>
-					<th><div id="slider_vel" class="slider" style="margin: 0px;"></div></th>
-					<th><input type="text" value="" id="input_vel" class="number" ></input></th>
-				</tr>
-			</table>
-		</div>
+		<ul class="dropmenu" id="normal">
+			<li><a href="#">
+				<input class="button" type="button" value="" id="startButton"/>
+			</a></li>
+			<li><a href="#" >
+				<center><input class="button" type="button" value="" id="resetButton"/></center>
+			</a></li>
+			<li><a href="#">表示</a>
+			<ul>
+				<li><a href="#">
+					Wave1 表示<input type="CHECKBOX" checked="checked" id="checkbox_wave1" />
+				</a></li>
+				<li><a href="#">
+					Wave2 表示<input type="CHECKBOX"  id="checkbox_wave2" />
+				</a></li>
+				<li><a href="#">
+					合成波 表示<input type="CHECKBOX"  id="checkbox_wave3" />
+				</a></li>
+				<li><a href="#">
+					<table>
+						<tr>
+							<th>Vel</th>
+							<th><div id="slider_vel" class="slider" style="margin: 0px;"></div></th>
+							<th><input type="text" value="" id="input_vel" class="number" ></input></th>
+						</tr>
+					</table>
+				</a></li>
+			</ul>
+			</li>
 
-		<div id="wave1">
-			<!-- wave1 -->
-			<h2>Wave1</h2>
-			表示<input type="CHECKBOX" checked="checked" id="checkbox_wave1" />
+			<div id="wave1">
+				<li><a href="#">Wave1</a>
+				<ul>
+					<li><a href="#">
+						<table style="width: 250;">
+							<tr>
+								<th>進行方向</th>
+								<th style="width: 30px;">左</th>
+								<th style="width: 150px;"><div id="slider_direction1" class="slider" style="margin: 0px;" ></div></th>
+								<th style="padding-left: 10px; width: 50px;">右</th>
+							</tr>
+						</table>
+					</a>
+					</li>
 
-			<h3>Direction</h3>
-			<table style="width: 250;">
-				<tr>
-					<th style="width: 50px;">左</th>
-					<th style="width: 150px;"><div id="slider_direction1" class="slider" style="margin: 0px;" ></div></th>
-					<th style="width: 50px;">右</th>
-				</tr>
-			</table>
+					<li><a href="#">
+						<table><tr>
+								<th>振幅</th>
+								<th><div id="slider_amp1" class="slider" ></div></th>
+								<th><input type="text" value="" id="input_amp1" class="number" ></th>
+						</tr></table>
+					</a> </li>
 
-			<!-- input A -->
-			<h3>Ampritude</h3>
-			<div id="slider_amp1" class="slider" ></div>
-			<input type="text" value="" id="input_amp1" class="number" >
+					<li><a href="#">
+						<table><tr>
+								<th>波長</th>
+								<th><div id="slider_lambda1" class="slider"></div></th>
+								<th><input type="text" value="" id="input_lambda1" class="number" ></input></th>
+						</tr></table>
+					</a></li>
+				</ul>
 
-			<!-- input f -->
-			<h3>Wave Length</h3>
-			<div id="slider_lambda1" class="slider"></div>
-			<input type="text" value="" id="input_lambda1" class="number" ></input>
+			</div>
 
+			<div id="wave2">
+				<li><a href="#">Wave2</a>
+				<ul>
 
-		</div>
+					<li><a href="#">
+						<table style="width: 250;">
+							<tr>
+								<th>進行方向</th>
+								<th style="width: 30px;">左</th>
+								<th style="width: 150px;"><div id="slider_direction2" class="slider"  style="margin: 0px;"></div></th>
+								<th style="padding-left: 10px;width: 50px;">右</th>
+							</tr>
+						</table>
+					</a>
 
-		<div id="wave2">
-			<!-- wave2 -->
-			<h2>Wave2</h2>
-			表示<input type="CHECKBOX" id="checkbox_wave2" />
+					<li><a href="#">
+						<table> <tr>
+								<th>振幅</th>
+								<th><div id="slider_amp2" class="slider" ></div></th>
+								<th><input type="text" value="" id="input_amp2" class="number" ></th>
+						</tr> </table>
+					</a> </li>
 
-			<h3>Direction</h3>
-			<table style="width: 250;">
-				<tr>
-					<th style="width: 50px;">左</th>
-					<th style="width: 150px;"><div id="slider_direction2" class="slider"  style="margin: 0px;"></div></th>
-					<th style="width: 50px;">右</th>
-				</tr>
-			</table>
+					<li><a href="#">
+						<table><tr>
+								<th>波長</th>
+								<th><div id="slider_lambda2" class="slider"></div></th>
+								<th><input type="text" value="" id="input_lambda2" class="number" ></input></th>
+						</tr></table>
+					</a> </li>
+				</ul>
+				</li>
+			</div>
 
-			<!-- input A -->
-			<h3>Ampritude</h3>
-			<div id="slider_amp2" class="slider" ></div>
-			<input type="text" value="" id="input_amp2" class="number" >
-
-			<!-- input f -->
-			<h3>Wave Length</h3>
-			<div id="slider_lambda2" class="slider"></div>
-			<input type="text" value="" id="input_lambda2" class="number" ></input>
-
-		</div>
-
-		<div id="wave3">
-			<!-- wave3 -->
-			<h2>Superposition</h2>
-			表示<input type="CHECKBOX" id="checkbox_wave3" />
-		</div>
-
-		<div id="output" style="margin: 40px 0px 0px 0px;float: right;">
-			<a href="" id="png" target="_blank" >Output PNG</a>
-		</div>
+		</ul>
 	</div>
+
+	<!-- frame -->
+	<div id="canvas-frame"></div>
+
+	<div id="output" style="margin: 40px 0px 0px 0px;float: right;">
+		<a href="" id="png" target="_blank" >Output PNG</a>
+	</div>
+
 </body>
 </html>
