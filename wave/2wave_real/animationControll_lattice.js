@@ -180,9 +180,9 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(60, -90, 90);
+	camera.position.set(60, -90, 60);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: 0, y:0, z: 0});
+	camera.lookAt({x: 0, y:0, z: -15});
 
 	//create trackball object
 	trackball = new THREE.TrackballControls(camera, canvasFrame);
@@ -297,7 +297,7 @@ var Slow = 0;
 var u;
 
 //wave opacity
-var alpha = 0.7;
+var alpha = 1.0;
 
 //init param
 function initWave(){
