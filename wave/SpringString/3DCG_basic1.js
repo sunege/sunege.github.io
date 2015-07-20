@@ -14,7 +14,7 @@ var step = 0; //step count
 var skip = 500;
 
 //oscillation
-var A = 0;
+var A = 1;
 
 //Field parameter
 var gamma = 0.5; // air resistance param
@@ -110,21 +110,6 @@ Calculation.prototype = {
 				force01.y = -spring.k*(spring.l-d_r.norm)*d_r.y/d_r.norm;
 				force01.z = -spring.k*(spring.l-d_r.norm)*d_r.z/d_r.norm;
 			}
-////////		if( i == 0 ){
-////////			p[i].fx = force01.x;
-////////			p[i].fy = force01.y;
-////////			p[i].fz = force01.z;
-////////		}
-////////		else if( i == N-1 ){
-////////			p[i].fx = force10.x;
-////////			p[i].fy = force10.y;
-////////			p[i].fz = force10.z;
-////////		}
-////////		else{
-////////			p[i].fx = force01.x+force10.x;
-////////			p[i].fy = force01.y+force10.y;
-////////			p[i].fz = force01.z+force10.z;
-////////		}
 			//gravity and resistance
 			if( i == 0 ){
 				p[i].fx = force01.x-gamma*p[i].vx;
@@ -203,31 +188,7 @@ var Ball = function(parameter){
 	this.ay = parameter.ay;
 	this.az = parameter.az;
 
-	//init trajectory
-	trajectory = [];
 
-	//plot data
-	data_x = []; // x position
-	data_y = []; // y position
-	data_z = []; // z position
-	data_vx = []; // x velocity
-	data_vy = []; // y velocity
-	data_vz = []; // z velocity
-	data_kinetic = []; // kinetic energy
-	data_potential = []; // potential energy
-	data_energy = []; // energy
-
-	//init plot data
-	data_x.push([0, this.x]);
-	data_y.push([0, this.y]);
-	data_z.push([0, this.z]);
-	data_vx.push([0, this.vx]);
-	data_vy.push([0, this.vy]);
-	data_vz.push([0, this.vz]);
-	var energy = this.calculateEnergy();
-	data_kinetic.push([0, energy.kinetic]);
-	data_potential.push([0, energy.potential]);
-	data_energy.push([0, energy.kinetic + energy.potential]);
 };
 //add Method
 Ball.prototype = {
@@ -276,16 +237,6 @@ Ball.prototype = {
 	}
 };
 
-//plot data
-var data_x = []; // x position
-var data_y = []; // y position
-var data_z = []; // z position
-var data_vx = []; // x position
-var data_vy = []; // y position
-var data_vz = []; // z position
-var data_kinetic = [];
-var data_potential = [];
-var data_energy = [];
 
 /*------- create ball object ---------*/
 // var g = 9.8;
@@ -297,13 +248,6 @@ var data_energy = [];
 // 		vx: 0, vy:0, vz: 0, // velocity vector
 // 		ax: 0, ay:0, az: g // acceleration vector
 // });
-var trajectory = []; // trajectory object
-
-//plot setting
-var skip_data = 10; // plot data skip
-var plot2D_position; // position plot object
-var plot2D_velocity; // velocity plot object
-var plot2D_energy; // energy plot object
 
 //stop flag
 var restartFlag = false; // restert flag
@@ -318,7 +262,6 @@ window.addEventListener("load", function(){
 			p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
 		cal = new Calculation(p);
 		initEvent();
-		plotStart();
 		threeStart();
 });
 
@@ -423,47 +366,6 @@ function initEvent(){
 			}
 	});
 
-	// 	$('#slider_g').slider({
-	// 			min: 0,
-	// 			max: 30,
-	// 			step: 0.1,
-	// 			value: g,
-	// 			slide: function(event, ui){
-	// 				var value = ui.value;
-	// 				document.getElementById("input_g").value = value;
-	// 			}
-	// 	});
-	// 	var strs = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'mass'];
-	// 	for(var i=0; i < strs.length; i++){
-	// 		var param = strs[i];
-	// 		var value = ball[param];
-	// 		document.getElementById("input_" + param).value = value;
-	// 		$('#slider_' + strs[i]).slider({
-	// 				min: -100,
-	// 				max: 100,
-	// 				step: 1,
-	// 				value: value,
-	// 				slide: function(event, ui){
-	// 					var value = ui.value;
-	// 					var param = this.id.replace("slider_", "");
-	// 					ball[param] = value;
-
-	// 					var id = this.id.replace("slider_", "input_");
-	// 					document.getElementById(id).value = value;
-	// 				}
-	// 		})
-
-	// 		document.getElementById("input_" + param).addEventListener("change", function(){
-	// 				var value = parseFloat(this.value) || 0;
-	// 				var param = this.id.replace("input_", "");
-	// 				ball[param] = value;
-
-	// 				var id = this.id.replace("input_", "slider_");
-	// 				$('#' + id).slider({ value: value });
-	// 		});
-	// }
-	// 	$('#slider_z').slider({ min: 0, max: 500 });
-
 
 	//input interface
 	document.getElementById("input_skip").value = skip;
@@ -476,7 +378,6 @@ function initEvent(){
 	document.getElementById("input_nl").value = nl;
 	document.getElementById("input_gamma").value = gamma;
 
-// 	document.getElementById("input_g").value = g;
 
 	//button interface
 	//start button
@@ -573,7 +474,7 @@ function initCamera(){
 	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
 	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
 
-	trackball.noRotate = false;
+	trackball.noRotate = true;//false;
 	trackball.rotateSpeed = 2.0;
 
 	trackball.noZoom = false;
@@ -622,40 +523,6 @@ var axis;
 var sphere=[]; //sphere object
 
 function initObject(){
-	//create geometry
-	// 	var geometry = new THREE.SphereGeometry( ball.radius, 20, 20 );
-	//create material
-	// 	var material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
-
-	//create sphere object
-	// 	sphere = new THREE.Mesh(geometry, material);
-
-	//add scene
-	// 	scene.add(sphere);
-
-	//create shadow
-	// 	sphere.castShadow = true;
-
-	/*  floar drow  */
-	// 	var yuka_n = 20,
-	// 		 yuka_w = 100;
-	// 	for(var i=-yuka_n/2; i<=yuka_n/2; i++){
-	// 		for(var j=-yuka_n/2; j<=yuka_n/2; j++){
-	// 			position
-	// 			var x = j*yuka_w;
-	// 			var y = i*yuka_w;
-	// 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
-	// 			if(Math.abs(i+j) % 2 == 0){
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
-	// 			}else{
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
-	// 			}
-	// 			var plane = new THREE.Mesh(geometry, material);
-	// 			plane.position.set(x, y, 0);
-	// 			plane.receiveShadow = true;
-	// 			scene.add(plane);
-	// 		}
-	// 	}
 	//create axis object
 	axis = new THREE.AxisHelper(100);
 	//add axis object to scene
@@ -678,11 +545,6 @@ function initObject(){
 	}
 }
 
-////////////////////////////////////////
-// define plotStart()
-////////////////////////////////////////
-function plotStart(){
-}
 
 ////////////////////////////////////////
 // define loop()
@@ -690,9 +552,6 @@ function plotStart(){
 function loop(){
 	//update trackball object
 	trackball.update();
-
-	//set sphere position
-	// 	sphere.position.set(ball.x, ball.y, ball.z);
 
 
 	if(restartFlag == true){
@@ -746,23 +605,6 @@ function loop(){
 	//time development
 	// 	var time = step * dt;
 	if(stopFlag == false){
-		// 		for(var k=0; k<skip; k++){
-		// 			step++;
-		// 			time = step * dt;
-		// 			ball.timeEvolution(dt);
-		// 			if(step % (skip*skip_data) == 0){
-		// 				data_x.push([time, ball.x]);
-		// 				data_y.push([time, ball.y]);
-		// 				data_z.push([time, ball.z]);
-		// 				data_vx.push([time, ball.vx]);
-		// 				data_vy.push([time, ball.vy]);
-		// 			data_vz.push([time, ball.vz]);
-		// 				var energy = ball.calculateEnergy();
-		// 				data_kinetic.push([time, energy.kinetic]);
-		// 				data_potential.push([time, energy.potential]);
-		// 				data_energy.push([time, energy.kinetic + energy.potential]);
-		// 			}
-		// 		}
 		for(var n=0; n<skip; n++){
 			//increment of step
 			step++;
@@ -805,19 +647,10 @@ function loop(){
 	//init clear color
 	renderer.clear();
 
-	//draw trajectory
-	// 	trajectory.push(new THREE.Vector3(ball.x, ball.y, ball.z));
-	// 	var trajectoryGeometry = new THREE.Geometry();
-	// 	trajectoryGeometry.vertices = trajectory;
-	// 	var material = new THREE.LineBasicMaterial({ color: 0xFF0000 });
-	// 	var line = new THREE.Line(trajectoryGeometry, material);
-	// 	scene.add(line);
 
 	//rendering
 	renderer.render(scene, camera);
 
-	//remove line
-	// 	scene.remove(line);
 
 	//call loop function
 	requestAnimationFrame(loop);
