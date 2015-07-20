@@ -317,31 +317,7 @@ var Ball = function(parameter){
 	this.ay = parameter.ay;
 	this.az = parameter.az;
 
-	//init trajectory
-	trajectory = [];
 
-	//plot data
-	data_x = []; // x position
-	data_y = []; // y position
-	data_z = []; // z position
-	data_vx = []; // x velocity
-	data_vy = []; // y velocity
-	data_vz = []; // z velocity
-	data_kinetic = []; // kinetic energy
-	data_potential = []; // potential energy
-	data_energy = []; // energy
-
-	//init plot data
-	data_x.push([0, this.x]);
-	data_y.push([0, this.y]);
-	data_z.push([0, this.z]);
-	data_vx.push([0, this.vx]);
-	data_vy.push([0, this.vy]);
-	data_vz.push([0, this.vz]);
-	var energy = this.calculateEnergy();
-	data_kinetic.push([0, energy.kinetic]);
-	data_potential.push([0, energy.potential]);
-	data_energy.push([0, energy.kinetic + energy.potential]);
 };
 //add Method
 Ball.prototype = {
@@ -390,34 +366,6 @@ Ball.prototype = {
 	}
 };
 
-//plot data
-var data_x = []; // x position
-var data_y = []; // y position
-var data_z = []; // z position
-var data_vx = []; // x position
-var data_vy = []; // y position
-var data_vz = []; // z position
-var data_kinetic = [];
-var data_potential = [];
-var data_energy = [];
-
-/*------- create ball object ---------*/
-// var g = 9.8;
-// var mass = 5;
-// var RADIUS = 10;
-// var ball = new Ball({ radius: RADIUS,
-// 		mass: mass,
-// 		x: 0, y: 0, z: 100, // position vector
-// 		vx: 0, vy:0, vz: 0, // velocity vector
-// 		ax: 0, ay:0, az: g // acceleration vector
-// });
-var trajectory = []; // trajectory object
-
-//plot setting
-var skip_data = 10; // plot data skip
-var plot2D_position; // position plot object
-var plot2D_velocity; // velocity plot object
-var plot2D_energy; // energy plot object
 
 //stop flag
 var restartFlag = false; // restert flag
@@ -432,7 +380,6 @@ window.addEventListener("load", function(){
 		p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
 	cal = new Calculation(p);
 	initEvent();
-	plotStart();
 	threeStart();
 });
 
@@ -818,11 +765,6 @@ function wall(v1, v2, v3, v4){
 	return new THREE.Mesh(geometry, material);
 }
 
-////////////////////////////////////////
-// define plotStart()
-////////////////////////////////////////
-function plotStart(){
-}
 
 ////////////////////////////////////////
 // define loop()
@@ -895,13 +837,6 @@ function loop(){
 	//init clear color
 	renderer.clear();
 
-	//draw trajectory
-	// 	trajectory.push(new THREE.Vector3(ball.x, ball.y, ball.z));
-	// 	var trajectoryGeometry = new THREE.Geometry();
-	// 	trajectoryGeometry.vertices = trajectory;
-	// 	var material = new THREE.LineBasicMaterial({ color: 0xFF0000 });
-	// 	var line = new THREE.Line(trajectoryGeometry, material);
-	// 	scene.add(line);
 
 	//rendering
 	renderer.render(scene, camera);
