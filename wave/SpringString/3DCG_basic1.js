@@ -35,6 +35,7 @@ var nl = 0.7;
 var spring = { k: 1000, l: nl*dl };
 
 var freq = 1;
+var phi = 0;
 var m=8; // mode
 //particle class
 var Particle = function(parameter){
@@ -252,6 +253,7 @@ Ball.prototype = {
 //stop flag
 var restartFlag = false; // restert flag
 var stopFlag = true; // stop flag
+var pulseFlag = false;
 
 
 ////////////////////////////////////////
@@ -309,6 +311,7 @@ function initEvent(){
 			value: freq,
 			slide: function(event, ui){
 				var value = ui.value;
+				phi = 2*Math.PI*time*(freq - value) + phi;
 				freq = value;
 				document.getElementById("input_freq").value = value;
 			}
@@ -399,7 +402,9 @@ function initEvent(){
 function mouseEvent(){
 	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
 	function onDocumentMouseDown( event ){
-		p[parseInt(N/2)].vz = 40;
+// 		p[parseInt(N/2)].vz = 40;
+			pulseFlag = true;
+
 	}
 };
 ////////////////////////////////////////
@@ -546,6 +551,7 @@ function initObject(){
 }
 
 
+var pulseTime = 0;
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
@@ -566,6 +572,7 @@ function loop(){
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
 		freq = parseFloat(document.getElementById("input_freq").value);
+		phi = 0;
 		A = parseFloat(document.getElementById("input_A").value);
 		spring.k = parseFloat(document.getElementById("input_k").value);
 		nl = parseFloat(document.getElementById("input_nl").value);
@@ -615,12 +622,20 @@ function loop(){
 			//p[0].x = A * Math.cos(2*Math.PI*freq * time);
 			p[0].x = 0;
 			p[0].y = 0;
-			p[0].z = A * Math.sin(2*Math.PI*freq * time);
+			p[0].z = A * Math.sin(2*Math.PI*freq * time + phi);
 			//p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
 			p[0].vx = 0;
 			p[0].vy = 0;
-			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
+// 			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
 
+			if(pulseFlag == true){
+				pulseTime += dt;
+				p[0].z = 2* Math.sin(2*Math.PI*freq * pulseTime);
+				if(p[0].z <= 0){
+					pulseTime = 0;
+					pulseFlag = false;
+				}
+			}
 			if(boundary == "d"){
 				p[N-1].x = 0;
 				p[N-1].y = L;

@@ -482,12 +482,12 @@ function initObject(){
 
 	sphere1 = new THREE.Mesh(geometry, material);
 	sphere2 = new THREE.Mesh(geometry, material);
-	scene.add(sphere1);
-	sphere1.castShadow = true;
-	sphere1.position.set(x1, 0, 0);
-	scene.add(sphere2);
-	sphere2.castShadow = true;
-	sphere2.position.set(x2, 0, 0);
+// 	scene.add(sphere1);
+// 	sphere1.castShadow = true;
+// 	sphere1.position.set(x1, 0, 0);
+// 	scene.add(sphere2);
+// 	sphere2.castShadow = true;
+// 	sphere2.position.set(x2, 0, 0);
 
 	//box object
 	var box_length = (l*N-space)/2;
