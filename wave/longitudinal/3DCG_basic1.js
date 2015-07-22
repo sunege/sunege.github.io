@@ -627,7 +627,7 @@ function loop(){
 			p[0].z = 0;
 			//p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
 			p[0].vx = 0;
-// 			p[0].vy = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time + phi);
+			p[0].vy = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time + phi);
 			p[0].vz = 0;
 
 			if(boundary == "d"){
