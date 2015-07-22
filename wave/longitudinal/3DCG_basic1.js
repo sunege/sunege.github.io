@@ -11,7 +11,7 @@ var N = 50;	   // number of particle
 var L = 20;	   // System length
 var dl = L / (N-1); //discreat space
 var step = 0; //step count
-var skip = 500;
+var skip = 50;
 
 //oscillation
 var A = 1;
@@ -253,7 +253,6 @@ Ball.prototype = {
 //stop flag
 var restartFlag = false; // restert flag
 var stopFlag = true; // stop flag
-var pulseFlag = false;
 
 
 ////////////////////////////////////////
@@ -318,8 +317,8 @@ function initEvent(){
 	});
 	$('#slider_A').slider({
 			min: 0,
-			max: 5,
-			step: 0.1,
+			max: 1,
+			step: 0.01,
 			value: A,
 			slide: function(event, ui){
 				var value = ui.value;
@@ -403,8 +402,6 @@ function mouseEvent(){
 	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
 	function onDocumentMouseDown( event ){
 // 		p[parseInt(N/2)].vz = 40;
-			pulseFlag = true;
-
 	}
 };
 ////////////////////////////////////////
@@ -479,7 +476,7 @@ function initCamera(){
 	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
 	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
 
-	trackball.noRotate = true;//false;
+	trackball.noRotate = false;
 	trackball.rotateSpeed = 2.0;
 
 	trackball.noZoom = false;
@@ -498,20 +495,25 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+var directionalLight1, //directionalLight object
+	directionalLight2, //directionalLight object
 	 ambientLight; // ambientlighLight object
 
 function initLight(){
 	//create directionalLight object
-	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
+	directionalLight1 = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
+	directionalLight2 = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
 
 	//set directionalLight options
-	directionalLight.position.set(100, 100, 100);
+	directionalLight1.position.set(0, -100, 0);
+	directionalLight2.position.set(0, 100, 0);
 
-	directionalLight.castShadow = true;
+	directionalLight1.castShadow = true;
+	directionalLight2.castShadow = true;
 
 	//add scene
-	scene.add(directionalLight);
+	scene.add(directionalLight1);
+	scene.add(directionalLight2);
 
 	//create ambientLight object
 	ambientLight = new THREE.AmbientLight(0x777777);
@@ -538,7 +540,8 @@ function initObject(){
 	sphere = [];
 	for(var i=0; i<N; i++){
 		//create geometry
-		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
+// 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
+		var geometry = new THREE.BoxGeometry(3, 0.03, 5);
 		//create material
 		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
 		//create object
@@ -551,7 +554,6 @@ function initObject(){
 }
 
 
-var pulseTime = 0;
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
@@ -621,21 +623,13 @@ function loop(){
 
 			//p[0].x = A * Math.cos(2*Math.PI*freq * time);
 			p[0].x = 0;
-			p[0].y = 0;
-			p[0].z = A * Math.sin(2*Math.PI*freq * time + phi);
+			p[0].y = A * Math.sin(2*Math.PI*freq * time + phi);
+			p[0].z = 0;
 			//p[0].vx = -A * 2*Math.PI*freq*Math.sin(2*Math.PI*freq * time);
 			p[0].vx = 0;
-			p[0].vy = 0;
-// 			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
+// 			p[0].vy = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time + phi);
+			p[0].vz = 0;
 
-			if(pulseFlag == true){
-				pulseTime += dt;
-				p[0].z = 2* Math.sin(2*Math.PI*freq * pulseTime);
-				if(p[0].z <= 0){
-					pulseTime = 0;
-					pulseFlag = false;
-				}
-			}
 			if(boundary == "d"){
 				p[N-1].x = 0;
 				p[N-1].y = L;
