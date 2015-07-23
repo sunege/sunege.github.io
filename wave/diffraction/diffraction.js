@@ -301,7 +301,7 @@ var Slow = 0;
 var u;
 
 //wave opacity
-var alpha = 0.7;
+var alpha = 1;
 
 //init param
 function initWave(){
