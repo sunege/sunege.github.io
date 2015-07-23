@@ -517,8 +517,8 @@ function loop(){
 						n++;
 					}
 				}
-				sphere1.position.set(x1, 0, Amp*sin(2*Math.PI*time/Time));
-				sphere2.position.set(x2, 0, Amp*sin(2*Math.PI*time/Time + phi));
+				sphere1.position.set(x1, 0, Amp*Math.sin(2*Math.PI*time/Time));
+				sphere2.position.set(x2, 0, Amp*Math.sin(2*Math.PI*time/Time + phi));
 // 				sphere2.position.set(x2, 0, f[step%Step][N/2 - space/2][N/2]);
 				lattice.geometry.verticesNeedUpdate = true;
 				lattice.geometry.normalsNeedUpdate = true;
