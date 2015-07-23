@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>diffraction</title>
+
+		<style>
+			div#canvas-frame{ width:900px; height:700px; }
+		</style>
+		<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
+
+		<!-- Javascript -->
+
+		<!-- jQuery -->
+		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+
+		<!-- Three -->
+		<script type="text/javascript" src="../../js/Three/build/three.js"></script>
+		<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+
+		<!-- Main script -->
+		<script type="text/javascript" src="diffraction.js"></script>
+	</head>
+	<body>
+
+		<ul id="normal" class="dropmenu">
+
+			<!-- start button -->
+			<li>
+			<a href="#"><input type="button" value="" id="startButton"/></a>
+			</li>
+
+			<!-- restartbutton -->
+			<li>
+			<a href="#"><input type="button" value="" id="restartButton"/></a>
+			</li>
+
+			<!-- input alpha -->
+			<li>
+			<a href="#">透明度</a>
+			<ul>
+				<li>
+				<a href="#">
+					<table><tr>
+							<td><div id="slider_alpha" class="slider" style="width:180px;"></div></td>
+							<td><center><input type="text" value="" id="input_alpha" class="number" style="width:40px"/></center></td>
+					</tr></table>
+				</a>
+				</li>
+			</ul>
+			</li>
+
+			<li>
+			<a href="#">波の設定</a>
+			<ul>
+				<li>
+				<!-- input A -->
+				<a href="#">
+					<table><tr>
+							<td>振幅</td>
+							<td><div id="slider_Amp" class="slider" style="width:180px;"></div></td>
+							<td><input type="text" value="" id="input_Amp" class="number" style="width:40px"/></td>
+					</tr></table>
+				</a>
+				</li>
+				<li>
+				<a href="#">
+					<!-- input lambda -->
+					<table><tr>
+							<td>波長</td>
+							<td><div id="slider_lambda" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_lambda" class="number" style="width:40px"/></td>
+					</tr></table>
+				</a>
+				</li>
+				<li>
+				<a href="#">
+					<!-- space -->
+					<table><tr>
+							<td>堤防の隙間</td>
+							<td><div id="slider_space" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_space" class="number" style="width:40px"/></td>
+					</tr></table>
+				</a>
+				</li>
+				<li>
+				<a href="#">
+					<!-- velocity -->
+					<table><tr>
+							<td>波の速さ</td>
+							<td><div id="slider_vel" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_vel" class="number" style="width:40px"/></td>
+					</tr></table>
+				</a>
+				</li>
+			</ul>
+			</li>
+
+			<!-- boundary -->
+			<li>
+			<a href="#">境界条件</a>
+			<ul>
+				<li>
+				<a href="#">固定端(Dirichlet)<input type="radio" name="bound" value="Dir" /></a>
+				</li>
+				<li>
+				<a href="#">自由端(Neumann)<input type="radio" name="bound" value="Neu" /></a>
+				</li>
+				<li>
+				<a href="#">無反射(du/dt=vdu/dx)<input type="radio" name="bound" value="Non" checked="checked"/></a>
+				</li>
+			</ul>
+			</li>
+		</ul>
+		<div id="canvas-frame"></div>
+		<a href="" id="png" target="_blank">Output PNG</a>
+	</body>
+</html>
