@@ -20,6 +20,8 @@ var DirichletFlag = false;
 var NeumannFlag = false;
 var nonreflectiveFlag = true;
 
+var boxFlag = false;
+
 var pngData;
 var pngName;
 function initEvent(){
@@ -180,9 +182,9 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(60, -90, 90);
+	camera.position.set(60, -90, 30);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: 0, y:0, z: 0});
+	camera.lookAt({x: 0, y:0, z: -25});
 
 	//create trackball object
 	trackball = new THREE.TrackballControls(camera, canvasFrame);
@@ -332,14 +334,28 @@ function calculate(){
 
 	//calculate vartex
 	var gamma2 = Math.pow(vel*dt/dx, 2);
-	for(var i=1; i <= N-1; i++){
-		for(var j=1; j <= N-1; j++){
-			if(i>=(N-box_width)/2 && i<=(N+box_width)/2){
-				if(j<=(N-space)/2 || j>=(N+space)/2){
-					continue;
-				}
-			}	
+	if(boxFlag==false){
+		for(var i=1; i <= N-1; i++){
+			for(var j=1; j <= N-1; j++){
+				if(i>=(N-box_width)/2 && i<=(N+box_width)/2){
+					if(j<=(N-space)/2 || j>=(N+space)/2){
+						continue;
+					}
+				}	
 				u[2][i][j] = 2*(1-2*gamma2)*u[1][i][j] - u[0][i][j] + gamma2*(u[1][i+1][j]+u[1][i-1][j]+u[1][i][j+1]+u[1][i][j-1]);
+			}
+		}
+	}
+	else if(boxFlag==true){
+		for(var i=1; i <= N-1; i++){
+			for(var j=1; j <= N-1; j++){
+				if(i>=(N-box_width)/2 && i<=(N+box_width)/2){
+					if(j>=(N-space)/2 && j<=(N+space)/2){
+						continue;
+					}
+				}	
+				u[2][i][j] = 2*(1-2*gamma2)*u[1][i][j] - u[0][i][j] + gamma2*(u[1][i+1][j]+u[1][i-1][j]+u[1][i][j+1]+u[1][i][j-1]);
+			}
 		}
 	}
 	//Dirichlet condition
@@ -360,47 +376,76 @@ function calculate(){
 	//nonreflective
 	else if(nonreflectiveFlag == true){
 		//edge condition
-		//Neumann
-		for(var i=1; i<(N-box_width)/2; i++){
-			u[2][i][0] = u[2][i][1];
-			u[2][i][N] = u[2][i][N - 1];
-		}
-		//nonreflective
-		for(var i=(N+box_width)/2; i<N; i++){
-			u[2][i][0] = u[2][i][0]+vel*(dt/dx)*(u[1][i][1] - u[1][i][0]);
-			u[2][i][N] = u[2][i][N]+vel*(dt/dx)*(u[1][i][N-1] - u[1][i][N]);
-		}
-		for (var i = 1; i <= N - 1; i++) {
-			u[2][N][i] = u[2][N][i]+vel*(dt/dx)*(u[1][N-1][i] - u[1][N][i]);
-		}
 		//around box object
-		for(var i=1; i<(N-space)/2; i++){
-			u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
-			u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
+		if(boxFlag == false){
+			//Neumann
+			for(var i=1; i<(N-box_width)/2; i++){
+				u[2][i][0] = u[2][i][1];
+				u[2][i][N] = u[2][i][N - 1];
+			}
+			//nonreflective
+			for(var i=(N+box_width)/2; i<N; i++){
+				u[2][i][0] = u[2][i][0]+vel*(dt/dx)*(u[1][i][1] - u[1][i][0]);
+				u[2][i][N] = u[2][i][N]+vel*(dt/dx)*(u[1][i][N-1] - u[1][i][N]);
+			}
+			for (var i = 1; i <= N - 1; i++) {
+				u[2][N][i] = u[2][N][i]+vel*(dt/dx)*(u[1][N-1][i] - u[1][N][i]);
+			}
+			for(var i=1; i<(N-space)/2; i++){
+				u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
+				u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
+			}
+			for(var i=(N+space)/2+1; i<N; i++){
+				u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
+				u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
+			}
+			for(var i=(N-box_width)/2+1; i<(N+box_width)/2; i++){
+				u[2][i][(N-space)/2] = u[2][i][(N-space)/2+1];
+				u[2][i][(N+space)/2] = u[2][i][(N+space)/2-1];
+			}
 		}
-		for(var i=(N+space)/2+1; i<N; i++){
-			u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
-			u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
-		}
-		for(var i=(N-box_width)/2+1; i<(N+box_width)/2; i++){
-			u[2][i][(N-space)/2] = u[2][i][(N-space)/2+1];
-			u[2][i][(N+space)/2] = u[2][i][(N+space)/2-1];
+		else if(boxFlag == true){
+			//Neumann
+			for(var i=1; i<N; i++){
+				u[2][i][0] = u[2][i][1];
+				u[2][i][N] = u[2][i][N - 1];
+			}
+			//nonreflective
+			for (var i = 1; i <= N - 1; i++) {
+				u[2][N][i] = u[2][N][i]+vel*(dt/dx)*(u[1][N-1][i] - u[1][N][i]);
+			}
+			for(var i=(N-space)/2+1; i<(N+space)/2; i++){
+				u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
+				u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
+			}
+			for(var i=(N-box_width)/2; i<(N+box_width)/2; i++){
+				u[2][i][(N-space)/2] = u[2][i][(N-space)/2-1];
+				u[2][i][(N+space)/2] = u[2][i][(N+space)/2+1];
+			}
 		}
 	}
-	
+
 	//edge
 	u[2][0][0] = (u[2][0][1] + u[2][1][0]) / 2;
 	u[2][0][N] = (u[2][0][N - 1] + u[2][1][N]) / 2;
 	u[2][N][0] = (u[2][N - 1][0] + u[2][N][1]) / 2;
 	u[2][N][N] = (u[2][N - 1][N] + u[2][N][N - 1]) / 2;
-	u[2][(N-box_width)/2][0] = (u[2][(N-box_width)/2-1][0] + u[2][(N-box_width)/2][1]) / 2;
-	u[2][(N+box_width)/2][0] = (u[2][(N+box_width)/2+1][0] + u[2][(N+box_width)/2][1]) / 2;
-	u[2][(N-box_width)/2][N] = (u[2][(N-box_width)/2-1][N] + u[2][(N-box_width)/2][N-1]) / 2;
-	u[2][(N+box_width)/2][N] = (u[2][(N+box_width)/2+1][N] + u[2][(N+box_width)/2][N-1]) / 2;
-	u[2][(N-box_width)/2][(N-space)/2] = (u[2][(N-box_width)/2+1][(N-space)/2] + u[2][(N-box_width)/2][(N-space)/2-1]) / 2;
-	u[2][(N+box_width)/2][(N-space)/2] = (u[2][(N+box_width)/2-1][(N-space)/2] + u[2][(N+box_width)/2][(N-space)/2-1]) / 2;
-	u[2][(N-box_width)/2][(N+space)/2] = (u[2][(N-box_width)/2+1][(N+space)/2] + u[2][(N-box_width)/2][(N+space)/2+1]) / 2;
-	u[2][(N+box_width)/2][(N+space)/2] = (u[2][(N+box_width)/2-1][(N+space)/2] + u[2][(N+box_width)/2][(N+space)/2+1]) / 2;
+	if(boxFlag==false){
+		u[2][(N-box_width)/2][0] = (u[2][(N-box_width)/2-1][0] + u[2][(N-box_width)/2][1]) / 2;
+		u[2][(N+box_width)/2][0] = (u[2][(N+box_width)/2+1][0] + u[2][(N+box_width)/2][1]) / 2;
+		u[2][(N-box_width)/2][N] = (u[2][(N-box_width)/2-1][N] + u[2][(N-box_width)/2][N-1]) / 2;
+		u[2][(N+box_width)/2][N] = (u[2][(N+box_width)/2+1][N] + u[2][(N+box_width)/2][N-1]) / 2;
+		u[2][(N-box_width)/2][(N-space)/2] = (u[2][(N-box_width)/2+1][(N-space)/2] + u[2][(N-box_width)/2][(N-space)/2-1]) / 2;
+		u[2][(N+box_width)/2][(N-space)/2] = (u[2][(N+box_width)/2-1][(N-space)/2] + u[2][(N+box_width)/2][(N-space)/2-1]) / 2;
+		u[2][(N-box_width)/2][(N+space)/2] = (u[2][(N-box_width)/2+1][(N+space)/2] + u[2][(N-box_width)/2][(N+space)/2+1]) / 2;
+		u[2][(N+box_width)/2][(N+space)/2] = (u[2][(N+box_width)/2-1][(N+space)/2] + u[2][(N+box_width)/2][(N+space)/2+1]) / 2;
+	}
+	else if(boxFlag==true){
+		u[2][(N-box_width)/2][(N-space)/2] = (u[2][(N-box_width)/2+1][(N-space)/2] + u[2][(N-box_width)/2][(N-space)/2+1]) / 2;
+		u[2][(N+box_width)/2][(N-space)/2] = (u[2][(N+box_width)/2-1][(N-space)/2] + u[2][(N+box_width)/2][(N-space)/2+1]) / 2;
+		u[2][(N-box_width)/2][(N+space)/2] = (u[2][(N-box_width)/2+1][(N+space)/2] + u[2][(N-box_width)/2][(N+space)/2-1]) / 2;
+		u[2][(N+box_width)/2][(N+space)/2] = (u[2][(N+box_width)/2-1][(N+space)/2] + u[2][(N+box_width)/2][(N+space)/2-1]) / 2;
+	}
 
 	for (var i = 0; i <= N; i++) {
 		for (var j = 0; j <= N; j++) {
@@ -443,31 +488,31 @@ function initObject(){
 	geometry.computeFaceNormals();
 	//calculate vertex normal vector
 	geometry.computeVertexNormals();
-	
-// 	for(var n=0; n < geometry.faces.length/2; n++){
-// 		for(var i=0; i<N; i++){
-// 			for(var j=0; j<N; j++){
-// 				geometry.faceVertexUvs[0].push([
-// 					new THREE.Vector2(i/N,j+1/N),
-// 					new THREE.Vector2(i+1/N,j+1/N),
-// 					new THREE.Vector2(i+1/N,j/N)
-// 				]);
-// 				geometry.faceVertexUvs[0].push([
-// 					new THREE.Vector2(i/N,j+1/N),
-// 					new THREE.Vector2(i+1/N,j/N),
-// 					new THREE.Vector2(i/N,j/N)
-// 				]);
-// 			}
-// 		}
-// 	}
+
+	// 	for(var n=0; n < geometry.faces.length/2; n++){
+	// 		for(var i=0; i<N; i++){
+	// 			for(var j=0; j<N; j++){
+	// 				geometry.faceVertexUvs[0].push([
+	// 					new THREE.Vector2(i/N,j+1/N),
+	// 					new THREE.Vector2(i+1/N,j+1/N),
+	// 					new THREE.Vector2(i+1/N,j/N)
+	// 				]);
+	// 				geometry.faceVertexUvs[0].push([
+	// 					new THREE.Vector2(i/N,j+1/N),
+	// 					new THREE.Vector2(i+1/N,j/N),
+	// 					new THREE.Vector2(i/N,j/N)
+	// 				]);
+	// 			}
+	// 		}
+	// 	}
 
 	//create material
 	var material = new THREE.MeshPhongMaterial({
-		color: 0xBFFFFF, ambient: 0x000050,
-		side: THREE.DoubleSide,
-		specular: 0xFFFFFF, shininess: 190, 
-// 		map: THREE.ImageUtils.loadTexture('0014.jpg'),
-		transparent: true, opacity: alpha
+			color: 0xBFFFFF, ambient: 0x000050,
+			side: THREE.DoubleSide,
+			specular: 0xFFFFFF, shininess: 190, 
+			// 		map: THREE.ImageUtils.loadTexture('0014.jpg'),
+			transparent: true, opacity: alpha
 	});
 
 	//create sphere object
@@ -482,28 +527,37 @@ function initObject(){
 
 	sphere1 = new THREE.Mesh(geometry, material);
 	sphere2 = new THREE.Mesh(geometry, material);
-// 	scene.add(sphere1);
-// 	sphere1.castShadow = true;
-// 	sphere1.position.set(x1, 0, 0);
-// 	scene.add(sphere2);
-// 	sphere2.castShadow = true;
-// 	sphere2.position.set(x2, 0, 0);
+	// 	scene.add(sphere1);
+	// 	sphere1.castShadow = true;
+	// 	sphere1.position.set(x1, 0, 0);
+	// 	scene.add(sphere2);
+	// 	sphere2.castShadow = true;
+	// 	sphere2.position.set(x2, 0, 0);
 
 	//box object
-	var box_length = (l*N-space)/2;
-	geometry = new THREE.BoxGeometry(box_width,box_length, 30);
-	material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+	if(boxFlag==false){
+		var box_length = (l*N-space)/2;
+		geometry = new THREE.BoxGeometry(box_width,box_length, 30);
+		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
 
-	box1 = new THREE.Mesh(geometry, material);
-	box2 = new THREE.Mesh(geometry, material);
-	box1.position.set(0, (box_length+space)/2, -5);
-	box2.position.set(0, -(box_length+space)/2, -5);
-	scene.add(box1);
-	scene.add(box2);
-	
+		box1 = new THREE.Mesh(geometry, material);
+		box2 = new THREE.Mesh(geometry, material);
+		box1.position.set(0, (box_length+space)/2, -5);
+		box2.position.set(0, -(box_length+space)/2, -5);
+		scene.add(box1);
+		scene.add(box2);
+	}
+	else{
+		geometry = new THREE.BoxGeometry(box_width, space, 30);
+		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+		box1 = new THREE.Mesh(geometry, material);
+		box1.position.set(l/2-dl, l/2-dl, -5)
+		scene.add(box1);
+	}
+
 
 	//line object
-// 	DrawLine();
+	// 	DrawLine();
 
 	/*  floar drow  */
 	var yuka_n = 10,
@@ -568,22 +622,42 @@ function loop(){
 				nonreflectiveFlag = true;
 			}
 		}
+		var ObjList = document.getElementsByName("Obj");
+		for(var i=0; i< ObjList.length; i++){
+			if(ObjList[i].checked && ObjList[i].value == "Space"){
+				boxFlag = false;
+			}
+			else if(ObjList[i].checked && ObjList[i].value == "Box"){
+				boxFlag = true;
+			}
+		}
+
 		lambda = _lambda*(dx/l);
 		x1 = space / 2;
 		x2 = -space / 2;
 
 		scene.remove(box1);
 		scene.remove(box2);
-		var box_length = (l*N-space)/2;
-		geometry = new THREE.BoxGeometry(box_width,box_length, 30);
-		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+		if(boxFlag==false){
+			var box_length = (l*N-space)/2;
+			geometry = new THREE.BoxGeometry(box_width,box_length, 30);
+			material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
 
-		box1 = new THREE.Mesh(geometry, material);
-		box2 = new THREE.Mesh(geometry, material);
-		box1.position.set(0, (box_length+space)/2, -5);
-		box2.position.set(0, -(box_length+space)/2, -5);
-		scene.add(box1);
-		scene.add(box2);
+			box1 = new THREE.Mesh(geometry, material);
+			box2 = new THREE.Mesh(geometry, material);
+			box1.position.set(0, (box_length+space)/2, -5);
+			box2.position.set(0, -(box_length+space)/2, -5);
+			scene.add(box1);
+			scene.add(box2);
+		}
+		else if(boxFlag==true){
+			geometry = new THREE.BoxGeometry(box_width,space, 30);
+			material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+
+			box1 = new THREE.Mesh(geometry, material);
+			box1.position.set(l/2,l/2,-5);
+			scene.add(box1);
+		}
 
 		//recalculate
 		initWave();
@@ -636,7 +710,7 @@ function loop(){
 	//rendering
 	renderer.render(scene, camera);
 
-	
+
 	if(stopFlag){
 		png_count++
 		if(png_count > 30){
