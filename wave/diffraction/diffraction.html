@@ -5,7 +5,7 @@
 		<title>diffraction</title>
 
 		<style>
-			div#canvas-frame{ width:900px; height:700px; }
+			div#canvas-frame{ width:900px; height:600px; }
 		</style>
 		<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
 		<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
@@ -40,13 +40,21 @@
 
 			<!-- input alpha -->
 			<li>
-			<a href="#">透明度</a>
+			<a href="#">物体</a>
 			<ul>
 				<li>
+				<a href="#">堤防<input type="radio" name="Obj" value="Space" checked="checked"/></a>
+				</li>
+				<li>
+				<a href="#">はこ<input type="radio" name="Obj" value="Box" /></a>
+				</li>
+				<li>
 				<a href="#">
+					<!-- space -->
 					<table><tr>
-							<td><div id="slider_alpha" class="slider" style="width:180px;"></div></td>
-							<td><center><input type="text" value="" id="input_alpha" class="number" style="width:40px"/></center></td>
+							<td>隙間(大きさ)</td>
+							<td><div id="slider_space" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_space" class="number" style="width:40px"/></td>
 					</tr></table>
 				</a>
 				</li>
@@ -56,6 +64,15 @@
 			<li>
 			<a href="#">波の設定</a>
 			<ul>
+				<li>
+				<a href="#">
+					<table><tr>
+							<td>透明度</td>
+							<td><div id="slider_alpha" class="slider" style="width:180px;"></div></td>
+							<td><center><input type="text" value="" id="input_alpha" class="number" style="width:40px"/></center></td>
+					</tr></table>
+				</a>
+				</li>
 				<li>
 				<!-- input A -->
 				<a href="#">
@@ -73,16 +90,6 @@
 							<td>波長</td>
 							<td><div id="slider_lambda" class="slider" style="width:180px"></div></td>
 							<td><input type="text" value="" id="input_lambda" class="number" style="width:40px"/></td>
-					</tr></table>
-				</a>
-				</li>
-				<li>
-				<a href="#">
-					<!-- space -->
-					<table><tr>
-							<td>堤防の隙間</td>
-							<td><div id="slider_space" class="slider" style="width:180px"></div></td>
-							<td><input type="text" value="" id="input_space" class="number" style="width:40px"/></td>
 					</tr></table>
 				</a>
 				</li>
