@@ -661,32 +661,48 @@ function initObject(){
 	  //速度によって色変化
 		
 		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
-		var v_center = 1500;
+		var v_center = 1200;
 		var v_ratio = parseFloat(velocity / v_center, 10);
 		if(v_ratio > 1){
-			v_ratio = 1;
-		}
-		var red = parseInt(254 * v_ratio, 10);
-		if(red < 16){
-			var red_hex = "0" + red.toString(16);
+			var red_hex = "ff";
+			var blue_hex = "00";
+
+			if(v_ratio > 2){
+				green_hex = "00";
+			}
+			else{
+				var green = parseInt(254 - 254*(v_ratio - 1), 10);
+				if(green < 16){
+					var green_hex = "0" + green.toString(16);
+				}
+				else{
+					var green_hex = green.toString(16);
+				}
+			}
 		}
 		else{
-			var red_hex = red.toString(16);
-		}
+			var red = parseInt(254 * v_ratio, 10);
+			if(red < 16){
+				var red_hex = "0" + red.toString(16);
+			}
+			else{
+				var red_hex = red.toString(16);
+			}
 
-		var green_hex = "ff";
+			var green_hex = "ff";
 
-		var blue = parseInt(254 * (1-v_ratio), 10);
-		if(blue < 16){
-			var blue_hex = "0" + blue.toString(16);
-		}
-		else{
-			var blue_hex = blue.toString(16);
+			var blue = parseInt(254 * (1-v_ratio), 10);
+			if(blue < 16){
+				var blue_hex = "0" + blue.toString(16);
+			}
+			else{
+				var blue_hex = blue.toString(16);
+			}
 		}
 
 		var color_code = red_hex + green_hex + blue_hex;
 		var material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
-		
+
 
 
 		//create object
