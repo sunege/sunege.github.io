@@ -97,18 +97,39 @@ function initEvent(){
 	});
 	document.getElementById("input_amp1").value = amp1;
 
+var slider_lambda1_ui_value;
 	$('#slider_lambda1').slider({
 			min: 0.01,
-			max: 20,
+			max: 5,
 			step: 0.01,
 			value: lambda1,
 			slide: function(event, ui){
 				var value = ui.value;
+				slider_lambda1_ui_value = ui.value;
 				lambda1 = value;
 				document.getElementById("input_lambda1").value = value;
+				freq1 = vel/lambda1;
+				document.getElementById("slider_freq1").value = freq1;
+				document.getElementById("input_freq1").value = freq1;
 			}
 	});
 	document.getElementById("input_lambda1").value = lambda1;
+
+	$('#slider_freq1').slider({
+			min: 1,
+			max: 30,
+			step: 0.1,
+			value: freq1,
+			slide: function(event, ui){
+				var value = ui.value;
+				freq1 = value;
+				document.getElementById("input_freq1").value = value;
+				lambda1 = vel/freq1;
+				$('slider_lambda1').slider("value", lambda1);
+				document.getElementById("input_lambda1").value = lambda1;
+			}
+	});
+	document.getElementById("input_freq1").value = freq1;
 
 	$('#slider_vel').slider({
 			min: 0,
@@ -293,11 +314,13 @@ var time = 0;
 var vel = 3;
 //wave1
 var lambda1 = 2; //wave length
+var freq1 = vel/lambda1;
 var amp1 = 1; //ampritude
 var direction1 = 1; //wave direction right:1
 
 //wave2
 var lambda2 = 2; //wave length
+var freq2 = vel/lambda2;
 var amp2 = 1; //ampritude
 var direction2 = -1; //wave direction left:-1
 
@@ -346,7 +369,7 @@ function initObject(){
 		grid[i + num_grid_x] = new THREE.Line(gridGeometry, gridMaterial);
 		scene.add(grid[i + num_grid_x]);
 	}
-	
+
 }
 function calculate(){
 	var geometry1 = new THREE.Geometry(); //geometry object
@@ -379,10 +402,6 @@ function calculate(){
 	line1 = new THREE.Line(geometry1, line1Material);
 	line2 = new THREE.Line(geometry2, line2Material);
 	line3 = new THREE.Line(geometry3, line3Material);
-
-	
-
-	
 }
 
 
@@ -394,21 +413,30 @@ var png_count = 0;
 function loop(){
 	//update trackball object
 	trackball.update();
+
+	//reset
 	if(resetFlag == true){
 		time = 0;
 		png_count = 0;
 		//wave1
-		var lambda1 = 5; //wave length
-		var amp1 = 1; //ampritude
-		var direction1 = -1; //wave direction right:-1
-
-		//wave2
-		var lambda2 = 5; //wave length
-		var amp2 = 1; //ampritude
-		var direction2 = 1; //wave direction left:1
-
+		lambda1 = 2; //wave length
+		amp1 = 1; //ampritude
+		direction1 = 1; //wave direction right:-1
 		document.getElementById("input_amp1").value = amp1;
 		document.getElementById("slider_amp1").value = amp1;
+		document.getElementById("input_lambda1").value = lambda1;
+		document.getElementById("slider_lambda1").value = lambda1;
+		document.getElementById("slider_direction1").value = direction1;
+
+		//wave2
+		lambda2 = 2; //wave length
+		amp2 = 1; //ampritude
+		direction2 = -1; //wave direction left:1
+		document.getElementById("input_amp2").value = amp2;
+		document.getElementById("slider_amp2").value = amp2;
+		document.getElementById("input_lambda2").value = lambda2;
+		document.getElementById("slider_lambda2").value = lambda2;
+		document.getElementById("slider_direction2").value = direction2;
 
 		resetFlag = false;
 	}
