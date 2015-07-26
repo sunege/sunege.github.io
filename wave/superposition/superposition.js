@@ -97,7 +97,6 @@ function initEvent(){
 	});
 	document.getElementById("input_amp1").value = amp1;
 
-var slider_lambda1_ui_value;
 	$('#slider_lambda1').slider({
 			min: 0.01,
 			max: 5,
@@ -105,12 +104,11 @@ var slider_lambda1_ui_value;
 			value: lambda1,
 			slide: function(event, ui){
 				var value = ui.value;
-				slider_lambda1_ui_value = ui.value;
 				lambda1 = value;
 				document.getElementById("input_lambda1").value = value;
 				freq1 = vel/lambda1;
-				document.getElementById("slider_freq1").value = freq1;
 				document.getElementById("input_freq1").value = freq1;
+				$("#slider_freq1").slider("value", freq1);
 			}
 	});
 	document.getElementById("input_lambda1").value = lambda1;
@@ -125,8 +123,8 @@ var slider_lambda1_ui_value;
 				freq1 = value;
 				document.getElementById("input_freq1").value = value;
 				lambda1 = vel/freq1;
-				$('slider_lambda1').slider("value", lambda1);
 				document.getElementById("input_lambda1").value = lambda1;
+				$('#slider_lambda1').slider("value", lambda1);
 			}
 	});
 	document.getElementById("input_freq1").value = freq1;
@@ -157,18 +155,49 @@ var slider_lambda1_ui_value;
 	});
 	document.getElementById("input_amp2").value = amp2;
 
+// 	$('#slider_lambda2').slider({
+// 			min: 0.01,
+// 			max: 20,
+// 			step: 0.01,
+// 			value: lambda2,
+// 			slide: function(event, ui){
+// 				var value = ui.value;
+// 				lambda2 = value;
+// 				document.getElementById("input_lambda2").value = value;
+// 			}
+// 	});
+// 	document.getElementById("input_lambda2").value = lambda2;
 	$('#slider_lambda2').slider({
 			min: 0.01,
-			max: 20,
+			max: 5,
 			step: 0.01,
 			value: lambda2,
 			slide: function(event, ui){
 				var value = ui.value;
 				lambda2 = value;
 				document.getElementById("input_lambda2").value = value;
+				freq2 = vel/lambda2;
+				document.getElementById("input_freq2").value = freq2;
+				$("#slider_freq2").slider("value", freq2);
 			}
 	});
 	document.getElementById("input_lambda2").value = lambda2;
+
+	$('#slider_freq2').slider({
+			min: 1,
+			max: 30,
+			step: 0.1,
+			value: freq2,
+			slide: function(event, ui){
+				var value = ui.value;
+				freq2 = value;
+				document.getElementById("input_freq2").value = value;
+				lambda2 = vel/freq2;
+				document.getElementById("input_lambda2").value = lambda2;
+				$('#slider_lambda2').slider("value", lambda2);
+			}
+	});
+	document.getElementById("input_freq2").value = freq2;
 
 };
 ////////////////////////////////////////
@@ -423,20 +452,32 @@ function loop(){
 		amp1 = 1; //ampritude
 		direction1 = 1; //wave direction right:-1
 		document.getElementById("input_amp1").value = amp1;
-		document.getElementById("slider_amp1").value = amp1;
+		$('#slider_amp1').slider("value", amp1);
 		document.getElementById("input_lambda1").value = lambda1;
-		document.getElementById("slider_lambda1").value = lambda1;
+		$('#slider_lambda1').slider("value", lambda1);
+		document.getElementById("input_freq1").value = vel/lambda1;
+		$('#slider_freq1').slider("value", vel/lambda1);
 		document.getElementById("slider_direction1").value = direction1;
+		$('#slider_direction1').slider("value", direction1);
 
 		//wave2
 		lambda2 = 2; //wave length
 		amp2 = 1; //ampritude
 		direction2 = -1; //wave direction left:1
+// 		document.getElementById("input_amp2").value = amp2;
+// 		document.getElementById("slider_amp2").value = amp2;
+// 		document.getElementById("input_lambda2").value = lambda2;
+// 		document.getElementById("slider_lambda2").value = lambda2;
+// 		document.getElementById("slider_direction2").value = direction2;
+
 		document.getElementById("input_amp2").value = amp2;
-		document.getElementById("slider_amp2").value = amp2;
+		$('#slider_amp2').slider("value", amp2);
 		document.getElementById("input_lambda2").value = lambda2;
-		document.getElementById("slider_lambda2").value = lambda2;
+		$('#slider_lambda2').slider("value", lambda2);
+		document.getElementById("input_freq2").value = vel/lambda2;
+		$('#slider_freq2').slider("value", vel/lambda2);
 		document.getElementById("slider_direction2").value = direction2;
+		$('#slider_direction2').slider("value", direction2);
 
 		resetFlag = false;
 	}

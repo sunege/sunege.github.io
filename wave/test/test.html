@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Superposition</title>
+
+<style>
+</style>
+<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
+
+<!-- Javascript -->
+
+<!-- jQuery -->
+<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+
+<!-- Three -->
+<script type="text/javascript" src="../../js/Three/build/three.js"></script>
+<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+
+<!-- Main script -->
+<script type="text/javascript">
+var x = 10;
+var x1 = 2;
+var x2 = x - x1;
+$(function(){
+	$("#slider1").slider({
+		min: 0,
+		max: 10,
+		value: x1,
+		step: 1,
+		create: function(event, ui){
+			//document.getElementById("input1").value = 2;
+			$(':text[id="input1"]').val(x1);
+		},
+		slide: function(event, ui){
+			var value = ui.value;
+			$(':text[id="input1"]').val(value);
+			$(':text[id="input2"]').val(x-value);
+			$("#slider2").slider("value", x-value);
+		}
+	});
+
+	$(':text[id="input1"]').change(function(){
+		$("#slider1").slider("value", $(this).val());
+	});
+
+	$("#slider2").slider({
+		min: 0,
+		max: 10,
+		value: x2,
+		step: 1,
+		create: function(event, ui){
+			$(':text[id="input2"]').val(x2);
+		},
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input2").value = value;
+		}
+	});
+
+	$(':text[id="input2"]').change(function(){
+		$("#slider2").slider("value", $(this).val());
+	});
+	
+});
+</script>
+</head>
+<body>
+	<div id="slider1"></div>
+	<input type="text" value="" id="input1"></input>
+	<div id="slider2"></div>
+	<input type="text" value="" id="input2" class="number" ></input>
+</body>
+</html>
