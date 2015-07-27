@@ -18,7 +18,7 @@
 				width: 180px;
 			}
 			input.number{
-				width: 20px;
+				width: 30px;
 			}
 		</style>
 
@@ -52,11 +52,11 @@
 				</a></li>
 
 				<li>
-				<a href="#">時間<span id="time">0</span></a>
+				<a href="#">時間<span id="time">0</span>s</a>
 				<ul>
 					<li><a href="#">dt
 						<!-- input dt -->
-						<input type="text" value="" id="input_dt" class="number" style="width:30px"/>
+						<input type="text" value="" id="input_dt" class="number" style="width:50px"/>
 					</a></li>
 					<li><a href="#">
 						<table><tr>
@@ -76,7 +76,7 @@
 									<!-- mass -->
 									<td>質量</td>
 									<td><div id="slider_mass" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_mass" class="number" /></td>
+									<td><input type="text" value="" id="input_mass" class="number" />kg</td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">
@@ -84,7 +84,7 @@
 									<!-- N -->
 									<td>粒子数</td>
 									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_N" class="number" /></td>
+									<td><input type="text" value="" id="input_N" class="number" />個</td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">
@@ -92,7 +92,7 @@
 									<!-- frequency -->
 									<td>振動数</td>
 									<td><div id="slider_freq" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_freq" class="number"/></td>
+									<td><input type="text" value="" id="input_freq" class="number"/>Hz</td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">
@@ -100,7 +100,7 @@
 									<!-- Amp -->
 									<td>振幅</td>
 									<td><div id="slider_A" class="slider"></div></td>
-									<td><input type="text" value="" id="input_A" class="number"/></td>
+									<td><input type="text" value="" id="input_A" class="number"/>m</td>
 							</tr></table>
 						</a></li>
 					</ul>
@@ -109,15 +109,18 @@
 				<li><a href="#">バネその他</a>
 					<ul>
 						<li><a href="#">
+							全長＝<span id="l"></span>m, 粒子間隔＝<span id="dl"></span>m, 自然長＝<span id="nl"></span>m
+						</a></li>
+						<li><a href="#">
 							<table><tr>
 									<td>ばね定数</td>
 									<td><div id="slider_k" class="slider"></div></td>
-									<td><input type="text" value="" id="input_k" class="number"/></td>
+									<td><input type="text" value="" id="input_k" class="number"/>N/m</td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">
 							<table><tr>
-									<td>自然長</td>
+									<td>自然長=間隔×</td>
 									<td><div id="slider_nl" class="slider"></div></td>
 									<td><input type="text" value="" id="input_nl" class="number"/></td>
 							</tr></table>
@@ -126,7 +129,7 @@
 							<table><tr>
 									<td>空気抵抗</td>
 									<td><div id="slider_gamma" class="slider"></div></td>
-									<td><input type="text" value="" id="input_gamma" class="number"/></td>
+									<td><input type="text" value="" id="input_gamma" class="number"/>Ns/m</td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">

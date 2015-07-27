@@ -14,7 +14,7 @@ var step = 0; //step count
 var skip = 500;
 
 //oscillation
-var A = 1;
+var A = 0;
 
 //Field parameter
 var gamma = 0.5; // air resistance param
@@ -306,7 +306,7 @@ function initEvent(){
 	});
 	$('#slider_freq').slider({
 			min: 0,
-			max: 2,
+			max: 10,
 			step: 0.0001,
 			value: freq,
 			slide: function(event, ui){
@@ -397,6 +397,9 @@ function initEvent(){
 			}
 	});
 
+	document.getElementById("l").innerHTML = L.toFixed(0);
+	document.getElementById("dl").innerHTML = dl.toFixed(3);
+	document.getElementById("nl").innerHTML = spring.l.toFixed(3);
 }
 
 function mouseEvent(){
@@ -599,6 +602,10 @@ function loop(){
 		initObject();
 		restartFlag = false;
 		stopFlag = false;
+
+		document.getElementById("l").innerHTML = L.toFixed(0);
+		document.getElementById("dl").innerHTML = dl.toFixed(3);
+		document.getElementById("nl").innerHTML = spring.l.toFixed(3);
 
 		document.getElementById("startButton").value = "Restart";
 	}
