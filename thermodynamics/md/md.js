@@ -455,6 +455,7 @@ function initEvent(){
 			document.getElementById("input_temp").value = value;
 		}
 	});
+	document.getElementById("temp").innerHTML = T.toFixed(0);
 
 	//input interface
 	document.getElementById("input_skip").value = _skip;
@@ -819,6 +820,7 @@ function loop(){
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
 		T = parseFloat(document.getElementById("input_temp").value);
+		document.getElementById("temp").innerHTML = T.toFixed(0);
 
 		//init particle and calculation class
 		for(var i=0; i<N; i++){

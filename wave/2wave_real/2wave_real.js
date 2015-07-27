@@ -120,6 +120,9 @@ function initEvent(){
 			}
 	});
 	document.getElementById("input_vel").value = vel;
+
+	document.getElementById("lambda").innerHTML = _lambda;
+	document.getElementById("space").innerHTML = space;
 };
 
 ////////////////////////////////////////
@@ -649,6 +652,8 @@ function loop(){
 		_lambda = parseFloat(document.getElementById("input_lambda").value);
 		space = parseInt(document.getElementById("input_space").value);
 		vel = parseInt(document.getElementById("input_vel").value);
+		document.getElementById("lambda").innerHTML = _lambda;
+		document.getElementById("space").innerHTML = space;
 		var phaseList =document.getElementsByName("phase"); 
 		for(var i=0; i< phaseList.length; i++){
 			if(phaseList[i].checked && phaseList[i].value == "s")
