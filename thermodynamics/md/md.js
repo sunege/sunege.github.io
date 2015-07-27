@@ -115,11 +115,17 @@ Calculation.prototype = {
 					var f_rand = this.rand(f_max, 0.0);
 					var f_flag = this.maxwell_distribution(v_rand);
 					if(f_rand <= f_flag){
-						var theta = this.rand(Math.PI,0.0);
-						var phi = this.rand(2*Math.PI, 0.0);
-						var vx = v_rand*Math.sin(theta)*Math.cos(phi);
-						var vy = v_rand*Math.sin(theta)*Math.sin(phi);
-						var vz = v_rand*Math.cos(theta);
+// 						var theta = this.rand(2*Math.PI,0.0);
+// 						var phi = this.rand(2*Math.PI, 0.0);
+// 						var vx = v_rand*Math.sin(theta)*Math.cos(phi);
+// 						var vy = v_rand*Math.sin(theta)*Math.sin(phi);
+// 						var vz = v_rand*Math.cos(theta);
+						var theta = this.rand(2*Math.PI,0.0);
+						var phi = this.rand(2*Math.PI,0.0);
+						var psi = this.rand(2*Math.PI,0.0);
+						var vx = (this.c(theta)*this.c(phi)*this.c(psi)-this.s(phi)*this.s(psi))*v_rand;
+						var vy = (-this.c(theta)*this.c(phi)*this.s(psi)-this.s(phi)*this.c(psi))*v_rand;
+						var vz = this.s(theta)*this.c(phi)*v_rand;
 						p[i].mass = MASS;
 						p[i].x = this.rand(RADIUS, L-RADIUS);
 						p[i].y = this.rand(RADIUS, L-RADIUS);
@@ -151,6 +157,13 @@ Calculation.prototype = {
 		var f = 4*Math.PI*v*v*Math.pow(MASS/(2*Math.PI*k_B*T),1.5)*Math.exp(-MASS*v*v/(2*k_B*T));
 		return f;
 	},
+	s: function(theta){
+		return Math.sin(theta);
+	},
+	c: function(theta){
+		return Math.cos(theta);
+	},
+
 		//calculation Force
 	calculateForce: function(p){
 		var force01,force10;
