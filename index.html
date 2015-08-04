@@ -40,6 +40,25 @@ h3:before{
 	background-color:#00A8FF;
 	box-shadow: 0 0 2px 2px rgba(255,255,255,0.2) inset
 }
+div.caption{
+	clear: both;
+}
+div#canvas-frame{
+	float: left;
+	width: 160px;
+	height: 160px;
+	margin:0px 10px 10px 20px;
+	padding: 0px 10px 10px 20px;
+}
+div#caption{
+	float: left;
+	width: 70%;
+	margin:0px 10px 10px 20px;
+	padding: 0px 10px 10px 20px;
+}
+div#link{
+	clear: both;
+}
 div.mechanics {
 	float: left;
 	width: 40%;
@@ -52,6 +71,9 @@ div.thermodynamics {
 }
 div.wave {
 	clear: both;
+	margin:10px;
+	padding: 10px;
+	
 }
 div#D1 {
 	float: left;
@@ -68,23 +90,184 @@ div#D2{
 div.others {
 	clear: both;
 }
-		</style>
 
-		
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	</style>
 
-			ga('create', 'UA-65937030-1', 'auto');
-			ga('send', 'pageview');
-		</script>
 
-	</head>
-	<body>
-		<h1>phys sim for web</h1>
-		<p style="margin:15px;">JavaScriptで物理のシミュレーションをします。高校の授業で使ったものです。<br/>WebGL対応のブラウザで見て下さい。</p>
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65937030-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+
+	<script type="text/javascript" src="./js/Three/build/three.min.js"></script>
+	<script type="text/javascript" src="./js/Three/src/controls/TrackballControls.js"></script>
+
+	<!-- demo script -->
+	<script type="text/javascript">
+		window.addEventListener("load", function (){
+			threeStart(); //three.js start
+		});
+
+		//////////////////////////////
+		//def threeStart()
+		//////////////////////////////
+		function threeStart(){
+			initThree(); //init three.js
+			initCamera(); //init camera
+			initObject(); //init object
+			initLight(); //init light
+			loop(); //loop function
+		}
+
+		//////////////////////////////
+		//def initThree()
+		//////////////////////////////
+		// global var
+		var renderer, //renderer object
+		scene, //scene object
+		trackball, //trackball object
+		canvasFrame; //frame DOM element
+
+		function initThree(){
+			//get canvas DOM element
+			canvasFrame = document.getElementById('canvas-frame');
+			//create renderer object
+			renderer = new THREE.WebGLRenderer({antialias: true});
+			if(!renderer) alert('faild : init three.js');
+			//set size of renderer
+			renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
+			//add canvas to frame
+			canvasFrame.appendChild(renderer.domElement);
+			//set renderer clear color
+			renderer.setClearColor(0x000000, 1.0);
+			//create scene object
+			scene = new THREE.Scene();
+		}
+
+		//////////////////////////////
+		// def initCamera()
+		//////////////////////////////
+		// global var
+		var camera;
+		function initCamera(){
+			var fov = 45;
+			var aspect = canvasFrame.clientWidth / canvasFrame.clientHeight;
+			var near = 1;
+			var far = 1000;
+			//create camera object
+			camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+			//camera position
+			camera.position.set(24, 20, 15);
+			//camera up vector
+			camera.up.set(0, 0, 1);
+			//camera center vector
+			camera.lookAt({x: 0, y: 0, z: 0});
+			//create trackball object
+			trackball = new THREE.TrackballControls(camera, canvasFrame);
+
+			//set trackball options
+			trackball.screen.width = canvasFrame.clientWidth;
+			trackball.screen.height = canvasFrame.clientHeight;
+			trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
+			trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+
+			trackball.noRotate = false;
+			trackball.rotateSpeed = 2.0;
+
+			trackball.noZoom = false;
+			trackball.zoomSpeed = 0.5;
+
+			trackball.noPan = false;
+			trackball.panSpeed = 0.6;
+			trackball.target = new THREE.Vector3(0, 0, 0);
+
+			trackball.staticMoving = true;
+
+			trackball.dynamicDampingFactor = 0.3;
+		}
+
+		//////////////////////////////
+		// def initObject()
+		//////////////////////////////
+		// global var
+		var axis; //axis object
+		var box; //primitive object
+
+		function initObject(){
+
+			//create geometry
+			var geometry = new THREE.BoxGeometry(10,10,10);
+			//create material
+			var material = new THREE.MeshLambertMaterial({color: 0x50FFFF});
+			//create object
+			box = new THREE.Mesh(geometry, material);
+			//add object
+			scene.add(box);
+			//position
+			box.position.set(0,0,0);
+		}
+
+		//////////////////////////////
+		// def initLight()
+		//////////////////////////////
+		// global var
+		var directionalLight;
+
+		function initLight(){
+			//create object
+			directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+			//light position
+			directionalLight.position.set(50, 50, 100);
+			//add light
+			scene.add(directionalLight);
+
+			//create object
+			// 	directionalLight1 = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+			//light position
+			// 	directionalLight1.position.set(50, 50, 50);
+			//add light
+			// 	scene.add(directionalLight1);
+		}
+
+		//////////////////////////////
+		// def loop()
+		//////////////////////////////
+
+		function loop(){
+
+			//update trackball object
+			trackball.update();
+			//init clear color
+			renderer.clear();
+			//rendering
+			renderer.render(scene, camera);
+			//loop
+			requestAnimationFrame(loop);
+		}
+	</script>
+
+</head>
+<body>
+	<h1>HTML5で高校物理のシミュレーション</h1>
+	<div class="caption">
+		<div id="canvas-frame"></div>
+		<div id="caption">
+			<p style="margin:15px;">
+			HTML5のcanvas要素とThree.jsを用いて、物理のシミュレーションをします。<br/>
+			ウェブブラウザで見ることができます。高校の授業で使ったものです。<br/>
+			いろんなパラメータをいじったり、ぐるぐる回したりして遊べます。<br/>
+			WebGL対応のブラウザで見て下さい。<br/>
+			左の立方体が表示されればOKです。<br/>
+			ドラッグで回せます。
+			</p>
+		</div>
+	</div>
+	<div id="link">
 		<div class="mechanics">
 			<!-- <h2>力学</h2> -->
 			<!-- <p><a href="mechanics/VirtualLab_v2/3DCG_basic1.html">自由落下(Euler method)</a></p> -->
@@ -161,5 +344,6 @@ div.others {
 		<div class="others">
 			<!-- <h2>その他</h2> -->
 		</div>
-	</body>
-</html>
+		<div id="link">
+		</body>
+	</html>
