@@ -178,7 +178,7 @@ function initEvent(){
 
 	$('#slider_radius').slider({
 			min: 0.01,
-			max: 5,
+			max: 1,
 			step: 0.01,
 			value: RADIUS,
 			slide: function(event, ui){
@@ -197,8 +197,8 @@ function initEvent(){
 	// 		}
 	// 	});
 	$('#slider_N').slider({
-			min: 3,
-			max: 200,
+			min: 2,
+			max: 20,
 			step: 1,
 			value: N,
 			slide: function(event, ui){
