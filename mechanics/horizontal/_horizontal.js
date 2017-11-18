@@ -7,12 +7,12 @@
 //System Parameter
 var time = 0;		// time
 var dt = 0.0001; // Delta t
-var N = 2;	   // number of particle
+var N = 4;	   // number of particle
 // var L = 20;	   // System length
 // var dl = L / (N-1); //discreat space
 var step = 0; //step count
-var _skip = 1; //slow mortion
-var skip = 1/(60*dt)*_skip;
+var skip = 5;
+var _skip = 0.1;
 
 //oscillation
 // var A = 0;
@@ -25,11 +25,9 @@ var gravity = 9.8; // gravitational accelaration
 
 
 //Particle parameter
-var MASS = 1; //kg
+var MASS = 10; //kg
 var RADIUS = 0.3;
 
-//particle max velocity
-var vel_init = 15;
 
 //particle class
 var Particle = function(parameter){
@@ -74,7 +72,7 @@ Calculation.prototype = {
 	//init Particles
 	initParticle: function(p){
 		for(var i=0; i<N; i++){
-			var vx = i*vel_init/N;
+			var vx = i*15/N;
 			var vy = 0.0;
 			var vz = 0.0;
 			p[i].mass = MASS;
@@ -120,7 +118,7 @@ Calculation.prototype = {
 		}
 
 		// f(t+dt)
-		this.calculateForce(p);
+		//this.calculateForce(p);
 
 		//v(t+dt) = v(t) + (f(t) + f(t+dt))*dt/2m
 		for(var i=0; i<N; i++){
@@ -145,7 +143,7 @@ var cal;
 
 //stop flag
 var restartFlag = false; // restert flag
-var stopFlag = true; // stop flag
+var stopFlag = false; // stop flag
 
 
 ////////////////////////////////////////
@@ -180,7 +178,7 @@ function initEvent(){
 
 	$('#slider_radius').slider({
 			min: 0.01,
-			max: 0.5,
+			max: 1,
 			step: 0.01,
 			value: RADIUS,
 			slide: function(event, ui){
@@ -188,16 +186,16 @@ function initEvent(){
 				document.getElementById("input_radius").value = value;
 			}
 	});
-	$('#slider_mass').slider({
-			min: 0.01,
-			max: 1,
-			step: 0.01,
-			value: MASS,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_mass").value = value;
-			}
-		});
+	// 	$('#slider_mass').slider({
+	// 		min: 0.01,
+	// 		max: 10,
+	// 		step: 0.01,
+	// 		value: MASS,
+	// 		slide: function(event, ui){
+	// 			var value = ui.value;
+	// 			document.getElementById("input_mass").value = value;
+	// 		}
+	// 	});
 	$('#slider_N').slider({
 			min: 2,
 			max: 20,
@@ -206,16 +204,6 @@ function initEvent(){
 			slide: function(event, ui){
 				var value = ui.value;
 				document.getElementById("input_N").value = value;
-			}
-	});
-	$('#slider_velocity').slider({
-			min: 0,
-			max: 30,
-			step: 1,
-			value: vel_init,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_velocity").value = value;
 			}
 	});
 	$('#slider_gamma').slider({
@@ -228,47 +216,13 @@ function initEvent(){
 				document.getElementById("input_gamma").value = value;
 			}
 	});
-	$('#slider_strobe').slider({
-			min: 0.01,
-			max: 1,
-			step: 0.01,
-			value: strobe_time,
-			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_strobe").value = value;
-			}
-	});
-
-
 	//input interface
 	document.getElementById("input_skip").value = _skip;
 	document.getElementById("input_radius").value = RADIUS;
 	document.getElementById("input_dt").value = dt;
 	document.getElementById("input_mass").value = MASS;
 	document.getElementById("input_N").value = N;
-	document.getElementById("input_velocity").value = vel_init;
 	document.getElementById("input_gamma").value = gamma;
-	document.getElementById("input_strobe").value = strobe_time;
-
-
-	//checkbox interface
-	$('#checkbox_orbital').click(function(){
-			if($(this).prop('checked') == true){
-				orbital_flag = true;
-			}
-			else{
-				orbital_flag = false;
-			}
-	});
-
-	$('#checkbox_strobe').click(function(){
-			if($(this).prop('checked') == true){
-				strobe_flag = true;
-			}
-			else{
-				strobe_flag = false;
-			}
-	});
 
 
 	//button interface
@@ -346,7 +300,7 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(13.0,-8.0,25.0);
+	camera.position.set(5.0,-3.0,10.0);
 	camera.up.set(0,1,0);
 	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
 
@@ -367,7 +321,7 @@ function initCamera(){
 
 	trackball.noPan = false;
 	trackball.panSpeed = 0.6;
-	trackball.target = new THREE.Vector3(13.0, -8.0, 0.0);
+	trackball.target = new THREE.Vector3(5.0, -3.0, 0.0);
 
 	trackball.staticMoving = true;
 
@@ -405,23 +359,8 @@ function initLight(){
 ////////////////////////////////////////
 //global variables
 var axis;
-
 var sphere=[]; //sphere object
-
-var strobe=[]; //strobe object
-var strobe_count; //strobe count
-var strobe_time=0.5; //strobe interval time
-var strobe_flag; //strobe flag
-
-var orbital=[]; //orbital object
-var orbital_vertices = []; //orbital data
-var orbital_geometry = [];
-var orbital_material = new THREE.LineBasicMaterial({ color: 0xFFFFFF});
-var orbital_flag;
-
 var wall1;
-
-var text_zero; //text object
 
 function initObject(){
 	//create geometry
@@ -461,7 +400,7 @@ function initObject(){
 	//create axis object
 	axis = new THREE.AxisHelper(100);
 	//add axis object to scene
-	//scene.add(axis);
+	scene.add(axis);
 	//set axis position
 	axis.position.set(0, 0, 0);
 
@@ -469,10 +408,33 @@ function initObject(){
 	for(var i=0; i<N; i++){
 		//create geometry
 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
+		//create material
+		//
+		/*	
+		 var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
+		 var v_center = 400;
+		 var v_ratio = parseFloat(velocity / v_center, 10);
+		 if(v_ratio > 1){
+			 v_ratio = 1;
+		 }
+		 var shine = parseInt(255*v_ratio, 10);
+
+		 var red = parseInt(255 * v_ratio, 10);
+		 var red_hex = red.toString(16);
+
+		 var green_hex = "88";
+
+		 var blue = parseInt(255 * (1-v_ratio), 10);
+		 var blue_hex = blue.toString(16);
+
+		 var color_code = red_hex + green_hex + blue_hex;
+		 var material = new THREE.MeshPhongMaterial({ color: color_code, ambient: color_code, side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: shine});
+
+		 */
 		//速度によって色変化
 
 		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
-		var v_center = vel_init/2;
+		var v_center = 8;
 		var v_ratio = parseFloat(velocity / v_center, 10);
 		if(v_ratio > 1){
 			var red_hex = "ff";
@@ -525,89 +487,6 @@ function initObject(){
 		sphere[i].castShadow = true;
 	}
 
-	//strobe object
-	strobe = new Array(N);
-	for(var i=0; i<N; i++){
-		strobe[i] = new Array();
-		if(strobe_flag == true){
-			strobe[i].push(new THREE.Mesh(sphere[i].geometry, sphere[i].material));
-			strobe[i][ strobe[i].length - 1 ].position.set(p[i].x, p[i].y, p[i].z);
-			scene.add(strobe[i][ strobe[i].length - 1 ]);
-		}
-	}
-	//init count
-	strobe_count = 0;
-
-
-
-	orbital = null;
-	orbital_vertices = null;
-
-	orbital = [];
-	orbital_vertices = [];
-	orbital_geometry = [];
-	for(var i=0; i<N; i++){
-		orbital_geometry[i] = new THREE.Geometry();
-		orbital_vertices[i] = new Array();
-		orbital_vertices[i].push(new THREE.Vector3(p[i].x, p[i].y, p[i].z));
-		orbital_geometry[i].vertices.push(orbital_vertices[i][0]);
-		orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
-		scene.add(orbital[i]);
-	}
-
-	//text object
-	//
-	var fontLoader = new THREE.FontLoader();
-	fontLoader.load("../../js/Three/fonts/helvetiker_regular.typeface.json",function(helvetiker_regular){
-			var textGeometry = new THREE.TextGeometry( '0',{
-					size : 30,
-					height : 4,
-					curveSegments: 3
-// 					font: "helvetiker_regular",
-// 					weight : "regular",
-			});
-			var textMaterial = new THREE.MeshLambertMaterial({color:0x00ff00});
-			text_zero = new THREE.Mesh( textGeometry, textMaterial);
-			scene.add(text_zero);
-	});
-}
-
-
-////////////////////////////////////////
-// object timedevelopment 
-////////////////////////////////////////
-function update_object(){
-	//set draw object
-	for(var i=0; i<N; i++){
-		//sphere 
-		sphere[i].position.set(p[i].x, p[i].y, p[i].z);
-
-
-		//orbital
-		scene.remove(orbital[i]);
-		//add vertex
-		orbital_geometry[i] = new THREE.Geometry();
-		orbital_vertices[i].push(new THREE.Vector3(p[i].x, p[i].y, p[i].z));
-		orbital_geometry[i].vertices = orbital_vertices[i];
-		orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
-		if(orbital_flag == true){
-			scene.add(orbital[i]);
-		}
-	}
-	console.log(strobe_flag);
-
-	if(strobe_flag == true){
-		strobe_count += dt*skip;
-		if(strobe_count > strobe_time){
-			//strobe
-			for(var i=0; i<N; i++){
-				strobe[i].push(new THREE.Mesh(sphere[i].geometry, sphere[i].material));
-				strobe[i][ strobe[i].length - 1 ].position.set(p[i].x, p[i].y, p[i].z);
-				scene.add(strobe[i][ strobe[i].length - 1 ]);
-			}
-			strobe_count = 0;
-		}
-	}
 }
 
 
@@ -623,14 +502,9 @@ function loop(){
 
 
 	if(restartFlag == true){
-		//remove sphere and orbital
-		for(var i=0; i<N; i++){
+		//remove sphere
+		for(var i=0; i<N; i++)
 			scene.remove(sphere[i]);
-			scene.remove(orbital[i]);
-			for(var j=0; j<strobe[i].length; j++){
-				scene.remove(strobe[i][j]);
-			}
-		}
 
 		//init time param
 		step = 0;
@@ -639,9 +513,7 @@ function loop(){
 		dt = parseFloat(document.getElementById("input_dt").value);
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
-		vel_init = parseFloat(document.getElementById("input_velocity").value);
 		gamma = parseFloat(document.getElementById("input_gamma").value);
-		strobe_time = parseFloat(document.getElementById("input_strobe").value);
 
 		//init particle and calculation class
 		for(var i=0; i<N; i++){
@@ -671,7 +543,10 @@ function loop(){
 
 			cal.timeDevelopment(p);
 		}
-		update_object();
+		//set draw object
+		for(var i=0; i<N; i++){
+			sphere[i].position.set(p[i].x, p[i].y, p[i].z);
+		}
 	}
 
 	document.getElementById("time").innerHTML = time.toFixed(2);

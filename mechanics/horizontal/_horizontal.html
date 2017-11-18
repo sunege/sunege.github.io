@@ -58,11 +58,11 @@
 			<!-- button -->
 			<div id="buttonFrame">
 				<li><a href="#">
-						<input class="button" type="button" value="Stop" id="stopButton" />
+						<input class="button" type="button" value="Restart" id="startButton" />
 					</a>
 				</li>
 				<li><a href="#">
-						<input class="button" type="button" value="Restart" id="startButton" />
+						<input class="button" type="button" value="Stop" id="stopButton" />
 					</a>
 				</li>
 			</div>
@@ -82,14 +82,8 @@
 					</li>
 					<li>
 						<!-- mass -->
-						<a href="#">
-							<table>
-								<tr>
-									<td>質量</td>
-									<td><div id="slider_mass" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_mass" class="number" style="width:20px">kg</td>
-								</tr>
-							</table>
+						<a href="#">質量
+							<input type="text" value="" id="input_mass" class="number" />kg
 						</a>
 					</li>
 					<li>
@@ -100,16 +94,6 @@
 									<td>粒子数</td>
 									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
 									<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
-								</tr>
-							</table>
-						</a>
-						<!-- velocity -->
-						<a href="#">
-							<table>
-								<tr>
-									<td>速度の最大</td>
-									<td><div id="slider_velocity" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_velocity" class="number" style="width:20px"/></td>
 								</tr>
 							</table>
 						</a>
@@ -130,26 +114,21 @@
 				<ul>
 					<li>
 						<a href="#">速度ベクトル
-							<input type="CHECKBOX" id="checkbox_velocity_vector">
+							<span id="L">0</span>
 						</a>
 					</li>
 					<li>
 						<a href="#">軌跡
-							<input type="CHECKBOX" id="checkbox_orbital" />
+							<span id="vel">0</span>
 						</a>
 					</li>
 					<li>
-						<a href="#">ストロボ撮影
-							<input type="CHECKBOX" id="checkbox_strobe" />
-						</a>
-					</li>
-					<li>
-						<a href="#">
+						<a href="#" >
 							<table>
 								<tr>
-									<td>撮影間隔</td>
-									<td><div id="slider_strobe" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_strobe" class="number" style="width:30px"/>秒</td>
+									<td>ストロボ</td>
+									<td><div id="slider_temp" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_temp" class="number" style="width:25px"/>K</td>
 								</tr>
 							</table>
 						</a>
@@ -184,7 +163,7 @@
 		<div id="controller" >
 
 		</div>
-			<div style="margin:30px 0px;">
-			</div>
+		<div style="margin:30px 0px;">
+		</div>
 	</body>
 </html>
