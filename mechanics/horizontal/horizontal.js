@@ -557,19 +557,19 @@ function initObject(){
 
 	//text object
 	//
-	var fontLoader = new THREE.FontLoader();
-	fontLoader.load("../../js/Three/fonts/helvetiker_regular.typeface.json",function(helvetiker_regular){
-			var textGeometry = new THREE.TextGeometry( '0',{
-					size : 30,
-					height : 4,
-					curveSegments: 3
+// 	var fontLoader = new THREE.FontLoader();
+// 	fontLoader.load("../../js/Three/fonts/helvetiker_regular.typeface.json",function(helvetiker_regular){
+// 			var textGeometry = new THREE.TextGeometry( '0',{
+// 					size : 30,
+// 					height : 4,
+// 					curveSegments: 3
 // 					font: "helvetiker_regular",
 // 					weight : "regular",
-			});
-			var textMaterial = new THREE.MeshLambertMaterial({color:0x00ff00});
-			text_zero = new THREE.Mesh( textGeometry, textMaterial);
-			scene.add(text_zero);
-	});
+// 			});
+// 			var textMaterial = new THREE.MeshLambertMaterial({color:0x00ff00});
+// 			text_zero = new THREE.Mesh( textGeometry, textMaterial);
+// 			scene.add(text_zero);
+// 	});
 }
 
 
