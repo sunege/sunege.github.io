@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>仮想物理実験室</title>
+		<style>
+#canvas-frame{
+	width : 500px;
+	height: 500px;
+}
+		</style>
+		<!-- three.js 関連 -->
+		<script src="../js/Three/build/three.min.js"></script>
+		<script src="../js/Three/src/controls/TrackballControls.js"></script>
+
+		<!-- 作成したライブラリ -->
+		<script src="js/physLab_r1.js"></script>
+		<script src="js/physObject_r1.js"></script>
+		
+		<!-- メインスクリプト -->
+		<script src="main.js"></script>
+
+	</head>
+	<body>
+		<div id="canvas-frame"></div>
+		<button id="play"></button>
+		<button id="reset"></button>
+		<a href="" id="picture"></a>
+	</body>
+</html>
+
