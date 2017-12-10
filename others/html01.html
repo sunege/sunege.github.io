@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>HTMLの基本</title>
+
+		<style type="text/css">
+			<!--
+			P { text-indent: 1em; }
+			-->
+		</style>
+		<script type="text/javascript" src="../js/sh/shCore.js"></script>
+		<script type="text/javascript" src="../js/sh/shBrushXml.js"></script>
+		<script type="text/javascript" src="../js/sh/shBrushJScript.js"></script>
+		<link type="text/css" rel="stylesheet" href="../css/sh/shCore.css" />
+		<link type="text/css" rel="stylesheet" href="../css/sh/shThemeDefault.css" />
+		<script type="text/javascript">
+			SyntaxHighlighter.config.colipboardSwf = "../js/sh/clipboard.swf";
+			SyntaxHighlighter.all();
+		</script>
+
+	</head>
+	<body>
+<h1>HTMLの基本</h1>
+<p>
+初めてウェブブラウザで物理シミュレーションを行おうと思う人のたのHTMLの書き方について説明します。<br/>
+綺麗なウェブサイトを作ることを目標としていないので、必要最低限のすごく大雑把な説明になりますことをご了承ください。
+</p>
+
+<h2>HTMLについて</h2>
+<p>
+HTMLはHyperText Markup Langageの略で、ウェブ上の文章を記述するための言語です。<br/>
+ウェブ上の文章は以下のサンプルコードように書かれており、これをブラウザが処理しています。<br/>
+メモ帳などのテキストエディタで以下のようなファイルを作り、「〜.html」と名前をつけて保存すればhtmlファイルの完成です。
+</p>
+<!-- htmlコード -->
+		<pre class="brush: html">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+	&lt;head&gt;
+		&lt;meta charset="UTF-8"/&gt;
+		&lt;title&gt;ここにタイトルを書きます&lt;/title&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;p&gt;
+			Hello, World!&lt;br/&gt;
+			ここに記述した内容がブラウザ上に表示されます。
+		&lt;/p&gt;
+
+		&lt;!-- この文字は表示されません --&gt;
+
+	&lt;/body&gt;
+&lt;/html&gt;
+		</pre>
+		<a href="./sample_html01.html">sample_html01.html</a>←こちらのリンクから上記コードがブラウザ上でどのように表示されるか見ることができます。
+<h2>HTMLの要素について</h2>
+<p>
+HTMLは基本的に<B>要素</B>と呼ばれる単位で構成されており、色々な要素を用いて文章の体裁を整えたり、ハイパーリンクを設定したり、画像や動画を表示したり...様々な機能を持たせることができます。<br/>
+要素を指定するとき、<B>タグ</B>とよばれる<code>&lt;要素名&gt;</code>を使います。
+要素の始まりを<code>&lt;要素名&gt;</code>、終わりを<code>&lt;/要素名&gt;</code>で指定し、この二つに挟まれた部分が要素になります。
+途中に改行があっても関係ありません。<br/>
+例えば、上記サンプルコードの場合は、7〜15行目の<code>&lt;body&gt;</code>と<code>&lt;/body&gt;</code>に挟まれた部分がbody要素というものになります。
+</p>
+
+<h2>HTMLの書き方のきまり</h2>
+<p>
+上記サンプルコードと合わせて見てきましょう。<br/>
+まず、１行目<code>&lt;!DOCTYPE html&gt;</code>は「これはHTMLで書かれています」ということを宣言する記述になります。
+１行目に必ずこの記述をいれます。<br/>
+２行目以降を見てみると、html要素の中にhead要素body要素があり、さらにその中に色々な要素が入っています。<br/>
+HTML文書の構造として、必ずhtml要素を作り、その中にhead要素とbody要素を作ます。
+これらの要素の役割は次のようになります。
+<ul>
+	<li>&lt;html&gt; ・・・この要素の中身がブラウザ上でhtmlとして処理されます。</li>
+	<li>&lt;head&gt; ・・・文書の情報を記述するための要素です。</li>
+	<li>&lt;body&gt; ・・・文書の本体となる要素です。ここに記述した内容がブラウザ上に表示されます。</li>
+</ul>
+以下にHTMLの概略図を載せます。
+<center><img src="./html01_fig1.png" style="width: 600px;"/></center>
+</p>
+<h2>head要素について</h2>
+	<pre class="brush: html, first-line: 3">
+	&lt;head&gt;
+		&lt;meta charset="UTF-8"/&gt;
+		&lt;title&gt;ここにタイトルを書きます&lt;/title&gt;
+	&lt;/head&gt;
+</pre>
+<h2>body要素について</h2>
+<pre class="brush: html, first-line: 8">
+	&lt;body&gt;
+		&lt;p&gt;
+			Hello, World!&lt;br/&gt;
+			ここに記述した内容がブラウザ上に表示されます。
+		&lt;/p&gt;
+
+		&lt;!-- この文字は表示されません --&gt;
+
+	&lt;/body&gt;
+</pre>
+	</body>
+</html>

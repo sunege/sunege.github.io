@@ -137,6 +137,29 @@ Calculation.prototype = {
 	},
 };
 
+//TextBoardObject class
+var TextBoardCanvas = function(parameter){
+	parameter = parameter || {};
+
+	this.backgroundColor = parameter.backgroundColor || {r:1, g:1, b:1, a:1};
+	this.textColor = parameter.textColor || {r:0, g:0, b:0, a:1};
+
+	this.boardWidth = parameter.boardWidth || 100;
+	this.boardHeight = parameter.boardHeight || 100;
+
+	this.fontSize = parameter.fontSize || 10;
+	this.lineHeight = parameter.lineHeight || 1.1;
+
+	this.fontName = parameter.fontName || "serif";
+
+	this.resolution = parameter.resolution || 4;
+
+	this._lineHeight = 0;
+	this.textLines = [];
+
+	this.init();
+}
+
 //particle object
 var p = [];
 
