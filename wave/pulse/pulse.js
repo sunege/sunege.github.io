@@ -251,8 +251,8 @@ Ball.prototype = {
 // });
 
 //stop flag
-var restartFlag = false; // restert flag
-var stopFlag = true; // stop flag
+var restartFlag = true; // restert flag
+var stopFlag = false; // stop flag
 var pulseFlag = false;
 
 
