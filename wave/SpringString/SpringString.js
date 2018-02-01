@@ -7,17 +7,17 @@
 //System Parameter
 var time = 0;		// time
 var dt = 0.0001; // Delta t
-var N = 50;	   // number of particle
-var L = 20;	   // System length
+var N = 100;	   // number of particle
+var L = 50;	   // System length
 var dl = L / (N-1); //discreat space
 var step = 0; //step count
-var skip = 500;
+var skip = 100;
 
 //oscillation
-var A = 0;
+var A = 1;
 
 //Field parameter
-var gamma = 0.5; // air resistance param
+var gamma = 0; // air resistance param
 var gravity = 0; // gravitational accelaration
 
 
@@ -30,7 +30,7 @@ var boundary="d";
 
 //Spring param
 //natural length
-var nl = 0.7;
+var nl = 0.2;
 
 var spring = { k: 1000, l: nl*dl };
 
@@ -253,7 +253,7 @@ Ball.prototype = {
 //stop flag
 var restartFlag = false; // restert flag
 var stopFlag = true; // stop flag
-var pulseFlag = false;
+// var pulseFlag = false;
 
 
 ////////////////////////////////////////
@@ -402,20 +402,20 @@ function initEvent(){
 	document.getElementById("nl").innerHTML = spring.l.toFixed(3);
 }
 
-function mouseEvent(){
-	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
-	function onDocumentMouseDown( event ){
+// function mouseEvent(){
+// 	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
+// 	function onDocumentMouseDown( event ){
 // 		p[parseInt(N/2)].vz = 40;
-			pulseFlag = true;
+// 			pulseFlag = true;
 
-	}
-};
+// 	}
+// };
 ////////////////////////////////////////
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
 	initThree();
-	mouseEvent();
+// 	mouseEvent();
 	initCamera();
 	initLight();
 	initObject();
@@ -469,7 +469,7 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(24*1.1, L/2, 0);
+	camera.position.set(50, L/2, 0);
 	camera.up.set(0,0,1);
 	camera.lookAt({x: 0, y:L/2, z: 0});
 
@@ -554,7 +554,7 @@ function initObject(){
 }
 
 
-var pulseTime = 0;
+// var pulseTime = 0;
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
@@ -635,14 +635,14 @@ function loop(){
 			p[0].vy = 0;
 // 			p[0].vz = A * 2*Math.PI*freq*Math.cos(2*Math.PI*freq * time);
 
-			if(pulseFlag == true){
-				pulseTime += dt;
-				p[0].z = 2* Math.sin(2*Math.PI*freq * pulseTime);
-				if(p[0].z <= 0){
-					pulseTime = 0;
-					pulseFlag = false;
-				}
-			}
+// 			if(pulseFlag == true){
+// 				pulseTime += dt;
+// 				p[0].z = 2* Math.sin(2*Math.PI*freq * pulseTime);
+// 				if(p[0].z <= 0){
+// 					pulseTime = 0;
+// 					pulseFlag = false;
+// 				}
+// 			}
 			if(boundary == "d"){
 				p[N-1].x = 0;
 				p[N-1].y = L;
