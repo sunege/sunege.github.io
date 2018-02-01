@@ -74,7 +74,7 @@ Calculation.prototype = {
 	//init Particles
 	initParticle: function(p){
 		for(var i=0; i<N; i++){
-			var vx = i*vel_init/N;
+			var vx = 0.0;
 			var vy = 0.0;
 			var vz = 0.0;
 			p[i].mass = MASS;
@@ -544,7 +544,7 @@ function initObject(){
 		//add object
 		scene.add(sphere[i]);
 		//position
-		sphere[i].position.set(p[i].x, p[i].y, p[i].z);
+		sphere[i].position.set(0, i*100/N+1*Math.sin(time/100-i/2), 0);
 		sphere[i].castShadow = true;
 	}
 
@@ -619,18 +619,18 @@ function update_object(){
 	}
 	console.log(strobe_flag);
 
-	if(strobe_flag == true){
-		strobe_count += dt*skip;
-		if(strobe_count > strobe_time){
-			//strobe
-			for(var i=0; i<N; i++){
-				strobe[i].push(new THREE.Mesh(sphere[i].geometry, sphere[i].material));
-				strobe[i][ strobe[i].length - 1 ].position.set(p[i].x, p[i].y, p[i].z);
-				scene.add(strobe[i][ strobe[i].length - 1 ]);
-			}
-			strobe_count = 0;
-		}
-	}
+// 	if(strobe_flag == true){
+// 		strobe_count += dt*skip;
+// 		if(strobe_count > strobe_time){
+// 			strobe
+// 			for(var i=0; i<N; i++){
+// 				strobe[i].push(new THREE.Mesh(sphere[i].geometry, sphere[i].material));
+// 				strobe[i][ strobe[i].length - 1 ].position.set(p[i].x, p[i].y, p[i].z);
+// 				scene.add(strobe[i][ strobe[i].length - 1 ]);
+// 			}
+// 			strobe_count = 0;
+// 		}
+// 	}
 }
 
 
@@ -727,7 +727,7 @@ function loop(){
 // 		}
 	}
 
-	document.getElementById("time").innerHTML = time.toFixed(2);
+// 	document.getElementById("time").innerHTML = time.toFixed(2);
 
 	//init clear color
 	renderer.clear();
