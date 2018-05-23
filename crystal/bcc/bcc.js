@@ -158,7 +158,7 @@ function initCamera(){
     camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
     //set camera options
-    camera.position.set(L*2.5,L*0.8,L*0.7);
+    camera.position.set(L*4,L*2,L*1.5);
     camera.up.set(0,0,1);
     camera.lookAt({x: L/2, y:L/2, z: L/2});
 
