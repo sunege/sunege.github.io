@@ -5,7 +5,7 @@
 ////////////////////
 
 //System Parameter
-var N = 9;
+var N = 2;
 var RADIUS = 5;
 var L = RADIUS * 3.95 / Math.sqrt(3);
 
@@ -35,32 +35,24 @@ var p = [];
 // define window event 
 ////////////////////////////////////////
 window.addEventListener("load", function(){
-        for(var i=0; i<N; i++){
+        for(var i=0; i<N*N*N*2; i++){
             p[i] = new Particle({index: i, radius: RADIUS});
         }
-        p[1].x = L;
-        
-        p[2].y = L;
-
-        p[3].x = L;
-        p[3].y = L;
-
-        p[4].x = L/2;
-        p[4].y = L/2;
-        p[4].z = L/2;
-
-        p[5].z = L;
-
-        p[6].x = L;
-        p[6].z = L;
-        
-        p[7].y = L;
-        p[7].z = L;
-
-        p[8].x = L;
-        p[8].y = L;
-        p[8].z = L;
-
+        for(var i=0; i<N*2; i++){
+            for(var j=0; j<N; j++){
+                for(var k=0; k<N; k++){
+                    if(i%2 == 0){
+                        p[i*N*N + j*N + k].x = L * k;
+                        p[i*N*N + j*N + k].y = L * j;
+                    }
+                    else if(i%2 == 1){
+                        p[i*N*N + j*N + k].x = L * k + L / 2;
+                        p[i*N*N + j*N + k].y = L * j + L / 2;
+                    }
+                    p[i*N*N + j*N + k].z = L * i / 2;
+                }
+            }
+        }
         initEvent();
         threeStart();
 });
@@ -158,9 +150,9 @@ function initCamera(){
     camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
     //set camera options
-    camera.position.set(L*4,L*2,L*1.5);
+    camera.position.set(L*N*4,L*N*2,L*N*1.5);
     camera.up.set(0,0,1);
-    camera.lookAt({x: L/2, y:L/2, z: L/2});
+    camera.lookAt({x: L*N/2, y:L*N/2, z: L*N/2});
 
     //create trackball object
     trackball = new THREE.TrackballControls(camera, canvasFrame);
@@ -179,7 +171,7 @@ function initCamera(){
 
     trackball.noPan = false;
     trackball.panSpeed = 0.6;
-    trackball.target = new THREE.Vector3(L/2, L/2, L/2);
+    trackball.target = new THREE.Vector3(L*N/2, L*N/2, L*N/2);
 
     trackball.staticMoving = true;
 
@@ -229,9 +221,9 @@ function initObject(){
     axis.position.set(0, 0, 0);
 
     sphere = [];
-    for(var i=0; i<N; i++){
+    for(var i=0; i<N*N*N*2; i++){
         //create geometry
-        var geometry = new THREE.SphereGeometry(p[i].radius, 50, 50);
+        var geometry = new THREE.SphereGeometry(p[i].radius, 8, 8);
         var material = new THREE.MeshLambertMaterial({color: 0xffffff, ambient: 0xffffff });
 
 
