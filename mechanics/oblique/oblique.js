@@ -1,6 +1,6 @@
 //////////////////////////
 //                      //
-// horizontal injection //
+// oblique angle injection //
 //                      //
 //////////////////////////
 
@@ -24,12 +24,15 @@ var gamma = 0.0; // air resistance param
 var gravity = 9.8; // gravitational accelaration
 
 
+
 //Particle parameter
 var MASS = 1; //kg
 var RADIUS = 0.3;
 
 //particle max velocity
 var vel_init = 15;
+
+var theta = Math.PI / 3;
 
 //particle class
 var Particle = function(parameter){
@@ -74,8 +77,9 @@ Calculation.prototype = {
 	//init Particles
 	initParticle: function(p){
 		for(var i=0; i<N; i++){
-			var vx = i*vel_init/N;
-			var vy = 0.0;
+			var v = vel_init;
+			var vx = v * Math.cos((i+1)*theta/(N));
+            var vy = v * Math.sin((i+1)*theta/(N));
 			var vz = 0.0;
 			p[i].mass = MASS;
 			p[i].x = 0;
@@ -87,7 +91,7 @@ Calculation.prototype = {
 			p[i].vx = vx;
 			p[i].vy = vy;
 			p[i].vz = vz;
-			p[i].v = Math.sqrt(vx*vx+vy*vy+vz*vz);
+			p[i].v = v;
 			this.calculateForce(p);
 		}
 	},
@@ -203,7 +207,7 @@ function initEvent(){
 
 	$('#slider_radius').slider({
 			min: 0.01,
-			max: 0.5,
+			max: 5,
 			step: 0.01,
 			value: RADIUS,
 			slide: function(event, ui){
@@ -212,9 +216,9 @@ function initEvent(){
 			}
 	});
 	$('#slider_mass').slider({
-			min: 0.01,
-			max: 1,
-			step: 0.01,
+            min: 0.1,
+			max: 10,
+			step: 0.1,
 			value: MASS,
 			slide: function(event, ui){
 				var value = ui.value;
@@ -223,7 +227,7 @@ function initEvent(){
 		});
 	$('#slider_N').slider({
 			min: 2,
-			max: 20,
+			max: 40,
 			step: 1,
 			value: N,
 			slide: function(event, ui){
@@ -231,14 +235,14 @@ function initEvent(){
 				document.getElementById("input_N").value = value;
 			}
 	});
-	$('#slider_velocity').slider({
+	$('#slider_theta').slider({
 			min: 0,
-			max: 30,
+			max: 90,
 			step: 1,
-			value: vel_init,
+			value: theta * 180 / Math.PI,
 			slide: function(event, ui){
-				var value = ui.value;
-				document.getElementById("input_velocity").value = value;
+				var value = Math.PI * ui.value / 180.0;
+				document.getElementById("input_theta").value = ui.value;
 			}
 	});
 	$('#slider_gamma').slider({
@@ -269,7 +273,7 @@ function initEvent(){
 	document.getElementById("input_dt").value = dt;
 	document.getElementById("input_mass").value = MASS;
 	document.getElementById("input_N").value = N;
-	document.getElementById("input_velocity").value = vel_init;
+	document.getElementById("input_theta").value = theta * 180.0 / Math.PI;
 	document.getElementById("input_gamma").value = gamma;
 	document.getElementById("input_strobe").value = strobe_time;
 
@@ -369,7 +373,7 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(13.0,-8.0,25.0);
+    camera.position.set(vel_init * vel_init * Math.sin(2*theta)/(2*gravity),10.0,40.0);
 	camera.up.set(0,1,0);
 	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
 
@@ -390,7 +394,7 @@ function initCamera(){
 
 	trackball.noPan = false;
 	trackball.panSpeed = 0.6;
-	trackball.target = new THREE.Vector3(13.0, -8.0, 0.0);
+	trackball.target = new THREE.Vector3(vel_init * vel_init * Math.sin(2*theta)/(2*gravity), 10.0, 0.0);
 
 	trackball.staticMoving = true;
 
@@ -484,7 +488,7 @@ function initObject(){
 	//create axis object
 	axis = new THREE.AxisHelper(100);
 	//add axis object to scene
-	//scene.add(axis);
+	scene.add(axis);
 	//set axis position
 	axis.position.set(0, 0, 0);
 
@@ -494,18 +498,18 @@ function initObject(){
 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//速度によって色変化
 
-		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
-		var v_center = vel_init/2;
-		var v_ratio = parseFloat(velocity / v_center, 10);
-		if(v_ratio > 1){
+		var theta_i = i*theta/(N+1);
+		var theta_center = theta/2;
+		var theta_ratio = parseFloat(theta_i / theta_center, 10);
+		if(theta_ratio > 1){
 			var red_hex = "ff";
 			var blue_hex = "00";
 
-			if(v_ratio > 2){
+			if(theta_ratio > 2){
 				green_hex = "00";
 			}
 			else{
-				var green = parseInt(254 - 254*(v_ratio - 1), 10);
+				var green = parseInt(254 - 254*(theta_ratio - 1), 10);
 				if(green < 16){
 					var green_hex = "0" + green.toString(16);
 				}
@@ -515,7 +519,7 @@ function initObject(){
 			}
 		}
 		else{
-			var red = parseInt(254 * v_ratio, 10);
+			var red = parseInt(254 * theta_ratio, 10);
 			if(red < 16){
 				var red_hex = "0" + red.toString(16);
 			}
@@ -525,7 +529,7 @@ function initObject(){
 
 			var green_hex = "ff";
 
-			var blue = parseInt(254 * (1-v_ratio), 10);
+			var blue = parseInt(254 * (1-theta_ratio), 10);
 			if(blue < 16){
 				var blue_hex = "0" + blue.toString(16);
 			}
@@ -662,7 +666,7 @@ function loop(){
 		dt = parseFloat(document.getElementById("input_dt").value);
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
-		vel_init = parseFloat(document.getElementById("input_velocity").value);
+		theta = Math.PI * parseFloat(document.getElementById("input_theta").value) / 180.0;
 		gamma = parseFloat(document.getElementById("input_gamma").value);
 		strobe_time = parseFloat(document.getElementById("input_strobe").value);
 
