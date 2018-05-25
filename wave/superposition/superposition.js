@@ -271,7 +271,7 @@ function initCamera(){
 	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
 	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
 
-	trackball.noRotate = false;
+    trackball.noRotate = true;
 	trackball.rotateSpeed = 2.0;
 
 	trackball.noZoom = false;
