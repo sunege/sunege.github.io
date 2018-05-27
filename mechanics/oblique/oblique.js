@@ -7,7 +7,7 @@
 //System Parameter
 var time = 0;		// time
 var dt = 0.0001; // Delta t
-var N = 2;	   // number of particle
+var N = 1;	   // number of particle
 // var L = 20;	   // System length
 // var dl = L / (N-1); //discreat space
 var step = 0; //step count
@@ -226,7 +226,7 @@ function initEvent(){
 			}
 		});
 	$('#slider_N').slider({
-			min: 2,
+			min: 1,
 			max: 40,
 			step: 1,
 			value: N,
@@ -446,15 +446,19 @@ var sphere=[]; //sphere object
 var v_arrow = [];
 var vx_arrow = [];
 var vy_arrow = [];
-var adjust_of_arrow_length = 0.7;
+var adjust_of_arrow_length = 0.3;
 var vector_flag = false;
-var head_length = 0.8;
-var head_width = 0.8;
+var head_length = 0.4;
+var head_width = 0.4;
 
 var strobe=[]; //strobe object
 var strobe_count; //strobe count
 var strobe_time=0.5; //strobe interval time
 var strobe_flag; //strobe flag
+
+var strobe_v=[]; //velocity strobe object
+var strobe_vx=[]; //velocity strobe object
+var strobe_vy=[]; //velocity strobe object
 
 var orbital=[]; //orbital object
 var orbital_vertices = []; //orbital data
@@ -467,40 +471,6 @@ var wall1;
 var text_zero; //text object
 
 function initObject(){
-	//create geometry
-	// 	var geometry = new THREE.SphereGeometry( ball.radius, 20, 20 );
-	//create material
-	// 	var material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
-
-	//create sphere object
-	// 	sphere = new THREE.Mesh(geometry, material);
-
-	//add scene
-	// 	scene.add(sphere);
-
-	//create shadow
-	// 	sphere.castShadow = true;
-
-	/*  floar drow  */
-	// 	var yuka_n = 20,
-	// 		 yuka_w = 100;
-	// 	for(var i=-yuka_n/2; i<=yuka_n/2; i++){
-	// 		for(var j=-yuka_n/2; j<=yuka_n/2; j++){
-	// 			position
-	// 			var x = j*yuka_w;
-	// 			var y = i*yuka_w;
-	// 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
-	// 			if(Math.abs(i+j) % 2 == 0){
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
-	// 			}else{
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
-	// 			}
-	// 			var plane = new THREE.Mesh(geometry, material);
-	// 			plane.position.set(x, y, 0);
-	// 			plane.receiveShadow = true;
-	// 			scene.add(plane);
-	// 		}
-	// 	}
 	//create axis object
 	axis = new THREE.AxisHelper(100);
 	//add axis object to scene
@@ -509,6 +479,9 @@ function initObject(){
     axis.position.set(0, 0, 0);
 
     //create velocity vector object
+    strobe_v = new Array(N);
+    strobe_vx = new Array(N);
+    strobe_vy = new Array(N);
     for(var i=0; i<N; i++){
         var dir_v = new THREE.Vector3(p[i].vx, p[i].vy, 0);
         var dir_vx = new THREE.Vector3(p[i].vx, 0, 0);
@@ -530,10 +503,24 @@ function initObject(){
         v_arrow[i] = new THREE.ArrowHelper( dir_v, origin, length_v, color_v, head_length, head_width);
         vx_arrow[i] = new THREE.ArrowHelper( dir_vx, origin, length_vx, color_vx, head_length, head_width);
         vy_arrow[i] = new THREE.ArrowHelper( dir_vy, origin, length_vy, color_vy, head_length, head_width);
+
+        strobe_v[i] = new Array();
+        strobe_vx[i] = new Array();
+        strobe_vy[i] = new Array();
+
         if(vector_flag == true){
             scene.add( v_arrow[i] );
             scene.add( vx_arrow[i] );
             scene.add( vy_arrow[i] );
+
+            if(strobe_flag == true){
+                strobe_v[i].push(new THREE.ArrowHelper( dir_v, origin, length_v, color_v, head_length, head_width));
+                strobe_vx[i].push(new THREE.ArrowHelper( dir_vx, origin, length_vx, color_vx, head_length, head_width));
+                strobe_vy[i].push(new THREE.ArrowHelper( dir_vy, origin, length_vy, color_vy, head_length, head_width));
+                scene.add(strobe_v[i][ strobe_v[i].length - 1 ]);
+                scene.add(strobe_vx[i][ strobe_vx[i].length - 1 ]);
+                scene.add(strobe_vy[i][ strobe_vy[i].length - 1 ]);
+            }
         }
     }
 
@@ -698,7 +685,6 @@ function update_object(){
             scene.add(orbital[i]);
         }
     }
-    console.log(strobe_flag);
 
     if(strobe_flag == true){
         strobe_count += dt*skip;
@@ -708,6 +694,31 @@ function update_object(){
                 strobe[i].push(new THREE.Mesh(sphere[i].geometry, sphere[i].material));
                 strobe[i][ strobe[i].length - 1 ].position.set(p[i].x, p[i].y, p[i].z);
                 scene.add(strobe[i][ strobe[i].length - 1 ]);
+                if(vector_flag == true){
+                    var dir_v = new THREE.Vector3(p[i].vx, p[i].vy, 0);
+                    var dir_vx = new THREE.Vector3(p[i].vx, 0, 0);
+                    var dir_vy = new THREE.Vector3(0, p[i].vy, 0);
+
+                    dir_v.normalize();
+                    dir_vx.normalize();
+                    dir_vy.normalize();
+
+                    var origin = new THREE.Vector3(p[i].x, p[i].y, p[i].z);
+
+                    var length_v = adjust_of_arrow_length * Math.sqrt(p[i].vx * p[i].vx + p[i].vy * p[i].vy);
+                    var length_vx = adjust_of_arrow_length * Math.abs(p[i].vx);
+                    var length_vy = adjust_of_arrow_length * Math.abs(p[i].vy);
+
+                    var color_v = 0xffff00;
+                    var color_vx = 0x00ffff;
+                    var color_vy = 0xff00ff;
+                    strobe_v[i].push(new THREE.ArrowHelper( dir_v, origin, length_v, color_v, head_length, head_width));
+                    strobe_vx[i].push(new THREE.ArrowHelper( dir_vx, origin, length_vx, color_vx, head_length, head_width));
+                    strobe_vy[i].push(new THREE.ArrowHelper( dir_vy, origin, length_vy, color_vy, head_length, head_width));
+                    scene.add(strobe_v[i][ strobe_v[i].length - 1 ]);
+                    scene.add(strobe_vx[i][ strobe_vx[i].length - 1 ]);
+                    scene.add(strobe_vy[i][ strobe_vy[i].length - 1 ]);
+                }
             }
             strobe_count = 0;
         }
@@ -736,6 +747,9 @@ function loop(){
             scene.remove(orbital[i]);
             for(var j=0; j<strobe[i].length; j++){
                 scene.remove(strobe[i][j]);
+                scene.remove(strobe_v[i][j]);
+                scene.remove(strobe_vx[i][j]);
+                scene.remove(strobe_vy[i][j]);
             }
         }
 
