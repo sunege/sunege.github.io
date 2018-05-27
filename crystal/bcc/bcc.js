@@ -223,7 +223,7 @@ function initObject(){
     sphere = [];
     for(var i=0; i<N*N*N*2; i++){
         //create geometry
-        var geometry = new THREE.SphereGeometry(p[i].radius, 8, 8);
+        var geometry = new THREE.SphereGeometry(p[i].radius, 40, 40);
         var material = new THREE.MeshLambertMaterial({color: 0xffffff, ambient: 0xffffff });
 
 
