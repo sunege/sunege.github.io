@@ -1,13 +1,13 @@
 ////////////////////
 //                //
-// bcc crystal    //
+// fcc crystal    //
 //                //
 ////////////////////
 
 //System Parameter
-var N = 9;
+var N = 14;
 var RADIUS = 5;
-var L = RADIUS * 3.95 / Math.sqrt(3);
+var L = 2 * Math.sqrt(2) * RADIUS;
 
 
 var restartFlag = false;
@@ -51,19 +51,37 @@ window.addEventListener("load", function(){
 
         p[4].x = L/2;
         p[4].y = L/2;
-        p[4].z = L/2;
-        
-        p[5].z = L;
-        
-        p[6].x = L;
-        p[6].z = L;
 
+        p[5].x = L/2;
+        p[5].z = L/2;
+
+        p[6].y = L/2;
+        p[6].z = L/2;
+
+        p[7].x = L/2;
         p[7].y = L;
-        p[7].z = L;
+        p[7].z = L/2;
 
         p[8].x = L;
-        p[8].y = L;
-        p[8].z = L;
+        p[8].y = L/2;
+        p[8].z = L/2;
+
+        p[9].z = L;
+
+        p[10].x = L;
+        p[10].z = L;
+
+        p[11].y = L;
+        p[11].z = L;
+
+        p[12].x = L;
+        p[12].y = L;
+        p[12].z = L;
+
+        p[13].x = L/2;
+        p[13].y = L/2;
+        p[13].z = L;
+
 
         /*
         for(var i=0; i<N*2; i++){
