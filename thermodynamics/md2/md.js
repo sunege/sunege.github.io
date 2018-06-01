@@ -7,8 +7,8 @@
 //System Parameter
 var time = 0;		// time
 var dt = 1e-15; // Delta t
-var N = 20;	   // number of particle
-var L = 1e-8;	   // System length
+var N = 125;	   // number of particle
+var L = 8.0e-8;	   // System length
 var draw_scale = 1e+9;
 var dl = L / (N-1); //discreat space
 var step = 0; //step count
@@ -19,9 +19,9 @@ var _skip = 0.1;
 var A = 0;
 
 //Field parameter
-var T = 300; // temp
+var T = 0.1; // temp
 var k_B = 1.38e-23;
-var gamma = 0.5; // air resistance param
+// var gamma = 0.5; // air resistance param
 var gravity = 0; // gravitational accelaration
 var sigma = 3.0e-10;
 var epsilon = 124.0*k_B;
@@ -34,7 +34,7 @@ var vel = 0; // avg vel
 
 //boundary condition
 var boundary="d";
-var restitution = 0.5;
+var restitution = 1;
 
 
 //particle class
@@ -117,6 +117,18 @@ Calculation.prototype = {
 				v+=dv;
 			}
 
+            var N_line;
+            for(var i=0; i<N; i++){
+                if(Math.pow(i, 3.0) >= N){
+                    N_line = i;
+                    break;
+                }
+            }
+            var lattice_const = (L - 2.3*RADIUS)/N_line;
+
+            var x_i = 0;
+            var y_i = 0;
+            var z_i = 0;
 			//モンテカルロ法（分布関数内に入っていたらその数値を採用する）
 			for(var i=0; i<N; i++){
 				loop_flag=true;
@@ -137,9 +149,19 @@ Calculation.prototype = {
 						var vy = (-this.c(theta)*this.c(phi)*this.s(psi)-this.s(phi)*this.c(psi))*v_rand;
 						var vz = this.s(theta)*this.c(phi)*v_rand;
 						p[i].mass = MASS;
-						p[i].x = this.rand(RADIUS, L-RADIUS);
-						p[i].y = this.rand(RADIUS, L-RADIUS);
-						p[i].z = this.rand(RADIUS, L-RADIUS);
+//                         p[i].x = 1.1*RADIUS + (i % N_line) * lattice_const;
+
+                        x_i = i % N_line;
+                        y_i = Math.floor(i / N_line) % N_line;
+                        z_i = Math.floor(i / (N_line * N_line));
+
+                        var first_position = (L/2) - ((N_line-1) * lattice_const / 2);
+                        p[i].x = first_position + x_i * lattice_const;
+                        p[i].y = first_position + y_i * lattice_const;
+                        p[i].z = first_position + z_i * lattice_const;
+// 						p[i].x = this.rand(RADIUS, L-RADIUS);
+// 						p[i].y = this.rand(RADIUS, L-RADIUS);
+// 						p[i].z = this.rand(RADIUS, L-RADIUS);
 						p[i].fx = 0;
 						p[i].fy = 0;
 						p[i].fz = 0;
@@ -196,7 +218,7 @@ Calculation.prototype = {
 					d_r.y = p[j].y - p[i].y;
 					d_r.z = p[j].z - p[i].z;
 					d_r.norm = Math.sqrt(d_r.x*d_r.x + d_r.y*d_r.y + d_r.z*d_r.z);
-					intforce = 24*epsilon*(2*Math.pow(sigma,12.0)/Math.pow(d_r.norm,13.0) - Math.pow(sigma,6.0)/Math.pow(d_r.norm,7.0));
+					intforce = 24*epsilon*(2*Math.pow(sigma,12.0)/Math.pow(1.2*d_r.norm,13.0) - Math.pow(sigma,6.0)/Math.pow(1.2*d_r.norm,7.0));
 					force01.x = intforce*d_r.x/d_r.norm;
 					force01.y = intforce*d_r.y/d_r.norm;
 					force01.z = intforce*d_r.z/d_r.norm;
@@ -398,7 +420,7 @@ function initEvent(){
 	//slider interface
 	$('#slider_skip').slider({
 		min: 1,
-		max: 10000,
+		max: 100,
 		step: 1,
 		value: skip,
 		slide: function(event, ui){
@@ -643,7 +665,7 @@ function initObject(){
 	for(var i=0; i<N; i++){
 		//create geometry
 		//var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
-		var geometry = new THREE.SphereGeometry(p[i].radius*draw_scale, 20, 20);
+		var geometry = new THREE.SphereGeometry(p[i].radius*10*draw_scale, 10, 5);
 		//create material
 		//
 		/*	
