@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>game</title>
+        <script type="text/javascript">
+
+var N;
+var btnName;
+var state;
+
+window.onload = function(){
+    init();
+}
+
+function init(){
+    N = Number(document.getElementById("number").value);
+    btnName = new Array(N*N);
+    state = new Array(N*N);
+    var btnCode = "";
+
+    for(var i=0; i<N*N; i++){
+        btnName[i] = "b" + String(i);
+        btnCode += "<input type='button' onclick='flip(this.id)' id='"+btnName[i]+"' value='□'/>";
+        if(i%N == N-1){
+            btnCode += "<br/>";
+        }
+        state[i] = 1;
+    }
+
+    document.getElementById("wrapper").innerHTML = btnCode;
+    check();
+}
+
+function flip(eleId){
+    var btnNum = Number(eleId.slice(1));
+    state[btnNum] = -state[btnNum];
+    if(btnNum > N-1){
+        var upBtnNum = btnNum - N;
+        state[upBtnNum] = -state[upBtnNum];
+    }
+    if(btnNum < (N-1)*N){
+        var downBtnNum = btnNum + N;
+        state[downBtnNum] = -state[downBtnNum];
+    }
+    if(btnNum % N != 0){
+        var leftBtnNum = btnNum - 1;
+        state[leftBtnNum] = -state[leftBtnNum];
+    }
+    if(btnNum % N != N-1){
+        var rightBtnNum = btnNum +1;
+        state[rightBtnNum] = -state[rightBtnNum];
+    }
+    display();
+}
+
+function display(){
+    for(var i=0; i<N*N; i++){
+        update(btnName[i], state[i]);
+    }
+    check();
+}
+
+function update(btn, num){
+    if(num == 1){
+        document.getElementById(btn).value = "□";
+    }else if(num == -1){
+        document.getElementById(btn).value = "■";
+    }
+}
+
+function check(){
+    var temp=0;
+    for(var i=0; i<N*N; i++){
+        temp+=state[i];
+    }
+    if(temp == -N*N){
+        document.getElementById("comment").innerText = "Clear!";
+    }else{
+        document.getElementById("comment").innerText = "";
+    }
+}
+        </script>
+    </head>
+    <body>
+        <h2>すべて黒にしてください</h2>
+        <label>縦横の数：</label>
+        <input type="text" id="number" style="width:40px" value="3"/>
+        <input type="button" id="start" onclick="init()" value="reset"/>
+        <br/>
+        <div id="wrapper">
+        </div>
+    <br/>
+    <div id="comment"></div>
+    </body>
+</html>
