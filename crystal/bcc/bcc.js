@@ -335,9 +335,9 @@ function wall(v1, v2, v3, v4){
 
 // 1/8 sphere test
 function test(R, N1, N2){
-    var d[N1 + 1];  
-    var r[N1 + 1];
-    var theta[N2 + 1];
+    var d = new Array(N1 + 1);  
+    var r = new Array(N1 + 1);
+    var theta = new Array(N2 + 1);
     for(var i=0; i<N1; i++){
         d[i] = i*(R/N1);
         r[i] = Math.sqrt(R*R - d[i]*d[i]);
@@ -348,10 +348,16 @@ function test(R, N1, N2){
         theta[i] = i*Math.PI/(2*N2);
     }
     theta[N2] = Math.PI/2;
-    var x[N1+1][N2+1];
-    var y[N1+1][N2+1];
-    var z[N1+1][N2+1];
-    var vertex[N1+1][N2+1];
+    var x = new Array(N1+1);
+    var y = new Array(N1+1);
+    var z = new Array(N1+1);
+    var vertex = new Array(N1+1);
+    for(var n=0; n<N1+1; n++){
+        x[n] = new Array(N2+1);
+        y[n] = new Array(N2+1);
+        z[n] = new Array(N2+1);
+        vertex[n] = new Array(N2+1);
+    }
     for(var n=0; n<N1+1; n++){
         for(var i=0; i<N2+1; i++){
             x[n][i] = r[n]*Math.cos(theta[i]);
