@@ -14,7 +14,7 @@ var step = 0; //step count
 var skip = 50;
 
 //oscillation
-var A = 1;
+var A = 0.5;
 
 //Field parameter
 var gamma = 0.5; // air resistance param
@@ -30,7 +30,7 @@ var boundary="d";
 
 //Spring param
 //natural length
-var nl = 0.7;
+var nl = 1.0;
 
 var spring = { k: 1000, l: nl*dl };
 
@@ -274,7 +274,7 @@ function initEvent(){
 	//slider interface
 	$('#slider_skip').slider({
 			min: 1,
-			max: 1000,
+			max: 200,
 			step: 1,
 			value: skip,
 			slide: function(event, ui){
@@ -463,7 +463,7 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(24*1.1, L/2, 0);
+	camera.position.set(20, L/2, 0);
 	camera.up.set(0,0,1);
 	camera.lookAt({x: 0, y:L/2, z: 0});
 
@@ -540,8 +540,8 @@ function initObject(){
 	sphere = [];
 	for(var i=0; i<N; i++){
 		//create geometry
-// 		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
-		var geometry = new THREE.BoxGeometry(3, 0.03, 5);
+		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
+// 		var geometry = new THREE.BoxGeometry(3, 0.03, 5);
 		//create material
 		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
 		//create object
@@ -638,10 +638,10 @@ function loop(){
 				p[N-1].vy = 0;
 				p[N-1].vz = 0;
 			}else if(boundary == "n"){
-				p[N-1].x = 0;
-				p[N-1].y = L;
-				p[N-1].vx = 0;
-				p[N-1].vy = 0;
+// 				p[N-1].x = 0;
+// 				p[N-1].y = L;
+// 				p[N-1].vx = 0;
+// 				p[N-1].vy = 0;
 			}
 
 		}
