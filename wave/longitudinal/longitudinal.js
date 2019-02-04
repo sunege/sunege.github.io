@@ -305,8 +305,8 @@ function initEvent(){
 	});
 	$('#slider_freq').slider({
 			min: 0,
-			max: 2,
-			step: 0.0001,
+			max: 10,
+			step: 0.01,
 			value: freq,
 			slide: function(event, ui){
 				var value = ui.value;
@@ -317,8 +317,8 @@ function initEvent(){
 	});
 	$('#slider_A').slider({
 			min: 0,
-			max: 1,
-			step: 0.01,
+			max: 5,
+			step: 0.1,
 			value: A,
 			slide: function(event, ui){
 				var value = ui.value;
@@ -328,7 +328,7 @@ function initEvent(){
 	});
 	$('#slider_k').slider({
 			min: 0,
-			max: 5000,
+			max: 10000,
 			step: 10,
 			value: spring.k,
 			slide: function(event, ui){
