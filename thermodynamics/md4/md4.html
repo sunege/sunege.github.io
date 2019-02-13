@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Molecular Dynamics</title>
+
+		<!-- style sheet -->
+		<link type="text/css" rel="stylesheet"
+		href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet"
+		href="../../css/menu.css" rel="stylesheet"/>
+		<style>
+            ul.normal{
+                width: 100vw;
+            }
+
+            div#canvas-frame{
+                width:900px;
+                height:600px;
+            }
+			/* スライダーのスタイル*/
+			div.slider{
+				width: 200px;
+			}
+
+			/* テキストボックスのスタイル*/
+			input#number{
+				width: 30px;
+			}
+
+            body {
+                margin: 0px;
+                overflow: hidden;
+            }
+
+		</style>
+
+		<!-- Javascript -->
+
+        
+		<!-- google-analytics -->
+		<script>
+/*
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-65937030-1', 'auto');
+			ga('send', 'pageview');
+*/
+		</script>
+
+		<!-- jQuery -->
+		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+
+		<!-- Three -->
+		<script type="text/javascript" src="../../js/Three/build/three.js"></script>
+		<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+
+		<!-- Main script -->
+		<script type="text/javascript" src="./md4.js"> </script>
+	</head>
+	<body>
+		<ul id="normal" class="dropmenu">
+			<!-- button -->
+			<div id="buttonFrame">
+				<li><a href="#">
+						<input class="button" type="button" value="Restart" id="startButton" />
+					</a>
+				</li>
+				<li><a href="#">
+						<input class="button" type="button" value="Stop" id="stopButton" />
+					</a>
+				</li>
+			</div>
+			<li><a href="#">粒子の設定</a>
+				<ul>
+					<li>
+						<!-- radius -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>半径</td>
+									<td><div id="slider_radius" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_radius" class="number" style="width:20px"/>m</td>
+								</tr>
+							</table>
+						</a>
+					</li>
+					<li>
+						<!-- mass -->
+						<a href="#">質量
+							<input type="text" value="" id="input_mass" class="number" />kg
+						</a>
+					</li>
+					<li>
+						<!-- N -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>粒子数</td>
+									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
+								</tr>
+							</table>
+						</a>
+					</li>
+				</ul>
+			</li>
+			<li><a href="#">温度<span id="temp"></span>K</a>
+				<ul>
+					<li>
+						<!-- heat -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>加熱冷却</td>
+									<td><div id="slider_restitution" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_restitution" class="number" style="width:20px"/></td>
+								</tr>
+							</table>
+						</a>
+					</li>
+					<li>
+						<!-- gravity -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>重力加速度</td>
+									<td><div id="slider_gravity" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_gravity" class="number" style="width:50px"/></td>
+								</tr>
+							</table>
+						</a>
+					</li>
+					<li>
+						<!-- heat2 -->
+						<a href="#">
+							<table>
+								<tr>
+									<td>加熱冷却（抵抗）</td>
+									<td><div id="slider_gamma" class="slider" style="width:100px"></div></td>
+									<td><input type="text" value="" id="input_gamma" class="number" style="width:20px"/></td>
+								</tr>
+							</table>
+						</a>
+					</li>
+					<li>
+						<a href="#">一辺
+							<span id="L">0</span>nm
+						</a>
+					</li>
+					<li>
+						<a href="#">v平均
+							<span id="vel">0</span>m/s
+						</a>
+					</li>
+				</ul>
+			</li>
+			<li><a href="#">時間<span id="time">0</span>ns</a>
+				<ul>
+					<li>
+						<a href="#"> dt
+							<input type="text" value="" id="input_dt" class="number" style="width:180px"/>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<table>
+								<tr>
+									<td>描画倍率</td>
+									<td><center><div id="slider_skip" class="slider" style="width:180px"></div></center></td>
+                                    <td><input type="text" value="" id="input_skip" class="number" style="width:45px"/></td>
+								</tr>
+							</table>
+						</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<!-- frame -->
+		<div id="canvas-frame"></div>
+
+	</body>
+</html>
