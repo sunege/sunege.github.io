@@ -1,40 +1,46 @@
 ////////////////////
 //                //
-// 1D H.O. System //
+// 分子動力学的な //
 //                //
 ////////////////////
 
 //System Parameter
 var time = 0;		// time
-var dt = 1e-15; // Delta t
-var N = 125;	   // number of particle
-var L = 8.0e-8;	   // System length
+var dt = 1e-12; // Delta t
+var N = 25;	   // number of particle
+var L = 10.0e-9;	   // System length
 var draw_scale = 1e+9;
 var dl = L / (N-1); //discreat space
 var step = 0; //step count
-var skip = 10;
+var skip = 100;
 var _skip = 0.1;
 
 //oscillation
 var A = 0;
 
 //Field parameter
-var T = 0.1; // temp
+var T = 30.0; // temp
 var k_B = 1.38e-23;
 // var gamma = 0.5; // air resistance param
 var gravity = 0; // gravitational accelaration
-var sigma = 3.0e-10;
-var epsilon = 124.0*k_B;
+// var gravity = 0; // gravitational accelaration
+var sigma = 0.398e-9;
+var epsilon = 232.0*k_B;
+// var cut_off = 5*Math.pow(2,1/6)*sigma;
+var cut_off = 7*sigma;
 
 
 //Particle parameter
-var MASS = 2.2e-29;//4.67e-26;
-var RADIUS = 1.2*sigma;
+var MASS = 131/(6.02e+23);//4.67e-26;
+var RADIUS = sigma;
 var vel = 0; // avg vel
 
 //boundary condition
 var boundary="d";
-var restitution = 1;
+var restitution = 0.7;
+
+//velocity limit flag
+velocity_limit_flag = false;
 
 
 //particle class
@@ -64,6 +70,12 @@ var Particle = function(parameter){
 	this.fz; 
 	//kinetic energy
 	this.kinetic = 0;
+    
+    //border
+    this.outside_x_flag = false;
+    this.outside_y_flag = false;
+    this.reflect_x_flag = false;
+    this.reflect_y_flag = false;
 };
 
 Particle.prototype = {
@@ -84,7 +96,8 @@ Calculation.prototype = {
 				p[i].mass = MASS;
 				p[i].x = this.rand(RADIUS, L-RADIUS);
 				p[i].y = this.rand(RADIUS, L-RADIUS);
-				p[i].z = this.rand(RADIUS, L-RADIUS);
+// 				p[i].z = this.rand(RADIUS, L-RADIUS);
+				p[i].z = L/2;
 				p[i].fx = 0;
 				p[i].fy = 0;
 				p[i].fz = 0;
@@ -119,7 +132,8 @@ Calculation.prototype = {
 
             var N_line;
             for(var i=0; i<N; i++){
-                if(Math.pow(i, 3.0) >= N){
+//                 if(Math.pow(i, 3.0) >= N){
+                if(Math.pow(i, 2.0) >= N){
                     N_line = i;
                     break;
                 }
@@ -129,7 +143,7 @@ Calculation.prototype = {
             var x_i = 0;
             var y_i = 0;
             var z_i = 0;
-			//モンテカルロ法（分布関数内に入っていたらその数値を採用する）
+			//分布関数内に入っていたらその数値を採用する
 			for(var i=0; i<N; i++){
 				loop_flag=true;
 				while(loop_flag == true){
@@ -145,9 +159,11 @@ Calculation.prototype = {
 						var theta = this.rand(2*Math.PI,0.0);
 						var phi = this.rand(2*Math.PI,0.0);
 						var psi = this.rand(2*Math.PI,0.0);
-						var vx = (this.c(theta)*this.c(phi)*this.c(psi)-this.s(phi)*this.s(psi))*v_rand;
-						var vy = (-this.c(theta)*this.c(phi)*this.s(psi)-this.s(phi)*this.c(psi))*v_rand;
-						var vz = this.s(theta)*this.c(phi)*v_rand;
+// 						var vx = (this.c(theta)*this.c(phi)*this.c(psi)-this.s(phi)*this.s(psi))*v_rand;
+// 						var vy = (-this.c(theta)*this.c(phi)*this.s(psi)-this.s(phi)*this.c(psi))*v_rand;
+// 						var vz = this.s(theta)*this.c(phi)*v_rand;
+                        var vx = v_rand * this.c(theta);
+                        var vy = v_rand * this.s(theta);
 						p[i].mass = MASS;
 //                         p[i].x = 1.1*RADIUS + (i % N_line) * lattice_const;
 
@@ -158,7 +174,8 @@ Calculation.prototype = {
                         var first_position = (L/2) - ((N_line-1) * lattice_const / 2);
                         p[i].x = first_position + x_i * lattice_const;
                         p[i].y = first_position + y_i * lattice_const;
-                        p[i].z = first_position + z_i * lattice_const;
+//                         p[i].z = first_position + z_i * lattice_const;
+                        p[i].z = L/2;
 // 						p[i].x = this.rand(RADIUS, L-RADIUS);
 // 						p[i].y = this.rand(RADIUS, L-RADIUS);
 // 						p[i].z = this.rand(RADIUS, L-RADIUS);
@@ -167,8 +184,10 @@ Calculation.prototype = {
 						p[i].fz = 0;
 						p[i].vx = vx;
 						p[i].vy = vy;
-						p[i].vz = vz;
-						p[i].v = Math.sqrt(vx*vx+vy*vy+vz*vz);
+// 						p[i].vz = vz;
+						p[i].vz = 0;
+// 						p[i].v = Math.sqrt(vx*vx+vy*vy+vz*vz);
+						p[i].v = Math.sqrt(vx*vx+vy*vy);
 						loop_flag=false;
 					}
 				}
@@ -207,7 +226,7 @@ Calculation.prototype = {
 		d_r={ x: 0, y: 0, z: 0, norm: 0 };
 		for(var i=0; i<N; i++){
 			p[i].fx=0;
-			p[i].fy=0;
+			p[i].fy=-p[i].mass * gravity;
 			p[i].fz=0;
 		}
 		for(var i=0; i<N; i++){
@@ -216,21 +235,28 @@ Calculation.prototype = {
 				else{
 					d_r.x = p[j].x - p[i].x;
 					d_r.y = p[j].y - p[i].y;
-					d_r.z = p[j].z - p[i].z;
-					d_r.norm = Math.sqrt(d_r.x*d_r.x + d_r.y*d_r.y + d_r.z*d_r.z);
-					intforce = 24*epsilon*(2*Math.pow(sigma,12.0)/Math.pow(1.2*d_r.norm,13.0) - Math.pow(sigma,6.0)/Math.pow(1.2*d_r.norm,7.0));
+// 					d_r.z = p[j].z - p[i].z;
+// 					d_r.norm = Math.sqrt(d_r.x*d_r.x + d_r.y*d_r.y + d_r.z*d_r.z);
+					d_r.norm = Math.sqrt(d_r.x*d_r.x + d_r.y*d_r.y);
+                    if(d_r.norm > cut_off){
+                        continue;
+                    }
+//                     if(d_r.norm < sigma){
+//                         continue;
+//                     }
+					intforce = -24*epsilon*(2*Math.pow(sigma,12.0)/Math.pow(d_r.norm,13.0) - Math.pow(sigma,6.0)/Math.pow(d_r.norm,7.0));
 					force01.x = intforce*d_r.x/d_r.norm;
 					force01.y = intforce*d_r.y/d_r.norm;
-					force01.z = intforce*d_r.z/d_r.norm;
+// 					force01.z = intforce*d_r.z/d_r.norm;
 					force10.x = -force01.x;
 					force10.y = -force01.y;
-					force10.z = -force01.z;
+// 					force10.z = -force01.z;
 					p[i].fx += force01.x;
 					p[i].fy += force01.y;
-					p[i].fz += force01.z;
+// 					p[i].fz += force01.z;
 					p[j].fx += force10.x;
 					p[j].fy += force10.y;
-					p[j].fz += force10.z;
+// 					p[j].fz += force10.z;
 				}
 			}
 		}
@@ -240,17 +266,17 @@ Calculation.prototype = {
 		// conserve f(t)
 		var old_fx = [];
 		var old_fy = [];
-		var old_fz = [];
+// 		var old_fz = [];
 
 		for(var i=0; i<N; i++){
 			//x(t+dt) = x(t) + v(t)*dt + f(t)*dt*dt/2m
 			p[i].x = p[i].x + p[i].vx*dt + p[i].fx*dt*dt/(2*p[i].mass);
 			p[i].y = p[i].y + p[i].vy*dt + p[i].fy*dt*dt/(2*p[i].mass);
-			p[i].z = p[i].z + p[i].vz*dt + p[i].fz*dt*dt/(2*p[i].mass);
+// 			p[i].z = p[i].z + p[i].vz*dt + p[i].fz*dt*dt/(2*p[i].mass);
 
 			old_fx[i] = p[i].fx;
 			old_fy[i] = p[i].fy;
-			old_fz[i] = p[i].fz;
+// 			old_fz[i] = p[i].fz;
 		}
 
 		// f(t+dt)
@@ -260,7 +286,7 @@ Calculation.prototype = {
 		for(var i=0; i<N; i++){
 			p[i].vx = p[i].vx + ( old_fx[i] + p[i].fx )*dt/(2*p[i].mass); 
 			p[i].vy = p[i].vy + ( old_fy[i] + p[i].fy )*dt/(2*p[i].mass); 
-			p[i].vz = p[i].vz + ( old_fz[i] + p[i].fz )*dt/(2*p[i].mass); 
+// 			p[i].vz = p[i].vz + ( old_fz[i] + p[i].fz )*dt/(2*p[i].mass); 
 		}
 		//p[0] = { vx: 0, vy: 0, vz: 0};
 		this.border(p);
@@ -270,27 +296,43 @@ Calculation.prototype = {
 			if(p[i].x < RADIUS){
 				p[i].x = RADIUS;
 				p[i].vx = -p[i].vx*restitution;
+                reflect_x_flag = true;
 			}
 			else if(p[i].x > L-RADIUS){
 				p[i].x = L-RADIUS;
 				p[i].vx = -p[i].vx*restitution;
+                reflect_x_flag = true;
 			}
 			if(p[i].y < RADIUS){
 				p[i].y = RADIUS;
 				p[i].vy = -p[i].vy*restitution;
+                reflect_y_flag = true;
 			}
 			else if(p[i].y > L-RADIUS){
 				p[i].y = L-RADIUS;
 				p[i].vy = -p[i].vy*restitution;
+                reflect_y_flag = true;
 			}
-			if(p[i].z < RADIUS){
-				p[i].z = RADIUS;
-				p[i].vz = -p[i].vz*restitution;
-			}
-			else if(p[i].z > L-RADIUS){
-				p[i].z = L-RADIUS;
-				p[i].vz = -p[i].vz*restitution;
-			}
+// 			if(p[i].z < RADIUS){
+// 				p[i].z = RADIUS;
+// 				p[i].vz = -p[i].vz*restitution;
+// 			}
+// 			else if(p[i].z > L-RADIUS){
+// 				p[i].z = L-RADIUS;
+// 				p[i].vz = -p[i].vz*restitution;
+// 			}
+            //速度制限
+            if(Math.abs(p[i].vx) >= (L/2 )/dt){
+                p[i].vx = (p[i].vx / Math.abs(p[i].vx))*(L/2)/dt;
+                velocity_limit_flag = true;
+            }
+            if(Math.abs(p[i].vy) >= (L/2)/dt){
+                velocity_limit_flag = true;
+                p[i].vy = (p[i].vy / Math.abs(p[i].vy))*(L/2)/dt;
+            }
+            if(Math.abs(p[i].vx) < (L/2 )/dt && Math.abs(p[i].vy) < (L/2)/dt){
+                velocity_limit_flag = false;
+            }
 		}
 	},
 	calculateKinetic: function(p){
@@ -298,6 +340,14 @@ Calculation.prototype = {
 			p[i].kinetic = p[i].mass*(p[i].vx*p[i].vx + p[i].vy*p[i].vy + p[i].vz*p[i].vz)/2;
 		}
 	},
+    totalKineticEnergy: function(p){
+        this.calculateKinetic(p);
+        var energy = 0;
+        for(var i=0; i<N; i++){
+            energy += p[i].kinetic;
+        }
+        return energy;
+    },
 	histgram: function(p){
 		var delta_v = 100;
 		var v_max = 3000;
@@ -420,7 +470,7 @@ function initEvent(){
 	//slider interface
 	$('#slider_skip').slider({
 		min: 1,
-		max: 100,
+		max: 5000,
 		step: 1,
 		value: skip,
 		slide: function(event, ui){
@@ -460,6 +510,7 @@ function initEvent(){
 			document.getElementById("input_N").value = value;
 		}
 	});
+    /*
 	$('#slider_temp').slider({
 		min: 1,
 		max: 1000,
@@ -470,7 +521,28 @@ function initEvent(){
 			document.getElementById("input_temp").value = value;
 		}
 	});
+    */
 	document.getElementById("temp").innerHTML = T.toFixed(0);
+	$('#slider_restitution').slider({
+		min: 0.01,
+		max: 1.5,
+		step: 0.01,
+		value: restitution,
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input_restitution").value = value;
+		}
+	});
+	$('#slider_gravity').slider({
+		min: 0.0,
+		max: 1e+7,
+		step: 1,
+		value: gravity,
+		slide: function(event, ui){
+			var value = ui.value;
+			document.getElementById("input_gravity").value = value;
+		}
+	});
 
 	//input interface
 	document.getElementById("input_skip").value = skip;
@@ -478,7 +550,8 @@ function initEvent(){
 	document.getElementById("input_dt").value = dt;
 	document.getElementById("input_mass").value = MASS;
 	document.getElementById("input_N").value = N;
-	document.getElementById("input_temp").value = T;
+	document.getElementById("input_restitution").value = restitution;
+	document.getElementById("input_gravity").value = gravity;
 
 
 	//button interface
@@ -504,6 +577,7 @@ function initEvent(){
 function threeStart(){
 	initThree();
 	initCamera();
+    onResize();
 	initLight();
 	initObject();
 	loop();
@@ -556,8 +630,8 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-	camera.position.set(L*draw_scale*2.5,L*draw_scale*0.8,L*draw_scale*0.7);
-	camera.up.set(0,0,1);
+	camera.position.set(L*draw_scale/2,L*draw_scale/2,L*draw_scale*2.5);
+	camera.up.set(0,1,0);
 	camera.lookAt({x: L*draw_scale/2, y:L*draw_scale/2, z: L*draw_scale/2});
 
 	//create trackball object
@@ -569,7 +643,7 @@ function initCamera(){
 	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
 	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
 
-	trackball.noRotate = false;
+	trackball.noRotate = true;
 	trackball.rotateSpeed = 2.0;
 
 	trackball.noZoom = false;
@@ -577,12 +651,24 @@ function initCamera(){
 
 	trackball.noPan = false;
 	trackball.panSpeed = 0.6;
-	//trackball.target = new THREE.Vector3(L/2, L/2, L/2);
 	trackball.target = new THREE.Vector3(L*draw_scale/2, L*draw_scale/2, L*draw_scale/2);
 
 	trackball.staticMoving = true;
 
 	trackball.dynamicDampingFactor = 0.3;
+}
+
+window.addEventListener('resize', onResize);
+
+function onResize(){
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+
+    camera.aspect = width/height;
+    camera.updateProjectionMatrix();
 }
 
 ////////////////////////////////////////
@@ -615,84 +701,21 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var axis;
+// var axis;
 var sphere=[]; //sphere object
 var wall1;
 
 function initObject(){
-	//create geometry
-	// 	var geometry = new THREE.SphereGeometry( ball.radius, 20, 20 );
-	//create material
-	// 	var material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
-
-	//create sphere object
-	// 	sphere = new THREE.Mesh(geometry, material);
-
-	//add scene
-	// 	scene.add(sphere);
-
-	//create shadow
-	// 	sphere.castShadow = true;
-
-	/*  floar drow  */
-	// 	var yuka_n = 20,
-	// 		 yuka_w = 100;
-	// 	for(var i=-yuka_n/2; i<=yuka_n/2; i++){
-	// 		for(var j=-yuka_n/2; j<=yuka_n/2; j++){
-	// 			position
-	// 			var x = j*yuka_w;
-	// 			var y = i*yuka_w;
-	// 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
-	// 			if(Math.abs(i+j) % 2 == 0){
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
-	// 			}else{
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
-	// 			}
-	// 			var plane = new THREE.Mesh(geometry, material);
-	// 			plane.position.set(x, y, 0);
-	// 			plane.receiveShadow = true;
-	// 			scene.add(plane);
-	// 		}
-	// 	}
-	//create axis object
-	axis = new THREE.AxisHelper(100);
-	//add axis object to scene
-	scene.add(axis);
-	//set axis position
-	axis.position.set(0, 0, 0);
-
 	sphere = [];
 	for(var i=0; i<N; i++){
 		//create geometry
-		//var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
-		var geometry = new THREE.SphereGeometry(p[i].radius*10*draw_scale, 10, 5);
+		var geometry = new THREE.SphereGeometry(p[i].radius*draw_scale, 20, 10);
 		//create material
 		//
-		/*	
-		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
-		var v_center = 400;
-		var v_ratio = parseFloat(velocity / v_center, 10);
-		if(v_ratio > 1){
-			v_ratio = 1;
-		}
-		var shine = parseInt(255*v_ratio, 10);
-
-		var red = parseInt(255 * v_ratio, 10);
-		var red_hex = red.toString(16);
-
-		var green_hex = "88";
-
-		var blue = parseInt(255 * (1-v_ratio), 10);
-		var blue_hex = blue.toString(16);
-
-		var color_code = red_hex + green_hex + blue_hex;
-		var material = new THREE.MeshPhongMaterial({ color: color_code, ambient: color_code, side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: shine});
-
-		*/
 	  //速度によって色変化
 		
 		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
-		var v_center = 1200;
+		var v_center = 10000;
 		var v_ratio = parseFloat(velocity / v_center, 10);
 		if(v_ratio > 1){
 			var red_hex = "ff";
@@ -754,14 +777,6 @@ function initObject(){
 	var v6 = { x: L*draw_scale, y: L*draw_scale, z:0 };
 	var v7 = { x: L*draw_scale, y: L*draw_scale, z:L*draw_scale };
 	var v8 = { x: L*draw_scale, y: 0, z:L*draw_scale };
-	//var v1 = { x: 0, y: 0, z:0 };
-	//var v2 = { x: 0, y: L, z:0 };
-	//var v3 = { x: 0, y: L, z:L };
-	//var v4 = { x: 0, y: 0, z:L };
-	//var v5 = { x: L, y: 0, z:0 };
-	//var v6 = { x: L, y: L, z:0 };
-	//var v7 = { x: L, y: L, z:L };
-	//var v8 = { x: L, y: 0, z:L };
 	//far
 	wall1 = wall(v1, v2, v3, v4);
 	scene.add(wall1);
@@ -775,8 +790,8 @@ function initObject(){
 	wall4 = wall(v2, v6, v7, v3);
 	scene.add(wall4);
 	//top
-	wall5 = wall(v4, v3, v7, v8);
-	scene.add(wall5);
+// 	wall5 = wall(v4, v3, v7, v8);
+// 	scene.add(wall5);
 	//bottom
 	wall6 = wall(v5, v6, v2, v1);
 	scene.add(wall6);
@@ -785,16 +800,13 @@ function initObject(){
 	wall2.castShadow = true;
 	wall3.castShadow = true;
 	wall4.castShadow = true;
-	wall5.castShadow = true;
+// 	wall5.castShadow = true;
 	wall6.castShadow = true;
-
-	geometry = new THREE.BoxGeometry(L*draw_scale,L*draw_scale,L*draw_scale);
-	//geometry = new THREE.BoxGeometry(L,L,L);
-	material = new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true});
-	var box = new THREE.Mesh(geometry, material);
-	scene.add(box);
-	//box.position.set(L/2, L/2, L/2);
-	box.position.set(L*draw_scale/2, L*draw_scale/2, L*draw_scale/2);
+    wall1.material.needsUpdate = true;
+    wall2.material.needsUpdate = true;
+    wall3.material.needsUpdate = true;
+    wall4.material.needsUpdate = true;
+//     wall6.material.needsUpdate = true;
 
 }
 
@@ -818,7 +830,7 @@ function wall(v1, v2, v3, v4){
 	geometry.computeVertexNormals();
 
 	//create material
-	var material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
+	var material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555555 });
 	//create sphere object
 	return new THREE.Mesh(geometry, material);
 }
@@ -827,12 +839,49 @@ function wall(v1, v2, v3, v4){
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
+//壁面更新用
+var compare_restitution = 0;
 function loop(){
 	//update trackball object
 	trackball.update();
 
 	//set sphere position
 	// 	sphere.position.set(ball.x, ball.y, ball.z);
+
+    if(compare_restitution != restitution){
+        compare_restitution = restitution;
+        if(restitution > 1){
+            color_code = 0xff8888;
+        }
+        else if(restitution < 1){
+            color_code = 0x8888ff;
+        }
+        else{
+            color_code = 0xaaaabb;
+        }
+    /*
+		var red = parseInt(255 * (restitution/1.5), 10);
+		var red_hex = red.toString(16);
+
+		var green_hex = "aa";
+
+		var blue = parseInt(255 * (1-restitution/1.5), 10);
+		var blue_hex = blue.toString(16);
+
+		var color_code = "0x" + red_hex + green_hex + blue_hex;
+
+        color_code = Number(color_code);
+    */
+        wall1.material.color.set(color_code);
+        wall2.material.color.set(color_code);
+        wall3.material.color.set(color_code);
+        wall4.material.color.set(color_code);
+        wall1.material.ambient.set(color_code);
+        wall2.material.ambient.set(color_code);
+        wall3.material.ambient.set(color_code);
+        wall4.material.ambient.set(color_code);
+        
+    }
 
 
 	if(restartFlag == true){
@@ -847,7 +896,6 @@ function loop(){
 		dt = parseFloat(document.getElementById("input_dt").value);
 		MASS = parseFloat(document.getElementById("input_mass").value);
 		N = parseFloat(document.getElementById("input_N").value);
-		T = parseFloat(document.getElementById("input_temp").value);
 		document.getElementById("temp").innerHTML = T.toFixed(0);
 
 		//init particle and calculation class
@@ -856,6 +904,14 @@ function loop(){
 		}
 		cal = new Calculation(p);
 		initObject();
+        wall1.material.color.set(color_code);
+        wall2.material.color.set(color_code);
+        wall3.material.color.set(color_code);
+        wall4.material.color.set(color_code);
+        wall1.material.ambient.set(color_code);
+        wall2.material.ambient.set(color_code);
+        wall3.material.ambient.set(color_code);
+        wall4.material.ambient.set(color_code);
 		restartFlag = false;
 		stopFlag = false;
 
@@ -889,10 +945,25 @@ function loop(){
 			//sphere[i].position.set(p[i].x, p[i].y, p[i].z);
 		}
 	}
+    var T_indicator = 0;
+    T_indicator = cal.totalKineticEnergy(p)/((3/2)*N*k_B);
 
-	document.getElementById("time").innerHTML = time.toFixed(2);
-	document.getElementById("L").innerHTML = L.toFixed(0);
+	document.getElementById("time").innerHTML = (time*1e+9).toFixed(1);
+	document.getElementById("L").innerHTML = (L*1e+9).toFixed(1);
+    vel = 0;
+    for(var i=0; i<N; i++){
+        vel += Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
+    }
+    vel = vel/N;
 	document.getElementById("vel").innerHTML = vel.toFixed(2);
+    if(velocity_limit_flag){
+        document.getElementById("temp").innerHTML = "NaN";
+    }
+    else{
+        document.getElementById("temp").innerHTML = (T_indicator).toFixed(1);
+    }
+    restitution = Number(document.getElementById("input_restitution").value);
+    gravity = Number(document.getElementById("input_gravity").value);
 
 	//init clear color
 	renderer.clear();
@@ -906,5 +977,6 @@ function loop(){
 
 	//call loop function
 	requestAnimationFrame(loop);
+    
 }
 
