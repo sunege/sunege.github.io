@@ -1,101 +1,164 @@
 /* コントロールメニューのスタイル*/
 .dropmenu{
-	*zoom: 1;
-	list-style-type: none;
-	width: 900px;
-	margin: 0px 10px 0px 0px;
-	padding: 0;
-	float: left;
+    *zoom: 1;
+    list-style-type: none;
+    width: 100%;
+    max-width: 900px;
+    margin: 0px 0px 0px 0px;
+    padding: 0;
+    float: left;
 }
 .dropmenu:before, .dropmenu:after{
-	content: "";
-	display: table;
+    content: "";
+    display: table;
 }
 .dropmenu:after{
-	clear: both;
+    clear: both;
 }
 .dropmenu li{
-	position: relative;
-	width: 20%;
-	float: left;
-	margin: 0;
-	padding: 0;
-	text-align: center;
+    position: relative;
+    width: 20%;
+    float: left;
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 .dropmenu li a{
-	display: block;
-	margin: 0;
-	padding: 25px 0 25px;
-	background: #00a8ff;
-	color: #fff;
-	font-size: 14px;
-	line-height: 2;
-	text-decoration: none;
+    display: block;
+    margin: 0;
+    padding: 25px 0 25px;
+    background: #00a8ff;
+    color: #fff;
+    font-size: 14px;
+    line-height: 2;
+    text-decoration: none;
 }
 .dropmenu li ul{
-	list-style: none;
-	position: absolute;
-	z-index: 9999;
-	top: 100%;
-	width: 100%;
-	left: 0;
-	margin: 0;
-	padding: 0;
+    list-style: none;
+    position: absolute;
+    z-index: 9999;
+    top: 100%;
+    width: 100%;
+    left: 0;
+    margin: 0;
+    padding: 0;
 }
 .dropmenu li:last-child ul{
-	left: -100%;
-	width: 100%;
+    left: -100%;
+    width: 100%;
 }
 .dropmenu li ul li{
-	overflow: hidden;
-	width: 200%;
-	height: 0;
-	color: #fff;
+    overflow: hidden;
+    width: 200%;
+    height: 0;
+    color: #fff;
 }
 .dropmenu li ul li a{
-	padding: 13px 15px;
-	border-top: 1px solid #00a8ff;
-	background: #0092dd;
-	text-align: left;
+    padding: 13px 15px;
+    border-top: 1px solid #00a8ff;
+    background: #0092dd;
+    text-align: left;
 }
 .dropmenu li:hover > a{
-	background: #0086cc;
+    background: #0086cc;
 }
 .dropmenu li a:hover{
-	background: #0086cc;
+    background: #0086cc;
 }
+#toggle{
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .dropmenu li{
+        width: 25%;
+        border-bottom: 1px solid #444;
+    }
+}
+@media only screen and (max-width: 480px) {
+    .dropmenu{
+        display: none;
+    }
+    .dropmenu li{
+        width: 100%;
+    }
+    #toggle{
+        display: block;
+        position: relative;
+        width: 100%;
+        background: #00a8ff;
+    }
+    #toggle a{
+        display: block;
+        position; relative;
+        padding: 12px 0 10px;
+        border-bottom: 1px solid #444;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+    }
+    #toggle:before{
+        display: block;
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        width: 20px;
+        height: 20px;
+        margin-top: -10px;
+        background: #fff;
+    }
+    #toggle a:before, #toggle a:after{
+        display: block;
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        left: 10px;
+        width: 20px;
+        height: 4px;
+        background: #222;
+    }
+    #toggle a:before{
+        margin-top: -6px;
+    }
+    #toggle a:after{
+        margin-top: 2px;
+    }
+}
+
 #normal li ul li{
-	overflow: hidden;
-	height: 0;
-	transition: .2s;
+    overflow: hidden;
+    height: 0;
+    transition: .2s;
 }
 #normal li:hover ul li{
-	overflow: visible;
-	height: 50px;
+    overflow: visible;
+    height: 50px;
 }
 
 /* ボタンのスタイル*/
 .button{
-	font-size: 14px;
-	margin: -25px;
-	padding: 30px 50px;
-	background: #00a8ff;
-	color: #fff;
-	border-style: none;
+    font-size: 14px;
+    margin: -25px;
+    padding: 30px 50px;
+    background: #00a8ff;
+    color: #fff;
+    border-style: none;
 }
 
 /* ラジオボックスのスタイル*/
 input[ type=radio ]{
-	-moz-transform-origin: left;
-	-moz-transform: scale(3, 3);
-	-webkit-transform-origin: left;
-	-webkit-transform: scale(3, 3);
+    -moz-transform-origin: left;
+    -moz-transform: scale(3, 3);
+    -webkit-transform-origin: left;
+    -webkit-transform: scale(3, 3);
 }
 
 /* チェックボックスのスタイル*/
 input[ type=checkbox ]{
-	-moz-transform-origin: left;
-	-moz-transform: scale(3, 3);
-	-webkit-transform-origin: left;
-	-webkit-transform: scale(3, 3);
+    -moz-transform-origin: left;
+    -moz-transform: scale(3, 3);
+    -webkit-transform-origin: left;
+    -webkit-transform: scale(3, 3);
 }

@@ -893,7 +893,6 @@ function loop(){
 
     if(compare_gamma != pre_gamma){
         compare_gamma = pre_gamma;
-        console.log(pre_gamma);
         if(pre_gamma > 0){
             color_code6 = 0xff8888;
         }
