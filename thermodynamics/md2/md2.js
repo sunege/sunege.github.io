@@ -946,7 +946,7 @@ function loop(){
 		}
 	}
     var T_indicator = 0;
-    T_indicator = cal.totalKineticEnergy(p)/((3/2)*N*k_B);
+    T_indicator = cal.totalKineticEnergy(p)/((2/2)*N*k_B);
 
 	document.getElementById("time").innerHTML = (time*1e+9).toFixed(1);
 	document.getElementById("L").innerHTML = (L*1e+9).toFixed(1);
