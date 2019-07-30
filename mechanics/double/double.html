@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>double</title>
+
+		<!-- style sheet -->
+		<link type="text/css" rel="stylesheet"
+		href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
+		<style>
+			div#canvas-frame{
+				width: 900px;
+				height: 600px;
+				float: left;
+			}
+			div#controller div.slider{
+				width: 180px;
+			}
+			input.number{
+				width: 30px;
+			}
+		</style>
+
+		<!-- Javascript -->
+
+		<!-- google-analytics -->
+		<!-- <script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-65937030-1', 'auto');
+			ga('send', 'pageview');
+		</script> -->
+
+		<!-- jQuery -->
+		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+
+
+		<!-- Three -->
+		<script type="text/javascript" src="../../js/Three/build/three.js"></script>
+		<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+
+		<!-- Main script -->
+		<script type="text/javascript" src="./double.js"> </script>
+	</head>
+	<body>
+
+		<!-- controller -->
+		<div id="controller">
+			<ul class="dropmenu" id="normal">
+
+				<!-- button -->
+				<li><a href="#">
+					<input class="button" type="button" value="Start" id="startButton" />
+				</a></li>
+				<li><a href="#">
+					<input class="button" type="button" value="Stop" id="stopButton" />
+				</a></li>
+
+				<li>
+				<a href="#">時間<span id="time">0</span>s</a>
+				<ul>
+					<li><a href="#">dt
+						<!-- input dt -->
+						<input type="text" value="" id="input_dt" class="number" style="width:50px"/>
+					</a></li>
+					<li><a href="#">
+						<table><tr>
+								<!-- input skip -->
+								<td>描画間隔</td>
+								<td><div id="slider_skip" class="slider" style="width:180px"></div></td>
+								<td><input type="text" value="" id="input_skip" class="number" /></td>
+						</tr></table>
+					</a></li>
+				</ul>
+				</li>
+
+				<li><a href="#">粒子の設定</a>
+					<ul>
+						<li><a href="#">
+							<table><tr>
+									<!-- mass -->
+									<td>質量</td>
+									<td><div id="slider_mass" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_mass" class="number" />kg</td>
+							</tr></table>
+						</a></li>
+						<li><a href="#">
+							<table><tr>
+									<!-- N -->
+									<td>粒子数</td>
+									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_N" class="number" />個</td>
+							</tr></table>
+						</a></li>
+						<li><a href="#">
+							<table><tr>
+									<!-- frequency -->
+									<td>振動数</td>
+									<td><div id="slider_freq" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_freq" class="number"/>Hz</td>
+							</tr></table>
+						</a></li>
+						<li><a href="#">
+							<table><tr>
+									<!-- Amp -->
+									<td>振幅</td>
+									<td><div id="slider_A" class="slider"></div></td>
+									<td><input type="text" value="" id="input_A" class="number"/>m</td>
+							</tr></table>
+						</a></li>
+					</ul>
+				</li>
+
+				<li><a href="#">バネその他</a>
+					<ul>
+						<li><a href="#">
+							全長＝<span id="l"></span>m, 粒子間隔＝<span id="dl"></span>m, 自然長＝<span id="nl"></span>m
+						</a></li>
+						<li><a href="#">
+							<table><tr>
+									<td>ばね定数</td>
+									<td><div id="slider_k" class="slider"></div></td>
+									<td><input type="text" value="" id="input_k" class="number"/>N/m</td>
+							</tr></table>
+						</a></li>
+						<li><a href="#">
+							<table><tr>
+									<td>自然長=間隔×</td>
+									<td><div id="slider_nl" class="slider"></div></td>
+									<td><input type="text" value="" id="input_nl" class="number"/></td>
+							</tr></table>
+						</a></li>
+						<li><a href="#">
+							<table><tr>
+									<td>空気抵抗</td>
+									<td><div id="slider_gamma" class="slider"></div></td>
+									<td><input type="text" value="" id="input_gamma" class="number"/>Ns/m</td>
+							</tr></table>
+						</a></li>
+						<li><a href="#">
+							重力ON/OFF<input type="checkbox" id="checkbox_gravity" />
+						</a></li>
+						<!-- 境界条件 -->
+						<li><a href="#">
+							固定端<input type="radio" name="boundary" value="d" checked="checked"/>
+						</a></li>
+						<li><a href="#">
+							自由端<input type="radio" name="boundary" value="n"/>
+						</a></li>
+					</ul>
+				</li>
+			</ul>
+
+		</div>
+
+		<!-- frame -->
+		<div id="canvas-frame"></div>
+	</body>
+</html>
