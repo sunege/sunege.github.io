@@ -17,12 +17,10 @@ var skip = 1/(60*Dt)*_skip;
 
 ////////////////////////////////////
 // system parameter
-// particle1 constraint length
+// constraint length
 var l = 1.0;
-// particle2 constraint length
-var L = 0.8;
+var L = 1.0;
 // air resistance param
-var gamma = 0.0;
 
 ////////////////////////////////////
 //Particle parameter
@@ -30,19 +28,19 @@ var gamma = 0.0;
 var mass1 = 1.0;
 var mass2 = 1.0;
 //draw radius
-var radius1 = 0.2;
-var radius2 = 0.2;
+var radius1 = 0.1*Math.pow(mass1, 1.0/3.0);
+var radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
 
 ////////////////////////////////////
 //initial state
 var theta0 = pi/3.0;
-var phi0 = pi*2.0/3.0;
+var phi0 = pi/3.0;
 var theta_v0 = 0;
 var phi_v0 = 0;
 
 ////////////////////////////////////
 //flag parameter
-var restartFlag = false; // restert flag
+var resetFlag = false; // restert flag
 var stopFlag = true; // stop flag
 
 ////////////////////////////////////
@@ -93,10 +91,6 @@ function timeDevelopment() {
     var m = p1.mass;
     var M = p2.mass;
 
-    if(debug_flag == 1){
-        console.log(p1.angle_v, pv);
-        debug_flag++;
-    }
     //runge kutta var
     var atv = 0;
     var apv = 0;
@@ -180,7 +174,6 @@ window.addEventListener("load", function(){
 function initSystem(){
     p1 = new Particle(radius1, mass1, theta0, theta_v0);
     p2 = new Particle(radius2, mass2, phi0, phi_v0);
-    console.log(p1);
 }
 
 ////////////////////////////////////////
@@ -190,13 +183,13 @@ function initEvent(){
 	//slider interface
 	$('#slider_skip').slider({
 			min: 0.01,
-			max: 1.01,
+			max: 5.00,
 			step: 0.01,
 			value: _skip,
 			slide: function(_event, ui){
 				var value = ui.value;
 				_skip = value;
-				skip = 1/(60*dt)*_skip;
+				skip = 1/(60*Dt)*_skip;
 				document.getElementById("input_skip").value = value;
 			}
 	});
@@ -210,18 +203,29 @@ function initEvent(){
 			slide: function(_event, ui){
 				var value = ui.value;
 				document.getElementById("input_radius").value = value;
-			}
-	});
-	$('#slider_mass').slider({
+            }
+    */
+	$('#slider_mass1').slider({
             min: 0.1,
 			max: 10,
 			step: 0.1,
-			value: MASS,
+			value: mass1,
 			slide: function(_event, ui){
 				var value = ui.value;
-				document.getElementById("input_mass").value = value;
+                document.getElementById("input_mass1").value = value;
 			}
-		});
+    });
+	$('#slider_mass2').slider({
+            min: 0.1,
+			max: 10,
+			step: 0.1,
+			value: mass1,
+			slide: function(_event, ui){
+				var value = ui.value;
+                document.getElementById("input_mass2").value = value;
+			}
+    });
+        /*
 	$('#slider_N').slider({
 			min: 1,
 			max: 40,
@@ -242,39 +246,18 @@ function initEvent(){
 				document.getElementById("input_theta").value = ui.value;
 			}
 	});
-	$('#slider_gamma').slider({
-			min: 0,
-			max: 1,
-			step: 0.01,
-			value: gamma,
-			slide: function(_event, ui){
-				var value = ui.value;
-				document.getElementById("input_gamma").value = value;
-			}
-	});
-	$('#slider_strobe').slider({
-			min: 0.01,
-			max: 1,
-			step: 0.01,
-			value: strobe_time,
-			slide: function(_event, ui){
-				var value = ui.value;
-				document.getElementById("input_strobe").value = value;
-			}
-	});
 
 
     */
 	//input interface
     document.getElementById("input_skip").value = _skip;
+	document.getElementById("input_mass1").value = mass1;
+	document.getElementById("input_mass2").value = mass2;
+	document.getElementById("input_Dt").value = Dt;
     /*
 	document.getElementById("input_radius").value = RADIUS;
-	document.getElementById("input_dt").value = dt;
-	document.getElementById("input_mass").value = MASS;
 	document.getElementById("input_N").value = N;
 	document.getElementById("input_theta").value = theta * 180.0 / Math.PI;
-	document.getElementById("input_gamma").value = gamma;
-	document.getElementById("input_strobe").value = strobe_time;
 
 
 	//checkbox interface
@@ -295,22 +278,15 @@ function initEvent(){
 			}
 	});
 
-	$('#checkbox_strobe').click(function(){
-			if($(this).prop('checked') == true){
-				strobe_flag = true;
-			}
-			else{
-				strobe_flag = false;
-			}
-	});
 
+    */
 
 	//button interface
 	//start button
 	document.getElementById("startButton").addEventListener("click", function(){
-			restartFlag = true;
-	});
-    */
+			resetFlag = true;
+    });
+    
 
 	//stop button
 	document.getElementById("stopButton").addEventListener("click", function(){
@@ -377,8 +353,8 @@ function initCamera(){
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-    camera.position.set(0.0,-5.0,30.0);
-	camera.up.set(0,1,0);
+    camera.position.set(0.0, 0.0, 10.0);
+	camera.up.set(0, 1, 0);
 	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
 
 	//create trackball object
@@ -398,7 +374,7 @@ function initCamera(){
 
 	trackball.noPan = false;
 	trackball.panSpeed = 0.6;
-	trackball.target = new THREE.Vector3(0.0, -5.0, 0.0);
+	trackball.target = new THREE.Vector3(0.0, 0.0, 0.0);
 
 	trackball.staticMoving = true;
 
@@ -442,6 +418,9 @@ var sphere1;
 //particle2
 var sphere2;
 
+var line1;
+var line2;
+
 function initObject(){
 	//create axis object
 	axis = new THREE.AxisHelper(100);
@@ -451,21 +430,47 @@ function initObject(){
     axis.position.set(0, 0, 0);
 
     //create sphere object
+    createShperes();
+
+    calculatePosition(p1, p2);
+    sphere1.position.set(p1.x, p1.y, p1.z);
+    sphere2.position.set(p2.x, p2.y, p2.z);
+
+    //create line
+    createLines();
+
+}
+
+function createShperes() {
     var geometry1 = new THREE.SphereGeometry(p1.radius, 20, 20);
     var material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
     sphere1.castShadow = true;
 
-    var geometry2 = new THREE.SphereGeometry(p1.radius, 20, 20);
+    var geometry2 = new THREE.SphereGeometry(p2.radius, 20, 20);
     var material2 = new THREE.MeshLambertMaterial({color: 0xff0000, ambient: 0xff0000 });
     sphere2 = new THREE.Mesh(geometry2, material2);
     scene.add(sphere2);
     sphere2.castShadow = true;
+}
 
-    calculatePosition(p1, p2);
-    sphere1.position.set(p1.x, p1.y, p1.z);
-    sphere2.position.set(p2.x, p2.y, p2.z);
+function createLines() {
+    var geometry_line1 = new THREE.Geometry();
+    geometry_line1.vertices.push(new THREE.Vector3(0,0,0));
+    geometry_line1.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
+
+    var geometry_line2 = new THREE.Geometry();
+    geometry_line2.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
+    geometry_line2.vertices.push(new THREE.Vector3(p2.x, p2.y,0));
+
+    var material_line = new THREE.LineBasicMaterial({color: 0x00ffff, linewidth: 2});
+
+    line1 = new THREE.Line(geometry_line1, material_line)
+    line2 = new THREE.Line(geometry_line2, material_line)
+
+    scene.add(line1);
+    scene.add(line2);
 }
 
 
@@ -477,6 +482,10 @@ function update_object(){
     calculatePosition(p1, p2);
     sphere1.position.set(p1.x, p1.y, p1.z);
     sphere2.position.set(p2.x, p2.y, p2.z);
+    //lines
+    scene.remove(line1);
+    scene.remove(line2);
+    createLines();
 }
 
 
@@ -487,37 +496,8 @@ function loop(){
     //update trackball object
     trackball.update();
 
-    //set sphere position
-    // 	sphere.position.set(ball.x, ball.y, ball.z);
-
-
-    /*
-    if(restartFlag == true){
-        //remove sphere and orbital
-        scene.remove(sphere1);
-        scene.remove(sphere2);
-
-        //init time param
-        step = 0;
-        _skip = parseInt(document.getElementById("input_skip").value);
-        RADIUS = parseFloat(document.getElementById("input_radius").value);
-        dt = parseFloat(document.getElementById("input_dt").value);
-        MASS = parseFloat(document.getElementById("input_mass").value);
-        N = parseFloat(document.getElementById("input_N").value);
-        theta = Math.PI * parseFloat(document.getElementById("input_theta").value) / 180.0;
-        gamma = parseFloat(document.getElementById("input_gamma").value);
-        strobe_time = parseFloat(document.getElementById("input_strobe").value);
-
-        //init particle and calculation class
-        for(var i=0; i<N; i++){
-            p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
-        }
-        cal = new Calculation(p);
-        initObject();
-        restartFlag = false;
-        stopFlag = false;
-
-        document.getElementById("startButton").value = "Restart";
+    if(resetFlag == true){
+        resetParameter();
     }
 
     if(stopFlag){
@@ -525,7 +505,6 @@ function loop(){
     }else{
         document.getElementById("stopButton").value = "stop";
     }
-    */
 
     //time development
     // 	var time = step * dt;
@@ -560,3 +539,35 @@ function loop(){
     requestAnimationFrame(loop);
 }
 
+function resetParameter() {
+        //remove sphere and orbital
+        scene.remove(sphere1);
+        scene.remove(sphere2);
+        scene.remove(line1);
+        scene.remove(line2);
+
+        //init time param
+        time = 0;
+        step = 0;
+        mass1 = parseFloat(document.getElementById("input_mass1").value);
+        mass2 = parseFloat(document.getElementById("input_mass2").value);
+        radius1 = 0.1*Math.pow(mass1, 1.0/3.0);
+        radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
+        Dt = parseFloat(document.getElementById("input_Dt").value);
+
+        /*
+        step = 0;
+        _skip = parseInt(document.getElementById("input_skip").value);
+        RADIUS = parseFloat(document.getElementById("input_radius").value);
+        N = parseFloat(document.getElementById("input_N").value);
+        theta = Math.PI * parseFloat(document.getElementById("input_theta").value) / 180.0;
+        strobe_time = parseFloat(document.getElementById("input_strobe").value);
+        */
+
+        //init particle and calculation class
+        initSystem();
+        initObject();
+        resetFlag = false;
+        stopFlag = true;
+
+}
