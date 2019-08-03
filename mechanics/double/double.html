@@ -62,64 +62,31 @@
 					</a>
 				</li>
 				<li><a href="#">
-						<input class="button" type="button" value="Restart" id="startButton" />
+						<input class="button" type="button" value="reset" id="startButton" />
 					</a>
 				</li>
 			</div>
 			<li><a href="#">粒子の設定</a>
 				<ul>
+					<!-- mass -->
 					<li>
-						<!-- radius -->
 						<a href="#">
 							<table>
 								<tr>
-									<td>半径</td>
-									<td><div id="slider_radius" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_radius" class="number" style="width:20px"/>m</td>
+									<td>質量1</td>
+									<td><div id="slider_mass1" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_mass1" class="number" style="width:20px">kg</td>
 								</tr>
 							</table>
 						</a>
 					</li>
 					<li>
-						<!-- mass -->
 						<a href="#">
 							<table>
 								<tr>
-									<td>質量</td>
-									<td><div id="slider_mass" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_mass" class="number" style="width:20px">kg</td>
-								</tr>
-							</table>
-						</a>
-					</li>
-					<li>
-						<!-- N -->
-						<a href="#">
-							<table>
-								<tr>
-									<td>粒子数</td>
-									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
-								</tr>
-							</table>
-						</a>
-						<!-- velocity -->
-						<a href="#">
-							<table>
-								<tr>
-									<td>角度の最大値</td>
-									<td><div id="slider_theta" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_theta" class="number" style="width:20px"/></td>
-								</tr>
-							</table>
-						</a>
-						<!-- gamma -->
-						<a href="#">
-							<table>
-								<tr>
-									<td>抵抗係数</td>
-									<td><div id="slider_gamma" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_gamma" class="number" style="width:20px"/></td>
+									<td>質量2</td>
+									<td><div id="slider_mass2" class="slider" style="width:180px"></div></td>
+									<td><input type="text" value="" id="input_mass2" class="number" style="width:20px">kg</td>
 								</tr>
 							</table>
 						</a>
@@ -129,30 +96,7 @@
 			<li><a href="#">表示</a>
 				<ul>
 					<li>
-						<a href="#">速度ベクトル
-							<input type="CHECKBOX" id="checkbox_velocity_vector">
-						</a>
-					</li>
-					<li>
-						<a href="#">軌跡
-							<input type="CHECKBOX" id="checkbox_orbital" />
-						</a>
-					</li>
-					<li>
-						<a href="#">ストロボ撮影
-							<input type="CHECKBOX" id="checkbox_strobe" />
-						</a>
-					</li>
-					<li>
-						<a href="#">
-							<table>
-								<tr>
-									<td>撮影間隔</td>
-									<td><div id="slider_strobe" class="slider" style="width:180px"></div></td>
-									<td><input type="text" value="" id="input_strobe" class="number" style="width:30px"/>秒</td>
-								</tr>
-							</table>
-						</a>
+						<a href="#">未実装</a>
 					</li>
 				</ul>
 			</li>
@@ -160,7 +104,7 @@
 				<ul>
 					<li>
 						<a href="#"> dt
-							<input type="text" value="" id="input_dt" class="number" style="width:180px"/>
+							<input type="text" value="" id="input_Dt" class="number" style="width:180px"/>
 						</a>
 					</li>
 					<li>
