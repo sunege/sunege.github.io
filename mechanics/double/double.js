@@ -19,7 +19,7 @@ var skip = 1/(60*Dt)*_skip;
 // system parameter
 // constraint length
 var l = 1.0;
-var L = 1.0;
+var L = 1.5;
 // air resistance param
 
 ////////////////////////////////////
@@ -34,7 +34,7 @@ var radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
 ////////////////////////////////////
 //initial state
 var theta0 = pi/3.0;
-var phi0 = pi/3.0;
+var phi0 = pi/6.0;
 var theta_v0 = 0;
 var phi_v0 = 0;
 
@@ -42,6 +42,11 @@ var phi_v0 = 0;
 //flag parameter
 var resetFlag = false; // restert flag
 var stopFlag = true; // stop flag
+var contourFlag = true;
+
+////////////////////////////////////
+//objects array
+var objects = [];
 
 ////////////////////////////////////
 //particle class
@@ -180,6 +185,7 @@ function initSystem(){
 // define slider button interface
 function initEvent(){
 
+
 	//slider interface
 	$('#slider_skip').slider({
 			min: 0.01,
@@ -260,15 +266,17 @@ function initEvent(){
 	document.getElementById("input_theta").value = theta * 180.0 / Math.PI;
 
 
+    */
 	//checkbox interface
-	$('#checkbox_velocity_vector').click(function(){
+	$('#checkbox_contour').click(function(){
 			if($(this).prop('checked') == true){
-				vector_flag = true;
+				contourFlag = true;
 			}
 			else{
-				vector_flag = false;
+				contourFlag = false;
 			}
-	});
+    });
+    /*
 	$('#checkbox_orbital').click(function(){
 			if($(this).prop('checked') == true){
 				orbital_flag = true;
@@ -303,6 +311,7 @@ function initEvent(){
 // define threeStart()
 function threeStart(){
 	initThree();
+    mouseEvent();
 	initCamera();
 	initLight();
     initObject();
@@ -421,6 +430,9 @@ var sphere2;
 var line1;
 var line2;
 
+var contour1;
+var contour2;
+
 function initObject(){
 	//create axis object
 	axis = new THREE.AxisHelper(100);
@@ -439,6 +451,9 @@ function initObject(){
     //create line
     createLines();
 
+    //create contour
+    createContour();
+
 }
 
 function createShperes() {
@@ -447,12 +462,14 @@ function createShperes() {
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
     sphere1.castShadow = true;
+    objects.push(sphere1);
 
     var geometry2 = new THREE.SphereGeometry(p2.radius, 20, 20);
     var material2 = new THREE.MeshLambertMaterial({color: 0xff0000, ambient: 0xff0000 });
     sphere2 = new THREE.Mesh(geometry2, material2);
     scene.add(sphere2);
     sphere2.castShadow = true;
+    objects.push(sphere2);
 }
 
 function createLines() {
@@ -466,26 +483,56 @@ function createLines() {
 
     var material_line = new THREE.LineBasicMaterial({color: 0x00ffff, linewidth: 2});
 
-    line1 = new THREE.Line(geometry_line1, material_line)
-    line2 = new THREE.Line(geometry_line2, material_line)
+    line1 = new THREE.Line(geometry_line1, material_line);
+    line2 = new THREE.Line(geometry_line2, material_line);
 
     scene.add(line1);
     scene.add(line2);
+}
+
+var contour1_vertices = [];
+var contour2_vertices = [];
+function createContour() {
+    var geometry_contour1 = new THREE.Geometry();
+    geometry_contour1.vertices = contour1_vertices;
+
+    var geometry_contour2 = new THREE.Geometry();
+    geometry_contour2.vertices = contour2_vertices;
+
+    var material_contour1 = new THREE.LineBasicMaterial({color: 0x99ff00, linewidth: 1});
+    var material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
+
+    contour1 = new THREE.Line(geometry_contour1, material_contour1);
+    contour2 = new THREE.Line(geometry_contour2, material_contour2);
+
+    if( contour1_vertices.length >= 2 && contourFlag ) {
+        scene.add(contour1);
+        scene.add(contour2);
+    }
 }
 
 
 ////////////////////////////////////////
 // object timedevelopment 
 ////////////////////////////////////////
-function update_object(){
+function updateObjects(){
     //sphere 
     calculatePosition(p1, p2);
     sphere1.position.set(p1.x, p1.y, p1.z);
     sphere2.position.set(p2.x, p2.y, p2.z);
+
     //lines
     scene.remove(line1);
     scene.remove(line2);
     createLines();
+
+    //contours
+    scene.remove(contour1);
+    scene.remove(contour2);
+    contour1_vertices.push(new THREE.Vector3(p1.x, p1.y, 0));
+    contour2_vertices.push(new THREE.Vector3(p2.x, p2.y, 0));
+    createContour();
+
 }
 
 
@@ -516,12 +563,10 @@ function loop(){
 
             timeDevelopment();
         }
-        update_object();
+        updateObjects();
     }
     else{
     }
-
-
 
     document.getElementById("time").innerHTML = time.toFixed(2);
 
@@ -543,8 +588,14 @@ function resetParameter() {
         //remove sphere and orbital
         scene.remove(sphere1);
         scene.remove(sphere2);
+        objects = [];
         scene.remove(line1);
         scene.remove(line2);
+        scene.remove(contour1);
+        contour1_vertices = [];
+        scene.remove(contour2);
+        contour2_vertices = [];
+
 
         //init time param
         time = 0;
@@ -570,4 +621,132 @@ function resetParameter() {
         resetFlag = false;
         stopFlag = true;
 
+}
+
+//////////////////////////////////////////////////////////////
+// mouse event
+var plane = new THREE.Plane();
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+var offset = new THREE.Vector3();
+var intersection = new THREE.Vector3();
+
+var mouseoveredObj;
+var draggedObj;
+function mouseEvent() {
+    renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+    renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+    renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+}
+
+function onDocumentMouseDown(event) {
+    var rect = event.target.getBoundingClientRect();
+    var mx = event.clientX - rect.left;
+    var my = event.clientY - rect.top;
+
+    mx = (mx / renderer.domElement.width) * 2 - 1;
+    my = -(my /renderer.domElement.height) * 2 + 1;
+
+    var pos = new THREE.Vector3(mx, my, 1);
+
+    pos.unproject(camera);
+    
+    pos = pos.sub(camera.position).normalize();
+    raycaster = new THREE.Raycaster( camera.position, pos );
+    var intersects = raycaster.intersectObjects(objects);
+
+
+    if (intersects.length > 0) {
+
+        draggedObj = intersects[0].object;
+
+        // rayとplaneの交点を求めてintersectionに設定
+        if (raycaster.ray.intersectPlane(plane, intersection)) {
+            // ドラッグ中のオブジェクトとplaneの距離
+            offset.copy(intersection).sub(draggedObj.position);
+        }
+    }
+}
+function onDocumentMouseMove(event) {
+    event.preventDefault();
+
+    var rect = event.target.getBoundingClientRect();
+    var mx = event.clientX - rect.left;
+    var my = event.clientY - rect.top;
+
+    mx = (mx / renderer.domElement.width) * 2 - 1;
+    my = -(my /renderer.domElement.height) * 2 + 1;
+
+    var pos = new THREE.Vector3(mx, my, 1);
+
+    pos.unproject(camera);
+    
+    pos = pos.sub(camera.position).normalize();
+    raycaster = new THREE.Raycaster( camera.position, pos );
+
+   // raycaster.setFromCamera(camera.position, pos);
+
+    if (draggedObj) {
+        // オブジェクトをドラッグして移動させているとき
+
+        // rayとplaneの交点をintersectionに設定
+        if (raycaster.ray.intersectPlane(plane, intersection)) {
+            // オブジェクトをplaneに対して平行に移動させる
+            draggedObj.position.copy(intersection.sub(offset));
+            // オブジェクトの位置を粒子の位置に直す 
+            var x1 = sphere1.position.x;
+            var y1 = -sphere1.position.y;
+            var x2 = sphere2.position.x;
+            var y2 = -sphere2.position.y;
+            l = Math.sqrt(x1*x1 + y1*y1);
+            L = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+            var sign_theta0 = 1;
+            if(x1 < 0){
+                sign_theta0 = -1;
+            }
+            theta0 = sign_theta0 * Math.acos(y1/l);
+            var sign_phi0 = 1;
+            if(x2-x1 < 0){
+                sign_phi0 = -1;
+            }
+            phi0 = sign_phi0 * Math.acos((y2-y1)/L);
+            p1.angle = theta0;
+            p1.angle_v = 0;
+            p2.angle = phi0;
+            p2.angle_v = 0;
+            calculatePosition();
+            scene.remove(line1);
+            scene.remove(line2);
+            createLines();
+        }
+    }
+    else {
+        // オブジェクトをドラッグしないでマウスを動かしている場合
+        var intersects = raycaster.intersectObjects(objects);
+
+        if (intersects.length > 0) {
+            if (mouseoveredObj != intersects[0].object) {
+                // マウスオーバー中のオブジェクトを入れ替え
+                mouseoveredObj = intersects[0].object;
+
+                // plane.normalにカメラの方向ベクトルを設定
+                // 平面の角度をカメラの向きに対して垂直に維持する
+                camera.getWorldDirection(plane.normal);
+            }
+        }
+        else {
+            mouseoveredObj = null;
+        }
+    }
+}
+
+function onDocumentMouseUp(event) {
+    event.preventDefault();
+
+    trackball.enabled = true;
+
+    if (mouseoveredObj) {
+        draggedObj = null;
+    }
 }
