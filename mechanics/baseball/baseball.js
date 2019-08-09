@@ -17,27 +17,36 @@ var skip = 1/(60*Dt)*_skip;
 
 ////////////////////////////////////
 // system parameter
-// constraint length
-var l = 1.0;
-var L = 1.5;
 // air resistance param
+var gamma = 0;
+// coefficient of restitution
+var e = 0.4;
 
 ////////////////////////////////////
 //Particle parameter
 //mass
-var mass1 = 1.0;
-var mass2 = 1.0;
+var mass_ball = 1.0;
 //draw radius
-var radius1 = 0.1*Math.pow(mass1, 1.0/3.0);
-var radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
+var radius_ball = 0.0365;
+var x0 = 18.4;
+var y0 = 0;
+var z0 = 0.008;
+var v0_x = -40;
+var v0_y = 0;
+var v0_z = 0;
+
 
 ////////////////////////////////////
-//initial state
-var theta0 = pi/3.0;
-var phi0 = pi/6.0;
-var theta_v0 = 0;
-var phi_v0 = 0;
-
+// bat parameter
+var radius_bat = 0.033;
+var length_bat = 0.3;
+var angle_x = 0.0;
+var angle_y = 0.0;
+var angle_z = pi/12.0;
+var rotation_euler = new THREE.Euler(angle_x, angle_y, angle_z, 'XYZ');
+var center_line = new THREE.Vector3(0, length_bat, 0);
+center_line.applyEuler(rotation_euler);
+console.log(center_line);
 ////////////////////////////////////
 //flag parameter
 var resetFlag = false; // restert flag
@@ -50,7 +59,7 @@ var objects = [];
 
 ////////////////////////////////////
 //particle class
-var p;
+var ball;
 class Particle {
     constructor(radius, mass, x, y, z, v_x, v_y, v_z) {
         this.radius = radius;
@@ -61,6 +70,7 @@ class Particle {
         this.v_x = v_x;
         this.v_y = v_y;
         this.v_z = v_z;
+        this.collisionFlag = false;
     }
 }
 
@@ -72,13 +82,43 @@ Particle.prototype = {
 //time development function
 //velocity velret method
 function timeDevelopment() {
-    p1.x = Math.sin(time);
-    cylinder.position.set(Math.sin(time), Math.cos(time), 0);
     collision();
+    if(ball.collisionFlag == true) {
+        var g = 9.8;
+        ball.v_z = ball.v_z - g * Dt;
+    }
+    ball.x = ball.v_x * Dt + ball.x;
+    ball.y = ball.v_y * Dt + ball.y;
+    ball.z = ball.v_z * Dt + ball.z;
 }
 
 //judge collision
 function collision() {
+    if(ball.collisionFlag == false){
+        var b1 = center_line;
+        // ball position vector
+        var c1 = new THREE.Vector3(ball.x, ball.y, ball.z);
+
+        var k = b1.dot(c1);
+        k = k / b1.dot(b1);
+        // normal direction vector
+        var normal = new THREE.Vector3().addVectors(c1, new THREE.Vector3(-k*b1.x, -k*b1.y, -k*b1.z));
+        var norm = Math.sqrt(normal.dot(normal));
+        if(norm <= radius_ball + radius_bat) {
+            ball.collisionFlag = true;
+            // normalize
+            normal.multiplyScalar(1/norm);
+            console.log(normal);
+            var v = new THREE.Vector3(ball.v_x, ball.v_y, ball.v_z);
+            var v_n = new THREE.Vector3(normal.x, normal.y, normal.z).multiplyScalar(v.dot(normal));
+            var v_t = new THREE.Vector3(v.x-v_n.x, v.y-v_n.y, v.z-v_n.z);
+            v_n.multiplyScalar(-e);
+            ball.v_x = v_n.x + v_t.x;
+            ball.v_y = v_n.y + v_t.y;
+            ball.v_z = v_n.z + v_t.z;
+        }
+
+    }
 }
 
 
@@ -94,9 +134,9 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 // create particles
 function initSystem(){
-    p1 = new Particle(radius1, mass1,
-        0, 0, 0,
-        0, 0, 0);
+    ball = new Particle(radius_ball, mass_ball,
+        x0, y0, z0,
+        v0_x, v0_y, v0_z);
 }
 
 ////////////////////////////////////////
@@ -129,24 +169,14 @@ function initEvent(){
 				document.getElementById("input_radius").value = value;
             }
     */
-	$('#slider_mass1').slider({
+	$('#slider_mass_ball').slider({
             min: 0.1,
 			max: 10,
 			step: 0.1,
-			value: mass1,
+			value: mass_ball,
 			slide: function(_event, ui){
 				var value = ui.value;
-                document.getElementById("input_mass1").value = value;
-			}
-    });
-	$('#slider_mass2').slider({
-            min: 0.1,
-			max: 10,
-			step: 0.1,
-			value: mass1,
-			slide: function(_event, ui){
-				var value = ui.value;
-                document.getElementById("input_mass2").value = value;
+                document.getElementById("input_mass_ball").value = value;
 			}
     });
         /*
@@ -175,8 +205,7 @@ function initEvent(){
     */
 	//input interface
     document.getElementById("input_skip").value = _skip;
-	document.getElementById("input_mass1").value = mass1;
-	document.getElementById("input_mass2").value = mass2;
+	document.getElementById("input_mass_ball").value = mass_ball;
 	document.getElementById("input_Dt").value = Dt;
     /*
 	document.getElementById("input_radius").value = RADIUS;
@@ -275,13 +304,13 @@ function initCamera(){
 	//create camera object
 	var fov = 45,
 		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
-		 near = 1,
-		 far = 10000;
+		 near = 0.1,
+		 far = 1000;
 	camera = new THREE.PerspectiveCamera(45, aspect, near, far);
 
 	//set camera options
-    camera.position.set(0.0, 0.0, 10.0);
-	camera.up.set(0, 1, 0);
+    camera.position.set(-1.5, -0.5, 0.3);
+	camera.up.set(0, 0, 1);
 	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
 
 	//create trackball object
@@ -363,11 +392,12 @@ function initObject(){
     //create sphere object
     createShperes();
 
-    sphere1.position.set(p1.x, p1.y, p1.z);
+    sphere1.position.set(ball.x, ball.y, ball.z);
 
     //create bat object
     createCylinder();
-    cylinder.rotation.set(pi/3.0, pi/6.0, pi/4.0);
+    cylinder.rotation.set(angle_x, angle_y, angle_z);
+    console.log(cylinder);
 
     //create line
     createLines();
@@ -378,7 +408,7 @@ function initObject(){
 }
 
 function createShperes() {
-    var geometry1 = new THREE.SphereGeometry(p1.radius, 20, 20);
+    var geometry1 = new THREE.SphereGeometry(ball.radius, 20, 20);
     var material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
@@ -388,8 +418,8 @@ function createShperes() {
 }
 
 function createCylinder() {
-    var geometry_bat = new THREE.CylinderGeometry(1.0, 1.0, 2.0, 20, 5);
-    var material_bat = new THREE.MeshLambertMaterial({color: 0x00ff7f, mabient: 0xff0000});
+    var geometry_bat = new THREE.CylinderGeometry(radius_bat, radius_bat, length_bat, 20, 5);
+    var material_bat = new THREE.MeshLambertMaterial({color: 0x226689, mabient: 0xff0000});
     cylinder = new THREE.Mesh(geometry_bat, material_bat);
     scene.add(cylinder);
 }
@@ -397,7 +427,7 @@ function createCylinder() {
 function createLines() {
     var geometry_line1 = new THREE.Geometry();
     geometry_line1.vertices.push(new THREE.Vector3(0,0,0));
-    geometry_line1.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
+    geometry_line1.vertices.push(new THREE.Vector3(ball.x, ball.y,ball.z));
 
     var material_line = new THREE.LineBasicMaterial();
 
@@ -416,7 +446,7 @@ function createContour() {
     var geometry_contour2 = new THREE.Geometry();
     geometry_contour2.vertices = contour2_vertices;
 
-    var material_contour1 = new THREE.LineBasicMaterial({color: 0x99ff00, linewidth: 1});
+    var material_contour1 = new THREE.LineBasicMaterial({color: 0xffff00, linewidth: 1});
     var material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
 
     contour1 = new THREE.Line(geometry_contour1, material_contour1);
@@ -434,7 +464,7 @@ function createContour() {
 ////////////////////////////////////////
 function updateObjects(){
     //sphere 
-    sphere1.position.set(p1.x, p1.y, p1.z);
+    sphere1.position.set(ball.x, ball.y, ball.z);
 
     //lines
     scene.remove(line1);
@@ -443,7 +473,7 @@ function updateObjects(){
     //contours
     scene.remove(contour1);
     scene.remove(contour2);
-    contour1_vertices.push(new THREE.Vector3(p1.x, p1.y, 0));
+    //contour1_vertices.push(new THREE.Vector3(ball.x, ball.y, ball.z));
     createContour();
 
 }
@@ -475,6 +505,7 @@ function loop(){
             time = Dt * step;
 
             timeDevelopment();
+            contour1_vertices.push(new THREE.Vector3(ball.x, ball.y, ball.z));
         }
         updateObjects();
     }
@@ -511,10 +542,9 @@ function resetParameter() {
         //init time param
         time = 0;
         step = 0;
-        mass1 = parseFloat(document.getElementById("input_mass1").value);
+        mass_ball = parseFloat(document.getElementById("input_mass_ball").value);
         mass2 = parseFloat(document.getElementById("input_mass2").value);
-        radius1 = 0.1*Math.pow(mass1, 1.0/3.0);
-        radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
+        radisu_ball = 0.1*Math.pow(mass_ball, 1.0/3.0);
         Dt = parseFloat(document.getElementById("input_Dt").value);
 
         /*
@@ -620,8 +650,8 @@ function onDocumentMouseMove(event) {
                 sign_phi0 = -1;
             }
             phi0 = sign_phi0 * Math.acos((y2-y1)/L);
-            p1.angle = theta0;
-            p1.angle_v = 0;
+            ball.angle = theta0;
+            ball.angle_v = 0;
             scene.remove(line1);
             createLines();
         }
