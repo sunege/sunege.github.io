@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>2wave real</title>
+
+		<style>
+			div#canvas-frame{ width:900px; height:600px; }
+		</style>
+		<!-- css -->
+		<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
+
+		<!-- Javascript -->
+		<!-- google-analytics -->
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-65937030-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+
+		<!-- jQuery -->
+		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+
+		<!-- Three -->
+		<script type="text/javascript" src="../../js/Three/build/three.js"></script>
+		<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+
+		<!-- Main script -->
+		<script type="text/javascript" src="2wave_line.js"></script>
+	</head>
+	<body>
+
+		<!-- output -->
+		<a href="" id="png" target="_blank">Output PNG</a>
+
+		<!-- controller -->
+		<ul class="dropmenu" id="normal">
+
+			<li><a href="#">
+				<input type="button" value="" id="startButton"/>
+			</a></li>
+
+			<li><a href="#">
+				<input type="button" value="" id="restartButton"/>
+			</a></li>
+
+			<li>
+			<a href="#">補助線</a>
+			<ul>
+				<li><a href="#">
+					経路差：整数倍の線<input type="CHECKBOX" id="checkbox_line1" />
+				</a></li>
+				<li><a href="#">
+					半整数倍の線<input type="CHECKBOX" id="checkbox_line2" />
+				</a></li>
+			</ul>
+			</li>
+
+			<li><a href="#">
+				波長=<span id="lambda"></span>m, 間隔=<span id="space"></span>m
+			</a>
+			<ul>
+				<!-- input alpha -->
+				<li><a href="#">
+					<table><tr>
+							<td style="width:25%">透明度</td>
+							<td><div id="slider_alpha" class="slider" style="width:180px;"></div></td>
+							<td><input type="text" value="" id="input_alpha" class="number" style="width:30px"></td>
+					</tr></table>
+				</a></li>
+				<!-- input A -->
+				<li><a href="#">
+					<table><tr>
+							<td style="width:25%">振幅</td>
+							<td><div id="slider_Amp" class="slider" style="width:180px;"></div></td>
+							<td><input type="text" value="" id="input_Amp" class="number" style="width:30px">m</td>
+					</tr></table>
+				</a></li>
+				<!-- input lambda -->
+				<li><a href="#">
+					<table><tr>
+							<td style="width:25%">波長</td>
+							<td><div id="slider_lambda" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_lambda" class="number" style="width:30px">m</td>
+					</tr></table>
+				</a></li>
+				<!-- space -->
+				<li><a href="#">
+					<table><tr>
+							<td style="width:25%">波源の間隔</td>
+							<td><div id="slider_space" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_space" class="number" style="width:30px">m</td>
+					</tr></table>
+				</a></li>
+				<!-- velocity -->
+				<li><a href="#">
+					<table><tr>
+							<td style="width:25%">波の速さ</td>
+							<td><div id="slider_vel" class="slider" style="width:180px"></div></td>
+							<td><input type="text" value="" id="input_vel" class="number" style="width:20px">m/s</td>
+					</tr></table>
+				</a></li>
+				<!-- phase -->
+				<li><a href="#">
+					<table><tr>
+							<td style="width:30%">波源の位相 : </td>
+							<td style="width:30%">同位相<input type="radio" name="phase" value="s" checked="checked"/></td>
+							<td style="width:30%">逆位相<input type="radio" name="phase" value="r" /></input></td>
+					</tr></table>
+				</a></li>
+				<li>
+			</ul>
+			</li>
+
+			<li><a href="#">境界条件</a>
+			<ul>
+				<!-- boundary -->
+				<li><a href="#">固定端<input type="radio" name="bound" value="Dir" /></a></li>
+				<li><a href="#">自由端<input type="radio" name="bound" value="Neu" /></a></li>
+				<li><a href="#">無反射<input type="radio" name="bound" value="Non" checked="checked"/></a></li>
+			</ul>
+			</li>
+		</ul>
+
+		<!-- frame -->
+		<div id="canvas-frame"></div>
+
+	</body>
+</html>
