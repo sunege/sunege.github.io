@@ -12,7 +12,7 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 var stopFlag = true;
 var resetFlag = false;
-var N_wave = 30;
+var N_wave = 10;
 var wave_flag = new Array(N_wave + 1);
 for(var i=0; i<N_wave + 1; i++){
     wave_flag[i] = true;
@@ -364,10 +364,10 @@ function initObject(){
         }
     }
     for(var i=0; i<N_wave; i++){
-        lambda[i] = 2*l/(i+1);
+        lambda[i] = 2*l/(2*i);
         freq[i] = vel / lambda[i];
 //         amp[i] = 1 * Math.exp(-i);
-        amp[i] = 1;
+        amp[i] = 1.0;
 //         direction[i] = Math.pow(-1,i);
         direction[i] = 1;
         phase[i] = 2 * Math.PI / 2.0;
