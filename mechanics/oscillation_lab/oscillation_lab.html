@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>spring_lab</title>
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+    <script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css" />
+    <script type="text/javascript" src="../../js/jqPlot/jquery.jqplot.min.js"></script>
+    <link rel="stylesheet" href="../../css/jquery.jqplot.min.css">
+    </link>
+</head>
+
+<body>
+    <script>
+        ////////　物理系の設定
+        //　時間
+        let time = 0;
+        let d_t = 1.0 / 6000.0;
+
+        //　重力加速度
+        const g = 9.8;
+
+        //　初期状態
+        let system_init_params1 = {
+            x: 0.1,
+            vel: 0,
+            mass: 0.5,
+            k: 10,
+            gamma: 0,
+            mu: 0
+        };
+        let system_init_params2 = {
+            x: 0.1,
+            vel: 0,
+            mass: 0.5,
+            k: 10,
+            gamma: 0,
+            mu: 0
+        };
+
+        //　初期状態の登録
+        const system_init_params_set = [];
+        system_init_params_set.push(system_init_params1);
+        system_init_params_set.push(system_init_params2);
+
+        //　調和振動子系の定義
+        class HOsystem {
+            constructor(init_params) {
+                this.x = init_params.x;
+                this.vel = init_params.vel;
+                this.mass = init_params.mass;
+                this.k = init_params.k;
+                this.gamma = init_params.gamma;
+                this.mu = init_params.mu;
+            }
+            //初期化メソッド
+            init(init_params) {
+                this.x = init_params.x;
+                this.vel = init_params.vel;
+                this.mass = init_params.mass;
+                this.k = init_params.k;
+                this.gamma = init_params.gamma;
+                this.mu = init_params.mu;
+            }
+            //時間発展メソッド（Euler法）
+            time_dev() {
+                this.f_spring = -this.k * this.x;
+                this.f_air_resistance = -this.gamma * this.vel;
+                if (this.vel == 0) {
+                    this.f_fliction = -this.mu * this.mass * g * this.x / Math.abs(this.x);
+                }
+                else {
+                    this.f_fliction = -this.mu * this.mass * g * this.vel / Math.abs(this.vel);
+                }
+                this.f_tot = this.f_spring + this.f_air_resistance + this.f_fliction;
+
+                this.vel += this.f_tot * d_t / this.mass;
+                this.x += this.vel * d_t;
+            }
+        }
+
+        //　振動子オブジェクト生成、登録
+        const system_obj = [];
+        system_obj.push(new HOsystem(system_init_params_set[0]));
+        system_obj.push(new HOsystem(system_init_params_set[1]));
+        //system_obj.push(new HOsystem(system_init_params_set[2]));
+
+        //　すべての系の初期化（グローバル変数timeも0にもどす）関数
+        function init_systems() {
+            system_obj.forEach((element, index) => element.init(system_init_params_set[index]));
+            time = 0;
+        }
+
+        //　すべての系の時間発展（グローバル変数timeも変化させる）関数
+        function time_dev_systems() {
+            system_obj.forEach(element => element.time_dev());
+            time += d_t;
+        }
+
+
+        ////////　描画系の設定
+        //　canvasの生成、追加
+        const WIDTH = 500;
+        const HEIGHT = 200;
+        const canvas = document.createElement('canvas');
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
+        canvas.style = "float: left";
+        const context = canvas.getContext('2d');
+        document.body.appendChild(canvas);
+
+        //　粒子の描画オブジェクト
+        class Particle {
+            constructor(x, y, radius, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color
+            }
+            render(context) {
+                context.beginPath();
+                context.fillStyle = this.color;
+                context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+                context.fill();
+            }
+        }
+
+        // 直線の描画オブジェクト
+        class Line {
+            constructor(start_x, start_y, end_x, end_y) {
+                this.start_x = start_x;
+                this.start_y = start_y;
+                this.end_x = end_x;
+                this.end_y = end_y;
+            }
+            render(context) {
+                context.beginPath();
+                context.moveTo(this.start_x, this.start_y);
+                context.lineTo(this.end_x, this.end_y);
+                context.strokeStyle = "rgb(0, 0, 0)";
+                context.lineWidth = 1;
+                context.stroke();
+            }
+        }
+
+        // ばねの描画オブジェクト
+        class Spring {
+            constructor(start_x, end_x, y, width) {
+                this.start_x = start_x;
+                this.end_x = end_x;
+                this.y = y;
+                this.width = width;
+            }
+            render(context) {
+                context.beginPath();
+                context.moveTo(this.start_x, this.y);
+                let length = this.end_x - this.start_x;
+                const N = 30;
+                let delta_x = length / N;
+                for (let i = 0; i < N; i++) {
+                    if (i == 0) {
+                        context.lineTo(this.start_x + delta_x / 2, this.y);
+                    }
+                    context.lineTo(this.start_x + delta_x / 2 + i * delta_x, Math.pow(-1, i) * 10 + this.y);
+                    if (i == (N - 1)) {
+                        context.lineTo(this.end_x, this.y);
+                    }
+                }
+                context.strokeStyle = "rgb(0,0,0)";
+                context.lineWidth = this.width;
+                context.stroke();
+            }
+        }
+
+        //　粒子オブジェクトの登録
+        const particle_obj = [];
+
+        const radius = 20;
+
+        const y1 = 50;
+        const y2 = 150;
+        //const y3 = 250;
+        particle_obj.push(new Particle(150, y1, radius, 0));
+        particle_obj.push(new Particle(150, y2, radius, 0));
+
+        //　倍率
+        const trns = 1000;
+
+        // 線オブジェクトの生成
+        const line_center = new Line(WIDTH / 2, 0, WIDTH / 2, HEIGHT);
+        let amp1 = WIDTH / 2 + trns * system_init_params_set[0].x + radius;
+        let amp2 = WIDTH / 2 - trns * system_init_params_set[0].x - radius;
+        const line_amp1 = new Line(amp1, 0, amp1, HEIGHT);
+        const line_amp2 = new Line(amp2, 0, amp2, HEIGHT);
+        const line_floor1 = new Line(0, y1 + radius, WIDTH, y1 + radius);
+        const line_floor2 = new Line(0, y2 + radius, WIDTH, y2 + radius);
+
+
+        // ばねオブジェクトの生成
+        const spring1 = new Spring(10, amp1, y1, 1);
+        const spring2 = new Spring(10, amp1, y2, 1);
+
+        const spring_obj = [];
+        spring_obj.push(spring1);
+        spring_obj.push(spring2);
+
+        // 物理系から描画系への変換
+        function transform_system_to_canvas() {
+            particle_obj[0].x = WIDTH / 2.0 + trns * system_obj[0].x;
+            particle_obj[1].x = WIDTH / 2.0 + trns * system_obj[1].x;
+
+            particle_obj[0].color = "hsl(0, 80%, " + (2.0 - system_obj[0].mass / 0.5) * 50 + "%)";
+            particle_obj[1].color = "hsl(0, 80%, " + (2.0 - system_obj[1].mass / 0.5) * 50 + "%)";
+
+            spring_obj[0].end_x = particle_obj[0].x - radius;
+            spring_obj[1].end_x = particle_obj[1].x - radius;
+
+            spring_obj[0].width = Math.floor(system_obj[0].k / 5);
+            spring_obj[1].width = Math.floor(system_obj[1].k / 5);
+        }
+
+        //　描画
+        function draw() {
+            // 画面消去
+            context.clearRect(0, 0, WIDTH, HEIGHT);
+            context.fillStyle = 'rgb(255, 253, 246)';
+            context.fillRect(0, 0, WIDTH, HEIGHT);
+
+            // 文字表示
+            context.fillStyle = 'rgb(0,0,0)';
+            // 時間を0.01sまで表示
+            context.font = '15pt Arial';
+            context.fillText(Math.floor(time * 100) / 100 + "[s]", WIDTH - 80, 20);
+
+            context.font = '10pt serif';
+            context.fillText('系1', 50, y1 - 30);
+            context.fillText('系2', 50, y2 - 30);
+
+            context.font = '8pt Arial';
+            context.fillText('x', amp1 + 120, y1 + 30);
+            context.fillText('0.10[m]', amp1 + 5, y1 + 30);
+            context.fillText('-0.10[m]', amp2 - 45, y1 + 30);
+            context.fillText('O', WIDTH / 2 + 5, y1 + 30);
+
+            context.fillText('x', amp1 + 120, y2 + 30);
+            context.fillText('0.10[m]', amp1 + 5, y2 + 30);
+            context.fillText('-0.10[m]', amp2 - 45, y2 + 30);
+            context.fillText('O', WIDTH / 2 + 5, y2 + 30);
+
+            // 物理系座標から粒子の座標への変換
+            transform_system_to_canvas();
+
+            //　センターラインの描画
+            line_center.render(context);
+            //　振幅ラインの描画
+            line_amp1.render(context);
+            line_amp2.render(context);
+
+            line_floor1.render(context);
+            line_floor2.render(context);
+
+            // 粒子オブジェクトの描画
+            particle_obj.forEach((obj) => obj.render(context));
+            // ばねオブジェクトの描画
+            spring_obj.forEach((obj) => obj.render(context));
+        }
+
+
+        //////// グラフ
+        // グラフのフラグ
+        let graph_plot_count = 0;
+        let graph_plot_skip = 4;
+
+        // グラフデータ格納用
+        let graph_data = [];
+        // 初期化
+        system_obj.forEach(() => graph_data.push([]));
+
+        let graph_time_min = 0;
+        let graph_time_max = 5;
+
+        let options = {
+            title: "x-t図",
+            axes: {
+                xaxis: {
+                    label: '時間[s]',
+                    min: graph_time_min,
+                    max: graph_time_max,
+                    tickInterval: graph_time_max / 10
+                },
+                yaxis: {
+                    label: '変位[m]',
+                    min: -0.12,
+                    max: 0.12,
+                    tickInterval: 0.02
+                }
+            },
+            seriesDefaults: {
+                markerOptions: {
+                    show: false
+                }
+            },
+            legend: {
+                show: true,
+                labels: ['系１', '系２']
+            }
+        };
+
+        //グラフデータの更新
+        function update_graph_data() {
+            system_obj.forEach((element, index) => graph_data[index].push([time, element.x]));
+        }
+
+        //////// 操作系
+        ////　フラグ関係
+        // 開始、停止フラグ(デフォルトでfalse)
+        let flag_run = false;
+        // 描画スピード
+        let refresh_rate = 1.0;
+
+
+        ////　ボタン動作
+        // start,stopボタンを押したとき
+        function click_start_stop() {
+            let btn_state = document.getElementById("btn_start_stop");
+            if (btn_state.value == "start") {
+                flag_run = true;
+                btn_state.value = "stop";
+            }
+            else {
+                flag_run = false;
+                btn_state.value = "start";
+            }
+        }
+
+        // resetボタンを押したとき
+        function click_init() {
+            flag_run = false;
+            document.getElementById("btn_start_stop").value = "start";
+            init_systems();
+            draw();
+            system_obj.forEach((element, index) => graph_data[index] = [[time, element.x]]);
+            $.jqplot('graph', graph_data, options).destroy();
+            options.axes.xaxis.max = graph_time_max;
+            options.axes.xaxis.tickInterval = (graph_time_max - graph_time_min) / 10;
+            $.jqplot('graph', graph_data, options);
+        }
+
+        ////　スライダー操作
+        //　描画速度
+        $(function () {
+            // 描画倍率
+            $("#slider_refresh_rate").slider({
+                min: 0.1,
+                max: 2.0,
+                step: 0.1,
+                range: "min",
+                value: refresh_rate,
+                slide: function (e, ui) {
+                    $("#indicator_refresh_rate").val(ui.value);
+                    refresh_rate = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_refresh_rate").val($(this).slider("option", "value"));
+                }
+            });
+            // グラフ表示範囲
+            $("#slider_graph_range").slider({
+                min: 0,
+                max: 10.2,
+                step: 0.2,
+                range: true,
+                values: [graph_time_min, graph_time_max],
+                slide: function (e, ui) {
+                    $("#indicator_graph_min").val(ui.values[0]);
+                    $("#indicator_graph_max").val(ui.values[1]);
+                    graph_time_min = ui.values[0];
+                    graph_time_max = ui.values[1];
+                    $.jqplot('graph', graph_data, options).destroy();
+                    options.axes.xaxis.min = graph_time_min;
+                    options.axes.xaxis.max = graph_time_max;
+                    options.axes.xaxis.tickInterval = (graph_time_max - graph_time_min) / 10;
+                    $.jqplot('graph', graph_data, options);
+                },
+                create: function (e, ui) {
+                    let values = $(this).slider("option", "values");
+                    $("#indicator_graph_min").val(values[0]);
+                    $("#indicator_graph_max").val(values[1]);
+                }
+            });
+
+            //　振幅1
+            $("#slider_amp1").slider({
+                min: 0.01,
+                max: 0.1,
+                step: 0.01,
+                range: "min",
+                value: system_init_params_set[0].x,
+                slide: function (e, ui) {
+                    $("#indicator_amp1").val(ui.value);
+                    system_init_params_set[0].x = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_amp1").val($(this).slider("option", "value"));
+                }
+            });
+            //　振幅2
+            $("#slider_amp2").slider({
+                min: 0.01,
+                max: 0.1,
+                step: 0.01,
+                range: "min",
+                value: system_init_params_set[1].x,
+                slide: function (e, ui) {
+                    $("#indicator_amp2").val(ui.value);
+                    system_init_params_set[1].x = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_amp2").val($(this).slider("option", "value"));
+                }
+            });
+
+            //　質量1
+            $("#slider_mass1").slider({
+                min: 0.1,
+                max: 1.1,
+                step: 0.1,
+                range: "min",
+                value: system_init_params_set[0].mass,
+                slide: function (e, ui) {
+                    $("#indicator_mass1").val(ui.value);
+                    system_init_params_set[0].mass = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_mass1").val($(this).slider("option", "value"));
+                }
+            });
+            //　質量2
+            $("#slider_mass2").slider({
+                min: 0.1,
+                max: 1.1,
+                step: 0.1,
+                range: "min",
+                value: system_init_params_set[1].mass,
+                slide: function (e, ui) {
+                    $("#indicator_mass2").val(ui.value);
+                    system_init_params_set[1].mass = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_mass2").val($(this).slider("option", "value"));
+                }
+            });
+
+            //　ばね定数1
+            $("#slider_k1").slider({
+                min: 1,
+                max: 20,
+                step: 1,
+                range: "min",
+                value: system_init_params_set[0].k,
+                slide: function (e, ui) {
+                    $("#indicator_k1").val(ui.value);
+                    system_init_params_set[0].k = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_k1").val($(this).slider("option", "value"));
+                }
+            });
+            //　ばね定数2
+            $("#slider_k2").slider({
+                min: 1,
+                max: 20,
+                step: 1,
+                range: "min",
+                value: system_init_params_set[1].k,
+                slide: function (e, ui) {
+                    $("#indicator_k2").val(ui.value);
+                    system_init_params_set[1].k = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_k2").val($(this).slider("option", "value"));
+                }
+            });
+
+            //　空気抵抗1
+            $("#slider_gamma1").slider({
+                min: 0,
+                max: 5,
+                step: 0.1,
+                range: "min",
+                value: system_init_params_set[0].gamma,
+                slide: function (e, ui) {
+                    $("#indicator_gamma1").val(ui.value);
+                    system_init_params_set[0].gamma = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_gamma1").val($(this).slider("option", "value"));
+                }
+            });
+            //　空気抵抗2
+            $("#slider_gamma2").slider({
+                min: 0,
+                max: 5,
+                step: 0.1,
+                range: "min",
+                value: system_init_params_set[1].gamma,
+                slide: function (e, ui) {
+                    $("#indicator_gamma2").val(ui.value);
+                    system_init_params_set[1].gamma = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_gamma2").val($(this).slider("option", "value"));
+                }
+            });
+
+            //　動摩擦係数1
+            $("#slider_mu1").slider({
+                min: 0,
+                max: 0.2,
+                step: 0.01,
+                range: "min",
+                value: system_init_params_set[0].mu,
+                slide: function (e, ui) {
+                    $("#indicator_mu1").val(ui.value);
+                    system_init_params_set[0].mu = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_mu1").val($(this).slider("option", "value"));
+                }
+            });
+            //　動摩擦係数2
+            $("#slider_mu2").slider({
+                min: 0,
+                max: 0.2,
+                step: 0.01,
+                range: "min",
+                value: system_init_params_set[1].mu,
+                slide: function (e, ui) {
+                    $("#indicator_mu2").val(ui.value);
+                    system_init_params_set[1].mu = ui.value;
+                },
+                create: function (e, ui) {
+                    $("#indicator_mu2").val($(this).slider("option", "value"));
+                }
+            });
+        });
+
+
+
+        $(function () {
+            let flag_graph_update = true;
+            click_init();
+            draw();
+            ////////　メイン処理
+            function loop(timestamp) {
+                plot = null;
+                if (flag_run) {
+                    for (let i = 0; i < Math.floor(100 * refresh_rate); i++) {
+                        time_dev_systems();
+                    }
+                    draw();
+                    if(flag_graph_update){
+                        update_graph_data();
+                    }
+                    if (graph_plot_count > graph_plot_skip && time < graph_time_max) {
+                        $.jqplot('graph', graph_data, options).destroy();
+                        $.jqplot('graph', graph_data, options).replot();
+                        graph_plot_count = 0;
+                    }
+                    graph_plot_count++;
+                    flag_graph_update = !flag_graph_update;
+                }
+                window.requestAnimationFrame((ts) => loop(ts));
+            }
+            window.requestAnimationFrame((ts) => loop(ts));
+        });
+
+    </script>
+    <br />
+    <div id="graph" style="position: absolute; left: 500px; width: 400px; height: 400px;"></div>
+    <div class="view_controller" style="position: absolute; top: 190px; width: 500px">
+        <input type="button" id="btn_start_stop" onclick="click_start_stop()" value="start" />
+        <input type="button" id="btn_init" onclick="click_init()" value="reset" />
+        <br />
+        <label id="label_refresh_rate" style="position: absolute; top:25px;">描画倍率</label>
+        <br />
+        <input id="indicator_refresh_rate" style="position: absolute; top: 25px; left: 70px" type="text" size="1"
+            readonly />
+        <label style="position:absolute; top: 25px; left: 120px;">倍</label>
+        <div id="slider_refresh_rate" style="position: absolute; top: 50px; left: 0px; width:150px;"></div>
+
+        <label id="label_graph_range" style="position: absolute; top:25px; left: 180px">グラフ表示範囲</label>
+        <input id="indicator_graph_min" style="position: absolute; top:25px; left: 300px" type="text" size="1"
+            readonly />
+        <label style="position: absolute; top:25px; left: 345px">s</label>
+        <label style="position: absolute; top:25px; left: 355px">～</label>
+        <input id="indicator_graph_max" style="position: absolute; top:25px; left: 375px" type="text" size="1"
+            readonly />
+        <label style="position: absolute; top:25px; left: 420px">s</label>
+        <div id="slider_graph_range" style="position: absolute; top:50px; left: 200px; width:220px;"></div>
+    </div>
+
+    <div class="system_controller" style="position: absolute; top:260px;">
+        <table border="1" style="border-collapse: collapse;">
+            <tr>
+                <td style="text-align: center;">
+                    <label>系１</label>
+                    <br/>
+                    <br/>
+                    <label>系２</label>
+                </td>
+                <td>
+                    <div class="amp" style="margin-left: auto; margin-right: auto; width: 130px;">
+                        <label id="label_mass">最初の位置</label><br />
+                        <input id="indicator_amp1" type="text" size="1" readonly />
+                        <label>m</label>
+                        <div id="slider_amp1" style="width:100px;"></div>
+
+                        <input id="indicator_amp2" type="text" size="1" readonly />
+                        <label>m</label>
+                        <div id="slider_amp2" style="width:100px;"></div>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="mass" style="width: 130px;">
+                        <label id="label_mass">質量</label><br />
+                        <input id="indicator_mass1" type="text" size="1" readonly />
+                        <label>kg</label>
+                        <div id="slider_mass1" style="width:100px;"></div>
+
+                        <input id="indicator_mass2" type="text" size="1" readonly />
+                        <label>kg</label>
+                        <div id="slider_mass2" style="width:100px;"></div>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="spring_k" style="width: 130px;">
+                        <label id="label_k">ばね定数</label><br />
+                        <input id="indicator_k1" type="text" size="1" readonly />
+                        <label>N/m</label>
+                        <div id="slider_k1" style="width:100px;"></div>
+
+                        <input id="indicator_k2" type="text" size="1" readonly />
+                        <label>N/m</label>
+                        <div id="slider_k2" style="width:100px;"></div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align: center;">
+                    <label>系１</label>
+                    <br/>
+                    <br/>
+                    <label>系２</label>
+                </td>
+                <td>
+                    <div class="gamma">
+                        <label id="label_gamma">空気抵抗係数</label><br />
+                        <input id="indicator_gamma1" type="text" size="1" readonly />
+                        <label>Ns/m</label>
+                        <div id="slider_gamma1" style="width:100px;"></div>
+
+                        <input id="indicator_gamma2" type="text" size="1" readonly />
+                        <label>Ns/m</label>
+                        <div id="slider_gamma2" style="width:100px;"></div>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="mu">
+                        <label id="label_mu">動摩擦係数</label><br />
+                        <input id="indicator_mu1" type="text" size="1" readonly />
+                        <div id="slider_mu1" style="width:100px;"></div>
+
+                        <input id="indicator_mu2" type="text" size="1" readonly />
+                        <div id="slider_mu2" style="width:100px;"></div>
+                    </div>
+                </td>
+                <td>
+                    <div></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
