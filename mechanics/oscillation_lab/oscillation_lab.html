@@ -271,15 +271,19 @@
 
 
         //////// グラフ
+        // グラフのインスタンス
+        let jqplot;
+
         // グラフのフラグ
         let graph_plot_count = 0;
-        let graph_plot_skip = 4;
+        let graph_plot_skip = 0;
 
         // グラフデータ格納用
         let graph_data = [];
         // 初期化
         system_obj.forEach(() => graph_data.push([]));
 
+        let plot_time = 0;
         let graph_time_min = 0;
         let graph_time_max = 5;
 
@@ -307,7 +311,8 @@
             legend: {
                 show: true,
                 labels: ['系１', '系２']
-            }
+            },
+            clear: true 
         };
 
         //グラフデータの更新
@@ -344,10 +349,14 @@
             init_systems();
             draw();
             system_obj.forEach((element, index) => graph_data[index] = [[time, element.x]]);
-            $.jqplot('graph', graph_data, options).destroy();
+            if(jqplot!=null){
+                jqplot.destroy();
+                //$.jqplot('graph', graph_data, options).destroy();
+            }
             options.axes.xaxis.max = graph_time_max;
             options.axes.xaxis.tickInterval = (graph_time_max - graph_time_min) / 10;
-            $.jqplot('graph', graph_data, options);
+            jqplot = $.jqplot("graph", graph_data, options);
+            plot_time = 0;
         }
 
         ////　スライダー操作
@@ -380,11 +389,13 @@
                     $("#indicator_graph_max").val(ui.values[1]);
                     graph_time_min = ui.values[0];
                     graph_time_max = ui.values[1];
-                    $.jqplot('graph', graph_data, options).destroy();
+                    jqplot.destroy();
+                    //$.jqplot('graph', graph_data, options).destroy();
                     options.axes.xaxis.min = graph_time_min;
                     options.axes.xaxis.max = graph_time_max;
                     options.axes.xaxis.tickInterval = (graph_time_max - graph_time_min) / 10;
-                    $.jqplot('graph', graph_data, options);
+                    jqplot.replot(options);
+                    //$.jqplot('graph', graph_data, options);
                 },
                 create: function (e, ui) {
                     let values = $(this).slider("option", "values");
@@ -554,6 +565,7 @@
         $(function () {
             let flag_graph_update = true;
             click_init();
+
             draw();
             ////////　メイン処理
             function loop(timestamp) {
@@ -566,9 +578,13 @@
                     if(flag_graph_update){
                         update_graph_data();
                     }
-                    if (graph_plot_count > graph_plot_skip && time < graph_time_max) {
-                        $.jqplot('graph', graph_data, options).destroy();
-                        $.jqplot('graph', graph_data, options).replot();
+                    if (graph_plot_count > graph_plot_skip && plot_time < graph_time_max) {
+                        plot_time = time;
+                        if(jqplot!=null) {
+                            jqplot.destroy();
+                        }
+                        jqplot = $.jqplot('graph', graph_data, options);
+                        //$.jqplot('graph', graph_data, options).replot();
                         graph_plot_count = 0;
                     }
                     graph_plot_count++;
@@ -588,19 +604,20 @@
         <br />
         <label id="label_refresh_rate" style="position: absolute; top:25px;">描画倍率</label>
         <br />
-        <input id="indicator_refresh_rate" style="position: absolute; top: 25px; left: 70px" type="text" size="1"
+        <input id="indicator_refresh_rate" style="position: absolute; top: 25px; left: 70px" type="text" size="3"
+
             readonly />
-        <label style="position:absolute; top: 25px; left: 120px;">倍</label>
+        <label style="position:absolute; top: 25px; left: 130px;">倍</label>
         <div id="slider_refresh_rate" style="position: absolute; top: 50px; left: 0px; width:150px;"></div>
 
         <label id="label_graph_range" style="position: absolute; top:25px; left: 180px">グラフ表示範囲</label>
-        <input id="indicator_graph_min" style="position: absolute; top:25px; left: 300px" type="text" size="1"
+        <input id="indicator_graph_min" style="position: absolute; top:25px; left: 300px" type="text" size="3"
             readonly />
-        <label style="position: absolute; top:25px; left: 345px">s</label>
-        <label style="position: absolute; top:25px; left: 355px">～</label>
-        <input id="indicator_graph_max" style="position: absolute; top:25px; left: 375px" type="text" size="1"
+        <label style="position: absolute; top:25px; left: 360px">s</label>
+        <label style="position: absolute; top:25px; left: 370px">～</label>
+        <input id="indicator_graph_max" style="position: absolute; top:25px; left: 390px" type="text" size="3"
             readonly />
-        <label style="position: absolute; top:25px; left: 420px">s</label>
+        <label style="position: absolute; top:25px; left: 450px">s</label>
         <div id="slider_graph_range" style="position: absolute; top:50px; left: 200px; width:220px;"></div>
     </div>
 
@@ -616,11 +633,11 @@
                 <td>
                     <div class="amp" style="margin-left: auto; margin-right: auto; width: 130px;">
                         <label id="label_mass">最初の位置</label><br />
-                        <input id="indicator_amp1" type="text" size="1" readonly />
+                        <input id="indicator_amp1" type="text" size="3" readonly />
                         <label>m</label>
                         <div id="slider_amp1" style="width:100px;"></div>
 
-                        <input id="indicator_amp2" type="text" size="1" readonly />
+                        <input id="indicator_amp2" type="text" size="3" readonly />
                         <label>m</label>
                         <div id="slider_amp2" style="width:100px;"></div>
                     </div>
@@ -629,11 +646,11 @@
                 <td>
                     <div class="mass" style="width: 130px;">
                         <label id="label_mass">質量</label><br />
-                        <input id="indicator_mass1" type="text" size="1" readonly />
+                        <input id="indicator_mass1" type="text" size="3" readonly />
                         <label>kg</label>
                         <div id="slider_mass1" style="width:100px;"></div>
 
-                        <input id="indicator_mass2" type="text" size="1" readonly />
+                        <input id="indicator_mass2" type="text" size="3" readonly />
                         <label>kg</label>
                         <div id="slider_mass2" style="width:100px;"></div>
                     </div>
@@ -642,11 +659,11 @@
                 <td>
                     <div class="spring_k" style="width: 130px;">
                         <label id="label_k">ばね定数</label><br />
-                        <input id="indicator_k1" type="text" size="1" readonly />
+                        <input id="indicator_k1" type="text" size="3" readonly />
                         <label>N/m</label>
                         <div id="slider_k1" style="width:100px;"></div>
 
-                        <input id="indicator_k2" type="text" size="1" readonly />
+                        <input id="indicator_k2" type="text" size="3" readonly />
                         <label>N/m</label>
                         <div id="slider_k2" style="width:100px;"></div>
                     </div>
@@ -663,11 +680,11 @@
                 <td>
                     <div class="gamma">
                         <label id="label_gamma">空気抵抗係数</label><br />
-                        <input id="indicator_gamma1" type="text" size="1" readonly />
+                        <input id="indicator_gamma1" type="text" size="3" readonly />
                         <label>Ns/m</label>
                         <div id="slider_gamma1" style="width:100px;"></div>
 
-                        <input id="indicator_gamma2" type="text" size="1" readonly />
+                        <input id="indicator_gamma2" type="text" size="3" readonly />
                         <label>Ns/m</label>
                         <div id="slider_gamma2" style="width:100px;"></div>
                     </div>
@@ -676,10 +693,10 @@
                 <td>
                     <div class="mu">
                         <label id="label_mu">動摩擦係数</label><br />
-                        <input id="indicator_mu1" type="text" size="1" readonly />
+                        <input id="indicator_mu1" type="text" size="3" readonly />
                         <div id="slider_mu1" style="width:100px;"></div>
 
-                        <input id="indicator_mu2" type="text" size="1" readonly />
+                        <input id="indicator_mu2" type="text" size="3" readonly />
                         <div id="slider_mu2" style="width:100px;"></div>
                     </div>
                 </td>
