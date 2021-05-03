@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>kepler_3</title>
+    <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.min.css" />
+    <script type="text/javascript" src="../../js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css" />
+    <script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
+    <script type="text/javascript" src="../../js/jqPlot/jquery.jqplot.min.js"></script>
+    <link rel="stylesheet" href="../../css/jquery.jqplot.min.css" />
+</head>
+
+<body>
+    <script>
+        //////// データ
+        let header = ["水星", "金星", "地球", "火星", "木星", "土星", "天王星", "海王星"];
+        let a = [0.387, 0.723, 1, 1.52, 5.20, 9.55, 19.2, 30.1];
+        let a2 = [];
+        let a3 = [];
+        let T = [0.241, 0.615, 1, 1.88, 11.9, 29.5, 84.0, 165];
+        let T2 = [];
+        let T3 = [];
+        for(let i=0; i<a.length; i++) {
+            a2.push(Math.pow(a[i],2));
+            a3.push(Math.pow(a[i],3));
+            T2.push(Math.pow(T[i],2));
+            T3.push(Math.pow(T[i],3));
+        }
+
+        //////// グラフ
+        // グラフのインスタンス用
+        let jqplot;
+
+        // グラフデータ格納用
+        let graph_data = [];
+
+        //グラフデータの更新
+        function update_graph_data(data1, data2) {
+            for(let i=0; i < data1.length; i++) {
+                graph_data[0].push([data1[i], data2[i]]);
+            }
+        }
+
+        // グラフデータ初期化
+        function init_graph_data() {
+            graph_data = [];
+            graph_data.push([]);
+        }
+
+        // グラフオプション
+        let options = {
+            axes: {
+                xaxis: {
+                    label: "長半径のx乗"
+                },
+                yaxis: {
+                    label: "周期のy乗"
+                }
+            },
+            seriesDefaults: {
+                markerOptions: {
+                    show: true
+                }
+            },
+            clear: true
+        };
+
+        $(function () {
+            for(let i=0; i<header.length; i++) {
+                $("#planet_data").append("<tr><td>"+ header[i] +"</td><td>" + a[i] + "</td><td>" + T[i] + "</td></tr>");
+            }
+            init_graph_data();
+            update_graph_data(a,T);
+            jqplot = $.jqplot("graph", graph_data, options);
+
+            $("#test").on('click', function(){
+                jqplot.destroy();
+                update_graph_data(a3,T2);
+                jqplot = $.jqplot("graph", graph_data, options);
+            });
+        });
+
+
+    </script>
+    <table id="planet_data" style="float: left; text-align: center;">
+        <tr>
+            <td>惑星名</td><td>長半径（天文単位）</td><td>周期（年）</td>
+        </tr>
+    </table>
+    <div id="graph" style="float: left; width: 400px; height: 400px;"></div>
+    <input type="button" id="test" value="test" />
+</body>
+
+</html>
