@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h1>重複しない３つの数字(0~9)を当ててください</h1>
+        <p>入力した数字が含まれる場合はHit、数字の場所もあっている場合はOutが表示</p>
+        <p>答えはコンソールに</p>
+        <input id="num0" style="width:15px"/>
+        <input id="num1" style="width:15px"/>
+        <input id="num2" style="width:15px"/>
+        <button id="judge_btn" onclick="click_judge()">判定</button>
+        <div id="hystory"></div>
+
+        <script>
+            //正解の数字を格納する配列
+            let number_array = [];
+
+            //乱数を生成
+            function get_random(min, max) {
+                return Math.floor( Math.random() * (max + 1 - min) ) + min;
+            }
+
+            //正解の数字を生成
+            function create_number() {
+                let count = 0;
+                //同じ数字がかぶらないようにする
+                while (count < 3) {
+                    //0~9まで
+                    let tmp = get_random(0, 9);
+                    if (number_array.includes(tmp) == false) {
+                        number_array.push(tmp);
+                        count++;
+                    }
+                }
+            }
+
+            //履歴に引数(str)を追加する関数
+            function add_hystory(str) {
+                //履歴用のdivを取得
+                let element_div = document.getElementById("hystory");
+                //表示用ラベルを生成
+                let element_label = document.createElement('label');
+                //ラベルに文字を追加
+                element_label.appendChild(document.createTextNode(str));
+                //ラベルを履歴用divに追加
+                element_div.appendChild(element_label);
+                //履歴に追加後、改行も追加
+                let element_br = document.createElement("br");
+                element_div.appendChild(element_br);
+            }
+
+
+            /////////////////////メイン処理
+            
+            //正解の数字を作る
+            create_number();
+
+            //一応コンソールに正解を表示させとく
+            console.log(number_array);
+
+            //正解判定の関数
+            //判定ボタンが押されたときにする処理
+            function click_judge() {
+                //hitの数を記録する変数
+                let count_hit = 0;
+
+                //outの数を記録する変数
+                let count_out = 0;
+
+                //入力された数字を格納する変数
+                let number_input = [];
+                //入力された数字を取得
+                for (let i = 0; i < 3; i++) {
+                    //入力フォームのオブジェクトを取得
+                    let element_input = document.getElementById("num" + i);
+                    //入力された数字を変数に格納
+                    //文字列になっているためNumber()関数で数字に直す
+                    number_input.push(Number(element_input.value));
+                    //入力フォームの文字を消す
+                    element_input.value = "";
+                }
+                //入力された数字を一つずつ判定
+                for (let i = 0; i < 3; i++) {
+                    //正解の数字に含まれていたら
+                    if (number_array.includes(number_input[i])) {
+                        //さらに順番が合っていたらoutを増やす
+                        if (number_array[i] == number_input[i]) {
+                            count_out++;
+                        }
+                        //順番が合ってなければhitを増やす
+                        else {
+                            count_hit++;
+                        }
+                    }
+                }
+                //履歴に表示する文字列を作る
+                let str;
+                str = String(number_input[0]) + String(number_input[1]) + String(number_input[2]) + "　：　"
+                        + count_hit + " Hit , " + count_out + " Out!" ;
+                //正解ならさらに追加
+                if (count_out == 3) {
+                    str += "　正解！";
+                }
+                //履歴に文字列を追加
+                add_hystory(str);
+            }
+
+        </script>
+
+    </body>
+</html>

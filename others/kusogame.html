@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>くそげー</title>
+</head>
+
+<body>
+    <h1>右下に行くゲーム</h1>
+    <label>右下にたどり着いたらゴール。★に当たってはいけない。</label>
+    <br />
+    <label>大きさ</label>
+    <input id="input_stage_length" style="width:30px" value="15" />
+    <label>の２乗</label>
+    <br/>
+    <label>敵の数</label>
+    <input id="input_num_of_sprite" style="width:30px" value="30" />
+    <lbale>匹</lbale>
+    <br/>
+    <button onclick="click_start()">はじめる</button>
+    <label>キーボード操作　　上 : w　　下 : s　　右 : d　　左 : a</label>
+    <br />
+    <br />
+
+    <!-- ステージを作るための要素 -->
+    <div id="stage" style="position:absolute"></div>
+
+    <script>
+        //ステージのながさ
+        let stage_length;
+
+        //ステージ上のマスのかず
+        let stage_cells;
+
+        //ステージの状態
+        //すべてのマスの状態を保存する変数
+        //0:何もない 1:プレイヤーが存在 -1:敵が存在 -2:敵に当たった状態
+        let stage_state = [];
+
+        //プレイヤーのいるマスを保存する変数
+        let player = 0;
+
+        //敵のいるマスを保存する変数（複数いるので配列を使う)
+        let sprite = [];
+
+        //敵の数
+        let num_of_sprite;
+
+        //プレイヤーと敵の衝突判定用変数　衝突してなかったら-1, 衝突したらその座標にする
+        let judge = -1;
+
+        //クリア判定フラグ　クリア状態になったら1
+        let clear = 0;
+
+        //乱数を取得する関数（min=0, max=11なら0～10の乱数を整数で返す)
+        function get_random(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        // N × N のステージを作る関数
+        function create_stage(N) {
+            //ステージのオブジェクトを取得
+            let parent = document.getElementById("stage");
+            //オブジェクトの初期化
+            parent.innerHTML = "";
+            //プレイヤーの初期化
+            player = 0;
+            //敵の初期化
+            sprite = [];
+            //衝突判定を初期化
+            judge = -1;
+            //クリア判定の初期化
+            clear = 0;
+
+            //ステージの上辺を書く(長さ+2)
+            for (let i = 0; i < N + 2; i++) {
+                create_bar2(parent);
+            }
+            create_br(parent); //改行
+            create_bar1(parent); //縦棒をひとつ
+
+            //ステージ上のマスの数（N × N)の<label>を用意する(画面表示用)
+            for (let i = 0; i < N * N; i++) {
+                //label要素の作成
+                let new_element = document.createElement('label');
+                //label要素にidを振る（マスの番号と同じid）
+                new_element.setAttribute("id", "L" + i);
+                //ステージオブジェクトに追加する
+                parent.appendChild(new_element);
+
+                //N個のlabelを追加したら（一行書いたら) 縦棒を書いて改行して縦棒
+                if (i % N == N - 1) {
+                    create_bar1(parent);
+                    create_br(parent);
+                    //最後の行を書いた後は縦棒を書かない
+                    if (i != N * N - 1) {
+                        create_bar1(parent);
+                    }
+                }
+                //ステージの状態を初期化する（すべて0）
+                stage_state.push(0);
+            }
+            //ステージの底辺を書く
+            for (let i = 0; i < N + 2; i++) {
+                create_bar2(parent);
+            }
+        }
+
+        //改行タグを追加する関数
+        function create_br(parent) {
+            let br_element = document.createElement('br');
+            parent.appendChild(br_element);
+        }
+
+        //縦棒を追加する関数
+        function create_bar1(parent) {
+            let bar_element = document.createElement('label');
+            let bar_content = document.createTextNode("｜");
+            bar_element.appendChild(bar_content);
+            parent.appendChild(bar_element);
+        }
+
+        //横棒を追加する関数
+        function create_bar2(parent) {
+            let bar_element = document.createElement('label');
+            let bar_content = document.createTextNode("－");
+            bar_element.appendChild(bar_content);
+            parent.appendChild(bar_element);
+        }
+
+        //敵をつくる
+        //敵の初期位置を乱数で作成
+        function create_sprite(N) {
+            for (let i = 0; i < N; i++) {
+                let sprite_position = get_random(1, stage_cells - 1);
+                //敵の位置をsprite変数に追加
+                sprite.push(sprite_position);
+            }
+        }
+
+        //敵を動かす関数
+        //乱数で0～4を生成して、0:左 1:右 2:上 3:下 4:動かない
+        //ステージの外側に行かないようにif文に加える
+        function move_sprite() {
+            for (let i = 0; i < num_of_sprite; i++) {
+                let random = get_random(0, 4);
+                if (random == 0 && sprite[i] % stage_length != 0) {
+                    sprite[i] += -1;
+                }
+                else if (random == 1 && sprite[i] % stage_length != stage_length - 1) {
+                    sprite[i] += 1;
+                }
+                else if (random == 2 && sprite[i] >= stage_length) {
+                    sprite[i] += -stage_length;
+                }
+                else if (random == 3 && sprite[i] < stage_cells - stage_length) {
+                    sprite[i] += stage_length;
+                }
+                else if (random == 4) {
+                }
+            }
+        }
+
+        //ステージの状態を更新する関数
+        function update_state() {
+            //すべて0で埋めつくす
+            stage_state.fill(0);
+            //playerのいるマスを1にする
+            stage_state[player] = 1;
+            //敵のいるマスを-1にする
+            sprite.forEach(value => stage_state[value] = -1);
+            //衝突していたら
+            if (judge != -1) {
+                //衝突したマスを-2に
+                stage_state[judge] = -2;
+            }
+        }
+
+        //ステージを描画する
+        function render_stage() {
+            //マス目一つ一つを書いていく
+            for (let i = 0; i < stage_cells; i++) {
+                //i番目のマス目用labelのオブジェクトを取得
+                let update_element = document.getElementById("L" + i);
+                //ステージの状態（マス目の状態）に応じて文字を表示
+                if (stage_state[i] == 0) {
+                    update_element.innerHTML = "　";
+                }
+                else if (stage_state[i] == 1) {
+                    update_element.innerHTML = "◎";
+                }
+                else if (stage_state[i] == -1) {
+                    update_element.innerHTML = "★";
+                }
+                else if (stage_state[i] == -2) {
+                    update_element.innerHTML = "×";
+                }
+            }
+            //衝突していたらゲームオーバーを表示
+            if (judge != -1) {
+                for (let i = 0; i < stage_length; i++) {
+                    if (player % stage_length == stage_length -1) {
+                        document.getElementById("L" + String(stage_length * i)).innerHTML = "げーむおーばー";
+                    }
+                    else {
+                        document.getElementById("L" + String(stage_length * i + stage_length -1)).innerHTML = "げーむおーばー";
+                    }
+                }
+            }
+            //クリアフラグが立っていたらくりあーをひょうじ
+            if (clear == 1) {
+                document.getElementById("L" + String(player)).innerHTML = "くりあーーーー";
+            }
+        }
+
+
+        /////////////////メイン処理
+
+        function click_start() {
+            //最初の処理
+            //ステージの長さを取得
+            stage_length = Number(document.getElementById("input_stage_length").value);
+            //マス目の数を計算
+            stage_cells = Math.pow(stage_length, 2);
+            //敵の数を取得
+            num_of_sprite = Number(document.getElementById("input_num_of_sprite").value);
+
+            //ステージを作る
+            create_stage(stage_length);
+
+            //敵をつくる
+            create_sprite(num_of_sprite);
+
+            //状態を更新する
+            update_state();
+
+            //画面に表示する
+            render_stage();
+        }
+
+        //キーボードを押したときの処理
+        document.body.addEventListener('keydown',
+            event => {
+                //a,d,w,sの場合だけ処理する
+                if (event.key == "a" || event.key == "d" || event.key == "w" || event.key == "s") {
+                    //キーに応じてプレイヤーを動かす、そのあと敵も動かす
+                    if (event.key == "a" && player % stage_length != 0) {
+                        player += -1;
+                        move_sprite();
+                    }
+                    else if (event.key == "d" && player % stage_length != stage_length - 1) {
+                        player += 1;
+                        move_sprite();
+                    }
+                    else if (event.key == "w" && player >= stage_length) {
+                        player += -stage_length;
+                        move_sprite();
+                    }
+                    else if (event.key == "s" && player < stage_cells - stage_length) {
+                        player += stage_length;
+                        move_sprite();
+                    }
+                    //プレイヤーと敵が動いた後で、衝突判定
+                    //プレイヤーのマス目と敵のマス目が同じならjudgeにそのマス目をいれる
+                    sprite.forEach(value => {
+                        if (value == player) {
+                            judge = value;
+                        }
+                    });
+
+                    //衝突していない状態で右下にたどり着いたとき
+                    if (judge == -1 && player == stage_cells - 1) {
+                        //clearフラグを1にする
+                        clear = 1;
+                    }
+                    //ステージの状態を更新
+                    update_state();
+                    //ステージを描画
+                    render_stage();
+                }
+            }
+        );
+
+    </script>
+</body>
+
+</html>
