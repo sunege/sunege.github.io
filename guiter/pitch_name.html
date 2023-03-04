@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>pitch name</title>
+    <meta charset="UTF-8"/>
+  </head>
+  <body>
+    <label id="lbl1" style="padding:40px;font-size:80px;"></label>
+    <br/>
+    <br/>
+    <button id="btn1" onclick="myclick()" style="padding:40px;font-size:40px;">次</button>
+
+<script type="text/javascript"/>
+let pitch_names = "ABCDEFG";
+
+function print_pitch_name( num ){
+  document.getElementById("lbl1").innerText = pitch_names[ num ];
+}
+
+print_pitch_name(0);
+
+function myclick(){
+  let rnd = Math.floor( Math.random() * 7 );
+  print_pitch_name(rnd);
+}
+
+</script>
+  </body>
+</html>
+
+
+ 
+  
