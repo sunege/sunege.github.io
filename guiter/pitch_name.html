@@ -3,31 +3,41 @@
   <head>
     <title>pitch name</title>
     <meta charset="UTF-8"/>
+    <style>
+.center{
+  width: 360px;
+  height: 780px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+    </style>
   </head>
   <body>
-    <label id="lbl1" style="padding:40px;font-size:80px;"></label>
-    <br/>
-    <br/>
-    <button id="btn1" onclick="myclick()" style="padding:40px;font-size:40px;">次</button>
+    <div class="center">
+      <label id="lbl1" style="padding:40px;font-size:300px;"></label>
+      <br/>
+      <br/>
+      <button id="btn1" onclick="myclick()" style="padding:40px;font-size:300px;">N</button>
+    </div>
 
-<script type="text/javascript"/>
+    <script type="text/javascript"/>
 let pitch_names = "ABCDEFG";
 
 function print_pitch_name( num ){
-  document.getElementById("lbl1").innerText = pitch_names[ num ];
+document.getElementById("lbl1").innerText = pitch_names[ num ];
 }
 
 print_pitch_name(0);
 
 function myclick(){
-  let rnd = Math.floor( Math.random() * 7 );
-  print_pitch_name(rnd);
+let rnd = Math.floor( Math.random() * 7 );
+print_pitch_name(rnd);
 }
 
-</script>
+    </script>
   </body>
 </html>
 
 
- 
-  
+
+
