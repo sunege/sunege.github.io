@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>ダイアトニックの練習</title>
+    <meta charset="UTF-8"/>
+    <style>
+.center{
+  height: 780px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+    </style>
+  </head>
+  <body>
+    <div class="center">
+      <br/>
+      <label id="key" style="padding:40px;font-size:80px;"></label>
+      <br/>
+      <label id="chord_prog" style="padding:40px;font-size:80px;"></label>
+      <br/>
+      <label id="root" style="padding-left: 40px;font-size:200px;"></label>
+      <label id="chord" style="font-size:100px;"></label>
+      <label id="next_root" style="padding-left:70px;font-size:100px;"></label>
+      <label id="next_chord" style="font-size:50px;"></label>
+      <br/>
+      <label id="cnt" style="padding-left: 40px;font-size:40px">○　○　○　○</label>
+      <br/>
+      <label id="diatonic_chords" style="padding:40px;font-size:40px;"></label>
+      <br/>
+      <br/>
+      <button id="btn1" onclick="next_chord_prog()" style="margin:40px;padding:30px;font-size:100px;">別の進行</button>
+      <br/>
+      <br/>
+      <button id="btn2" onclick="next_key()" style="margin:40px;padding:30px;font-size:100px;">別のキー</button>
+    </div>
+
+    <script type="text/javascript"/>
+
+//コード名生成用
+let pitch_names = ["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"]; 
+let major_intervals = [ 2, 4, 5, 7, 9, 11 ];
+let diatonic_chords = ["M7", "m7", "m7", "M7", "7", "m7", "m7(b5)"];
+let digree_names = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"];
+
+//コード進行
+let chord_progs = [ [2, 5, 1, 6],
+                    [4, 5, 6, 1],
+                    [4, 5, 3, 6],
+                    [1, 4, 5, 1]];
+
+
+//カウント用
+let cnt = 0;
+let cnt_string = ["○　○　○　○", "●　○　○　○", "●　●　○　○", "●　●　●　○", "●　●　●　●"];
+
+let key; // key = C
+let scale = [];
+
+// 現在の状態
+let current_key = 3;
+let current_prog_num = 0;
+let current_num = 0;
+
+init( current_key, current_prog_num );
+
+function init( key_num, prog_num ){
+  key = key_num;
+  current_num = 0;
+  create_scale();
+  print_key();
+  print_chord_prog( prog_num );
+  print_chord( prog_num, 0);
+  print_next_chord( prog_num, 1);
+  print_diatonic_chord();
+}
+
+function create_scale(){
+  scale = [];
+  scale.push(pitch_names[key]);
+  for(let i=0; i < major_intervals.length; i++){
+    let next = key + major_intervals[i];
+    if(next > 11){
+      next = next - 12;
+    }
+    scale.push(pitch_names[next]);
+  }
+}
+
+// キーを表示
+function print_key(){
+  document.getElementById("key").innerText = "key = " + pitch_names[ key ];
+}
+
+// コード進行をディグリーネームで表示
+// コード進行を配列で渡す
+function print_chord_prog( num ){
+  let chord_prog_str = "";
+  for(let i=0; i<chord_progs[num].length; i++){
+    chord_prog_str += digree_names[chord_progs[num][i]-1];
+    if(i < chord_progs[num].length -1)
+      chord_prog_str += "→";
+  }
+  document.getElementById("chord_prog").innerText = chord_prog_str;
+}
+
+function print_chord( prog_num, num ){
+  let digree_num = chord_progs[prog_num][num] - 1;
+  document.getElementById("root").innerText = scale[ digree_num ];
+  document.getElementById("chord").innerText = diatonic_chords[ digree_num ];
+}
+
+function print_next_chord( prog_num, num ){
+  let digree_num = chord_progs[prog_num][num] - 1;
+  document.getElementById("next_root").innerText = scale[ digree_num ];
+  document.getElementById("next_chord").innerText = diatonic_chords[ digree_num ];
+}
+
+function print_diatonic_chord(){
+  let diatonic_chords_str = "";
+  for(let i=0; i<scale.length ; i++){
+    diatonic_chords_str += (scale[i] + diatonic_chords[i] + " ");
+  }
+  document.getElementById("diatonic_chords").innerText = diatonic_chords_str;
+}
+
+function print_cnt_string( num ){
+  document.getElementById("cnt").innerText = cnt_string[ num ];
+}
+
+function rnd( max ){
+  return Math.floor( Math.random()*max);
+}
+
+function next_chord_prog(){
+  let next_prog = rnd( chord_progs.length );
+  init(current_key, next_prog);
+  cnt = 0;
+  print_cnt_string(0);
+}
+
+function next_key(){
+  let next_key_num = rnd( pitch_names.length );
+  init(next_key_num, current_prog_num);
+  cnt = 0;
+  print_cnt_string(0);
+}
+
+let sleep = waitTime => new Promise( resolve => setTimeout(resolve, waitTime) );
+
+//print_pitch_name(0);
+print_cnt_string(0);
+
+
+const loop = () => sleep( 1000 )
+  .then( () => {
+    cnt++;
+    if (cnt >= 5){
+      cnt = 1;
+      current_num++;
+      if (current_num == chord_progs[current_prog_num].length)
+        current_num = 0;
+    print_chord(current_prog_num, current_num);
+    let next_num = current_num + 1;
+    if (next_num == chord_progs[current_prog_num].length)
+      next_num = 0;
+    print_next_chord(current_prog_num, next_num);
+    }
+    print_cnt_string(cnt);
+    loop();
+});
+
+loop();
+
+    </script>
+  </body>
+</html>
+
+
+
+
