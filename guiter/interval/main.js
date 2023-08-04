@@ -65,7 +65,7 @@ const initString = () => {
 
         //弦番号を乱数で選択
         qRootString = availableStrings[getRandomInt(0, availableStrings.length)];
-        qRootFlet = getRandomInt(1, 7);
+        qRootFlet = getRandomInt(2, 6);
     }
     qString = getRandomInt(1, 7);
     while (1) {
