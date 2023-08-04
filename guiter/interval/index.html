@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <style>
+html, body, #canvas {
+    display: block;
+    width: 100%;
+    height: 70%;
+    margin: 0;
+    padding: 0;
+}
+.btn {
+    width: 100px;
+    height: 70px;
+    margin-left: 50px;
+    font-size: 20px;
+}
+#ans_lbl {
+    font-family: 'ans-serif';
+    font-size: 30px;
+    margin-left: 20px;
+}
+.chbx {
+    width: 20px;
+    height: 20px;
+}
+
+        </style>
+    </head>
+    <body>
+        <br/>
+        <label>黒がルート、赤は何度？</label>
+        <canvas id="canvas"></canvas>
+        <input class="btn" id="ans_btn" type="button" onclick="ans_btn_click()" value="答え"/>
+        <label id="ans_lbl">aaa</label>
+        <br/>
+        <ul>
+            <label>ルートの場所</label> 
+            <li><label><input class="chbx" id="chbx1" type="checkbox">１弦</label></li>
+            <li><label><input class="chbx" id="chbx2" type="checkbox">２弦</label></li>
+            <li><label><input class="chbx" id="chbx3" type="checkbox">３弦</label></li>
+            <li><label><input class="chbx" id="chbx4" type="checkbox">４弦</label></li>
+            <li><label><input class="chbx" id="chbx5" type="checkbox">５弦</label></li>
+            <li><label><input class="chbx" id="chbx6" type="checkbox" checked>６弦</label></li>
+        </ul>
+        
+        <script type="text/javascript" src="./main.js"> </script>
+    </body>
+</html>
