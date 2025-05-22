@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>クリックでビット反転</title>
+  <style>
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+    }
+    .row canvas {
+      border: 1px solid #ccc;
+      display: block;
+      cursor: pointer;
+    }
+    .row input {
+      width: 40px;
+      margin-left: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>8x8 ビットマトリクス</h1>
+  <p>各行のビットが各行の16進数に対応しています</p>
+  <p>「0」⇒白　「1」⇒黒</p>
+  <div id="grid"></div>
+  <button onclick="drawGrid()">描画</button>
+
+  <script>
+    const gridContainer = document.getElementById("grid");
+    const rowCanvases = [];
+    const rowInputs = [];
+    const bitData = Array(8).fill("00000000"); // 各行の8bitバイナリ
+
+    for (let row = 0; row < 8; row++) {
+      const div = document.createElement("div");
+      div.className = "row";
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 320;
+      canvas.height = 40;
+
+      const input = document.createElement("input");
+      input.placeholder = "00";
+      input.maxLength = 2;
+
+      // クリックイベントでビット反転
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const col = Math.floor(x / 40); // どのビットか
+
+        // ビット列を反転
+        let binary = bitData[row].split('');
+        binary[col] = binary[col] === "1" ? "0" : "1";
+        bitData[row] = binary.join('');
+
+        // inputを更新
+        const newHex = parseInt(bitData[row], 2).toString(16).toUpperCase().padStart(2, "0");
+        input.value = newHex;
+
+        drawRow(row); // 反映して再描画
+      });
+
+      div.appendChild(canvas);
+      div.appendChild(input);
+      gridContainer.appendChild(div);
+
+      rowCanvases.push(canvas);
+      rowInputs.push(input);
+    }
+
+    function drawRow(row) {
+      const ctx = rowCanvases[row].getContext("2d");
+      ctx.clearRect(0, 0, 320, 40);
+      ctx.lineWidth = 0.5;
+
+      for (let col = 0; col < 8; col++) {
+        const bit = bitData[row][col];
+        ctx.fillStyle = bit === "1" ? "black" : "white";
+        ctx.fillRect(col * 40, 0, 40, 40);
+        ctx.strokeStyle = "gray";
+        ctx.strokeRect(col * 40 + 0.5, 0.5, 40, 40);
+      }
+    }
+
+    function drawGrid() {
+      for (let row = 0; row < 8; row++) {
+        let hex = rowInputs[row].value.trim();
+        if (!/^[0-9a-fA-F]{1,2}$/.test(hex)) {
+          hex = "00"; // デフォルト
+        }
+        const binary = parseInt(hex, 16).toString(2).padStart(8, '0');
+        bitData[row] = binary;
+        rowInputs[row].value = parseInt(binary, 2).toString(16).toUpperCase().padStart(2, "0");
+        drawRow(row);
+      }
+    }
+
+    //読み込み時に描画
+    drawGrid();
+  </script>
+</body>
+</html>
