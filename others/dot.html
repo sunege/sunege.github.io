@@ -1,105 +1,301 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>クリックでビット反転</title>
+  <meta charset="UTF-8" />
+  <title>8x8 ビットマトリクス + HEX入力</title>
   <style>
-    .row {
+    .main-container {
       display: flex;
-      align-items: center;
-      margin-bottom: 0;
+      align-items: flex-start;
     }
-    .row canvas {
+    .canvas-section {
+      display: flex;
+      flex-direction: row;
+    }
+    #matrixCanvas {
       border: 1px solid #ccc;
-      display: block;
-      cursor: pointer;
+      cursor: crosshair;
     }
-    .row input {
-      width: 40px;
+    .row-hex {
+      display: flex;
+      flex-direction: column;
       margin-left: 10px;
+    }
+    .row-hex span {
+      height: 40px;
+      width: 40px;
       text-align: center;
+      line-height: 40px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      font-family: monospace;
+      font-size: 16px;
+    }
+    .controls {
+      margin-top: 10px;
+    }
+    textarea {
+      width: 320px;
+      height: 320px;
+      font-family: monospace;
+      font-size: 16px;
+      margin-left: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>8x8 ビットマトリクス</h1>
-  <p>各行のビットが各行の16進数に対応しています</p>
-  <div id="grid"></div>
-  <button onclick="drawGrid()">描画</button>
+  <h2>8x8 ビットマトリクス + HEX入力</h2>
+  <div class="main-container">
+    <!-- 左：キャンバスと行HEX -->
+    <div class="canvas-section">
+      <canvas id="matrixCanvas" width="320" height="320"></canvas>
+      <div class="row-hex" id="hexDisplay"></div>
+    </div>
+    <!-- 右：テキスト表示 -->
+    <textarea id="hexTextArea" 
+      placeholder="1行ごとに16桁の16進数を8行入力してください（例：FF00FF00AA55AA55）「保存」ボタンで現在の画像を自動追記できます。"></textarea>
+    <div style="margin-left: 20px; margin-top: 10px;">
+  </div>
+
+  </div>
+
+  <!-- 下：フォーム -->
+  <div class="controls">
+    <input type="text" id="hexInput" maxlength="16" placeholder="例: FFEEDDCCBBAA9988" />
+    <button onclick="copyHex()">保存</button>
+    <button onclick="setAll('1')">すべて ON</button>
+    <button onclick="setAll('0')">すべて OFF</button>
+    <div>
+      <button onclick="togglePlay()" id="playButton">再生</button><br/>
+      <label for="intervalSlider">FPS（1sあたりのフレーム数）: <span id="intervalLabel">3</span></label>
+      <input type="range" id="intervalSlider" min="1" max="30" value="3" step="1" />
+    </div>
+  </div>
 
   <script>
-    const gridContainer = document.getElementById("grid");
-    const rowCanvases = [];
-    const rowInputs = [];
-    const bitData = Array(8).fill("00000000"); // 各行の8bitバイナリ
+    const canvas = document.getElementById("matrixCanvas");
+    const ctx = canvas.getContext("2d");
+    const hexInput = document.getElementById("hexInput");
+    const hexDisplay = document.getElementById("hexDisplay");
+    const hexTextArea = document.getElementById("hexTextArea");
 
-    for (let row = 0; row < 8; row++) {
-      const div = document.createElement("div");
-      div.className = "row";
+    const cellSize = 40;
+    const gridSize = 8;
+    const bitData = Array(gridSize).fill().map(() => "00000000");
+    const hexSpans = [];
 
-      const canvas = document.createElement("canvas");
-      canvas.width = 320;
-      canvas.height = 40;
+    let userTyping = false;
+    let isPlaying = false;
+    let currentTimeout = null;
+    let animationInterval = parseInt(1000/3);
+    
+    document.getElementById("intervalSlider").addEventListener("input", function () {
+      let fps = parseInt(this.value);
+      animationInterval = parseInt(1000/fps);
+      document.getElementById("intervalLabel").textContent = fps;
+    });
 
-      const input = document.createElement("input");
-      input.placeholder = "00";
-      input.maxLength = 2;
+    // 初期化：右側の16進表示列
+    for (let i = 0; i < gridSize; i++) {
+      const span = document.createElement("span");
+      span.textContent = "00";
+      hexDisplay.appendChild(span);
+      hexSpans.push(span);
+    }
+    
+    function copyHex() {
+      const input = document.getElementById("hexInput");
+      const textArea = document.getElementById("hexTextArea");
+      const value = input.value.trim();
 
-      // クリックイベントでビット反転
-      canvas.addEventListener("click", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const col = Math.floor(x / 40); // どのビットか
+      if (!/^[0-9a-fA-F]{16}$/.test(value)) {
+        alert("16桁の16進数を入力してください。");
+        return;
+      }
+      
 
-        // ビット列を反転
-        let binary = bitData[row].split('');
-        binary[col] = binary[col] === "1" ? "0" : "1";
-        bitData[row] = binary.join('');
 
-        // inputを更新
-        const newHex = parseInt(bitData[row], 2).toString(16).toUpperCase().padStart(2, "0");
-        input.value = newHex;
+      // 現在のテキストエリアの値に改行して追記
+      const current = textArea.value.trim();
+      const newText = current ? current + "\n" + value.toUpperCase() : value.toUpperCase();
+      textArea.value = newText;
+    }
 
-        drawRow(row); // 反映して再描画
+    function togglePlay() {
+      if (isPlaying) {
+        // 再生中なら停止
+        isPlaying = false;
+        document.getElementById("playButton").textContent = "再生";
+        if (currentTimeout) clearTimeout(currentTimeout);
+      } else {
+        // 再生開始
+        isPlaying = true;
+        document.getElementById("playButton").textContent = "停止";
+        playMatrixSequence();
+      }
+    }
+
+
+    function drawMatrix() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+          const bit = bitData[row][col];
+          ctx.fillStyle = bit === "1" ? "black" : "white";
+          ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+          ctx.strokeStyle = "gray";
+          ctx.strokeRect(col * cellSize + 0.5, row * cellSize + 0.5, cellSize, cellSize);
+        }
+        const hex = parseInt(bitData[row], 2).toString(16).toUpperCase().padStart(2, '0');
+        hexSpans[row].textContent = hex;
+      }
+      updateHexInput();
+    }
+
+    function updateHexInput() {
+      if (userTyping) return;
+      hexInput.value = bitData
+        .map(bin => parseInt(bin, 2).toString(16).toUpperCase().padStart(2, '0'))
+        .join('');
+    }
+
+    function updateTextArea() {
+      const text = bitData.map(bin => bin).join("\n");
+      hexTextArea.value = text;
+    }
+
+    function playMatrixSequence() {
+      const lines = hexTextArea.value.trim().split("\n").filter(line => line.trim() !== "");
+      if (lines.length === 0) {
+        alert("1行以上の16桁16進数を入力してください。");
+        isPlaying = false;
+        document.getElementById("playButton").textContent = "再生";
+        return;
+      }
+
+      // 入力検証
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!/^[0-9a-fA-F]{16}$/.test(line)) {
+          alert(`行 ${i + 1} が無効です。16桁の16進数で入力してください。`);
+          isPlaying = false;
+          document.getElementById("playButton").textContent = "再生";
+          return;
+        }
+      }
+
+      // すべてのマトリクス画像を事前に生成
+      const matrices = lines.map(line => {
+        const bin64 = BigInt("0x" + line.trim()).toString(2).padStart(64, "0");
+        const matrix = [];
+        for (let i = 0; i < 8; i++) {
+          matrix.push(bin64.slice(i * 8, (i + 1) * 8));
+        }
+        return matrix;
       });
 
-      div.appendChild(canvas);
-      div.appendChild(input);
-      gridContainer.appendChild(div);
+      let currentIndex = 0;
 
-      rowCanvases.push(canvas);
-      rowInputs.push(input);
-    }
-
-    function drawRow(row) {
-      const ctx = rowCanvases[row].getContext("2d");
-      ctx.clearRect(0, 0, 320, 40);
-      ctx.lineWidth = 0.5;
-
-      for (let col = 0; col < 8; col++) {
-        const bit = bitData[row][col];
-        ctx.fillStyle = bit === "1" ? "black" : "white";
-        ctx.fillRect(col * 40, 0, 40, 40);
-        ctx.strokeStyle = "gray";
-        ctx.strokeRect(col * 40 + 0.5, 0.5, 40, 40);
-      }
-    }
-
-    function drawGrid() {
-      for (let row = 0; row < 8; row++) {
-        let hex = rowInputs[row].value.trim();
-        if (!/^[0-9a-fA-F]{1,2}$/.test(hex)) {
-          hex = "00"; // デフォルト
+      function showNextMatrix() {
+        //if (currentIndex >= matrices.length) return;
+        if (isPlaying == false) return;
+        if (currentIndex >= matrices.length) {
+          currentIndex = 0;
         }
-        const binary = parseInt(hex, 16).toString(2).padStart(8, '0');
-        bitData[row] = binary;
-        rowInputs[row].value = parseInt(binary, 2).toString(16).toUpperCase().padStart(2, "0");
-        drawRow(row);
+        for (let i = 0; i < gridSize; i++) {
+          bitData[i] = matrices[currentIndex][i];
+        } 
+        drawMatrix();
+        currentIndex++;
+        setTimeout(showNextMatrix, animationInterval);
       }
+
+      showNextMatrix();
     }
 
-    //読み込み時に描画
-    drawGrid();
+
+    function drawFromHex() {
+      let hex = hexInput.value.trim();
+      if (!/^[0-9a-fA-F]{8,16}$/.test(hex)) {
+        return;
+      }
+      hex = hex.padEnd(16, "0");
+      for (let i = 0; i < gridSize; i++) {
+        const hexPair = hex.slice(i * 2, i * 2 + 2);
+        const binary = parseInt(hexPair, 16).toString(2).padStart(8, "0");
+        bitData[i] = binary;
+      }
+      drawMatrix();
+    }
+
+    function setAll(value) {
+      const bitStr = value.repeat(8);
+      for (let i = 0; i < gridSize; i++) {
+        bitData[i] = bitStr;
+      }
+      drawMatrix();
+    }
+
+    // キャンバス操作（クリック・ドラッグ）
+    let isDragging = false;
+    let dragValue = null;
+    const touched = new Set();
+
+    canvas.addEventListener("mousedown", (e) => {
+      const { row, col } = getCell(e);
+      if (row == null || col == null) return;
+      const bit = bitData[row][col];
+      dragValue = bit === "1" ? "0" : "1";
+      isDragging = true;
+      touched.clear();
+      updateCell(row, col, dragValue);
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const { row, col } = getCell(e);
+      if (row == null || col == null) return;
+      const key = `${row}-${col}`;
+      if (!touched.has(key)) {
+        updateCell(row, col, dragValue);
+        touched.add(key);
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+      dragValue = null;
+    });
+
+    function getCell(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const col = Math.floor(x / cellSize);
+      const row = Math.floor(y / cellSize);
+      if (col < 0 || col >= 8 || row < 0 || row >= 8) return { row: null, col: null };
+      return { row, col };
+    }
+
+    function updateCell(row, col, value) {
+      const bits = bitData[row].split('');
+      bits[col] = value;
+      bitData[row] = bits.join('');
+      drawMatrix();
+    }
+
+    // 入力中フラグ処理＋自動描画
+    hexInput.addEventListener("focus", () => userTyping = true);
+    hexInput.addEventListener("blur", () => userTyping = false);
+    hexInput.addEventListener("input", () => {
+      const hex = hexInput.value.trim();
+      if (/^[0-9a-fA-F]{8}$/.test(hex) || /^[0-9a-fA-F]{16}$/.test(hex)) {
+        drawFromHex();
+      }
+    });
+
+    drawMatrix();
   </script>
 </body>
 </html>
+
