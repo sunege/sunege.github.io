@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>デジタル音声ラボ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    canvas {
+      width: 100%;
+      height: 100px;
+      background: #f0f0f0;
+    }
+    button {
+      margin: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>デジタル音声ラボ</h1>
+
+  <section>
+    <button id="startBtn">🎙️ 録音開始</button>
+    <button id="stopBtn" disabled>⏹️ 停止</button>
+    <button id="playBtn" disabled>▶️ 再生</button>
+    <audio id="audioPlayback" controls style="margin-top: 1rem;"></audio>
+  </section>
+
+  <section>
+    <label for="sampleRateSlider">サンプリング周波数</label>
+    <input type="range" id="sampleRateSlider" min="3000" max="88200" step="500" value="44100">
+    <span id="sampleRateValue">44100 Hz</span>
+  </section>
+
+  <section>
+    <label for="bitDepth">量子化ビット数</label>
+    <input type="range" id="bitDepth" min="4" max="24" step="1" value="16">
+    <span id="bitDepthValue">16 bit</span>
+  </section>
+
+  <section>
+    <label for="encoding">符号化</label>
+    <select id="encoding">
+      <option value="pcm">未圧縮（PCM）</option>
+      <option value="mp3">MP3（※要拡張）</option>
+      <option value="opus">Opus（※要拡張）</option>
+    </select>
+  </section>
+
+  <section>
+    <label>波形</label>
+    <canvas id="waveform"></canvas>
+  </section>
+
+  <section>
+    <label>スペクトル</label>
+    <canvas id="spectrum"></canvas>
+  </section>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const playBtn = document.getElementById("playBtn");
+    const audioPlayback = document.getElementById("audioPlayback");
+
+    const sampleRateSlider = document.getElementById("sampleRateSlider");
+    const bitDepthSlider = document.getElementById("bitDepth");
+    const sampleRateValue = document.getElementById("sampleRateValue");
+    const bitDepthValue = document.getElementById("bitDepthValue");
+
+    const waveformCanvas = document.getElementById("waveform");
+    const spectrumCanvas = document.getElementById("spectrum");
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let audioBlob;
+    let audioURL;
+
+    let audioContext;
+    let analyser;
+    let micSource;
+    let analyserNode;
+    let sourceNode;
+    let isAnalyserSetup = false;
+
+    // イベント: 録音開始
+    startBtn.addEventListener("click", async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+          audioChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+        // Decode blob to AudioBuffer
+        const arrayBuffer = await audioBlob.arrayBuffer();
+        const audioContext = new AudioContext();
+        const originalBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        // Get user-selected sample rate
+        const targetSampleRate = parseInt(document.getElementById("sampleRateSlider").value);
+        //const targetSampleRate = parseInt(sampleRateValue);
+
+        // Re-sample using OfflineAudioContext
+        const offlineCtx = new OfflineAudioContext({
+          numberOfChannels: originalBuffer.numberOfChannels,
+          length: Math.floor(originalBuffer.duration * targetSampleRate),
+          sampleRate: targetSampleRate
+        });
+
+        const bufferSource = offlineCtx.createBufferSource();
+        bufferSource.buffer = originalBuffer;
+        bufferSource.connect(offlineCtx.destination);
+        bufferSource.start();
+
+        const resampledBuffer = await offlineCtx.startRendering();
+
+        // Convert resampled AudioBuffer to WAV blob
+        const resampledBlob = audioBufferToWavBlob(resampledBuffer);
+
+        // Set up for playback
+        audioPlayback.src = URL.createObjectURL(resampledBlob);
+      };
+
+      // 音声解析用
+      audioContext = new AudioContext();
+      micSource = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      micSource.connect(analyser);
+
+      drawWaveform();
+      drawSpectrum();
+
+      mediaRecorder.start();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      playBtn.disabled = true;
+    });
+
+    // イベント: 停止
+    stopBtn.addEventListener("click", () => {
+      mediaRecorder.stop();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+
+    // イベント: 再生
+    playBtn.addEventListener("click", () => {
+/*
+      if (!isAnalyserSetup) {
+        audioContext = new AudioContext();
+        sourceNode = audioContext.createMediaElementSource(audioPlayback);
+        analyserNode = audioContext.createAnalyser();
+        sourceNode.connect(analyserNode);
+        analyserNode.connect(audioContext.destination);
+        isAnalyserSetup = true;
+        audioContext = new AudioContext();
+        source = audioContext.createMediaElementSource(audioPlayback);
+        analyser = audioContext.createAnalyser();
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        isAnalyserSetup = true;
+      }
+*/
+      const audioPlayback = new Audio(audioURL); // Blob URL から新たに作成
+      const context = new AudioContext();
+      const source = context.createMediaElementSource(audioPlayback);
+      analyser = context.createAnalyser();
+      source.connect(analyser);
+      analyser.connect(context.destination);
+
+      drawWaveform();   // 再生音声に対して波形描画開始
+      drawSpectrum();   // 再生音声に対してスペクトル描画開始
+
+      audioPlayback.play();
+    });
+
+
+    // スライダー表示更新
+    sampleRateSlider.addEventListener("input", () => {
+      sampleRateValue.textContent = `${sampleRateSlider.value} Hz`;
+    });
+
+    bitDepthSlider.addEventListener("input", () => {
+      bitDepthValue.textContent = `${bitDepthSlider.value} bit`;
+    });
+
+    // 波形描画
+    function drawWaveform() {
+      const ctx = waveformCanvas.getContext("2d");
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.fftSize;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function draw() {
+        requestAnimationFrame(draw);
+        analyser.getByteTimeDomainData(dataArray);
+
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, waveformCanvas.width, waveformCanvas.height);
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#007bff";
+        ctx.beginPath();
+
+        const sliceWidth = waveformCanvas.width / bufferLength;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = dataArray[i] / 128.0;
+          const y = (v * waveformCanvas.height) / 2;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          x += sliceWidth;
+        }
+        ctx.stroke();
+      }
+
+      draw();
+    }
+
+    // スペクトル描画
+    function drawSpectrum() {
+      const ctx = spectrumCanvas.getContext("2d");
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function draw() {
+        requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+
+        const barWidth = (spectrumCanvas.width / bufferLength) * 2.5;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = dataArray[i];
+          ctx.fillStyle = "#007bff";
+          ctx.fillRect(x, spectrumCanvas.height - barHeight / 2, barWidth, barHeight / 2);
+          x += barWidth + 1;
+        }
+      }
+
+      draw();
+    }
+/*
+    function drawSpectrum() {
+      const canvas = document.getElementById("spectrum");
+      const ctx = canvas.getContext("2d");
+
+      const WIDTH = canvas.width;
+      const HEIGHT = canvas.height;
+
+      requestAnimationFrame(drawSpectrum);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteFrequencyData(dataArray);
+
+      // 背景クリア
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      // スペクトルバー描画
+      const barWidth = WIDTH / bufferLength;
+      for (let i = 0; i < bufferLength; i++) {
+        const value = dataArray[i];
+        const barHeight = value / 255 * HEIGHT;
+        ctx.fillStyle = "blue";
+        ctx.fillRect(i * barWidth, HEIGHT - barHeight, barWidth, barHeight);
+      }
+
+      // ==== 横軸ラベル（周波数）を描く ====
+
+      const sampleRate = analyser.context.sampleRate;
+      const nyquist = sampleRate / 2; // 最大周波数（ナイキスト周波数）
+      const freqPerBin = nyquist / bufferLength;
+
+      ctx.strokeStyle = "#888";
+      ctx.fillStyle = "#000";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      //for (let freq = 0; freq <= nyquist; freq += 1000) {
+      for (let freq = 0; freq <= 10000; freq += 1000) {
+        const binIndex = freq / freqPerBin;
+        const x = binIndex * barWidth;
+
+        // 目盛り線
+        ctx.beginPath();
+        ctx.moveTo(x, HEIGHT);
+        ctx.lineTo(x, HEIGHT - 5);
+        ctx.stroke();
+
+        // ラベル（縦書き）
+        ctx.save();
+        ctx.translate(x, HEIGHT - 7);
+        ctx.rotate(-Math.PI / 2); // 90度反時計回りに回転（縦書き）
+        ctx.fillText(`${freq}`, 0, 0);
+        ctx.restore();
+      }
+
+    }
+*/
+
+
+    function audioBufferToWavBlob(buffer) {
+      const numChannels = buffer.numberOfChannels;
+      const sampleRate = buffer.sampleRate;
+      const length = buffer.length * numChannels * 2;
+      const wav = new ArrayBuffer(44 + length);
+      const view = new DataView(wav);
+
+      const writeString = (offset, str) => {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(offset + i, str.charCodeAt(i));
+        }
+      };
+
+      let offset = 0;
+      writeString(offset, "RIFF"); offset += 4;
+      view.setUint32(offset, 36 + length, true); offset += 4;
+      writeString(offset, "WAVE"); offset += 4;
+      writeString(offset, "fmt "); offset += 4;
+      view.setUint32(offset, 16, true); offset += 4;
+      view.setUint16(offset, 1, true); offset += 2;
+      view.setUint16(offset, numChannels, true); offset += 2;
+      view.setUint32(offset, sampleRate, true); offset += 4;
+      view.setUint32(offset, sampleRate * numChannels * 2, true); offset += 4;
+      view.setUint16(offset, numChannels * 2, true); offset += 2;
+      view.setUint16(offset, 16, true); offset += 2;
+      writeString(offset, "data"); offset += 4;
+      view.setUint32(offset, length, true); offset += 4;
+
+      for (let i = 0; i < buffer.length; i++) {
+        for (let ch = 0; ch < numChannels; ch++) {
+          const sample = buffer.getChannelData(ch)[i];
+          const s = Math.max(-1, Math.min(1, sample));
+          view.setInt16(offset, s * 32767, true);
+          offset += 2;
+        }
+      }
+
+      return new Blob([view], { type: "audio/wav" });
+    }
+
+  </script>
+</body>
+</html>
+
