@@ -257,16 +257,15 @@ div.ref {
 </head>
 <body>
 	<h1>Sunege simulation</h1>
-	<h2>HTML5で高校物理のシミュレーションをやる</h2>
+	<h2>ブラウザで高校物理のシミュレーションをやる</h2>
 	<div class="caption">
 		<div id="canvas-frame"></div>
 		<div id="caption">
 			<p style="margin:15px;">
-			HTML5のcanvas要素とThree.jsを用いて、物理のシミュレーションをします。<br/>
+			物理のシミュレーションをします。<br/>
 			ウェブブラウザで見ることができます。<br/>
-			高校の授業で使ったものです。<br/>
+			高校の授業で使ったものたちです。<br/>
 			いろんなパラメータをいじったり、ぐるぐる回したりして遊べます。<br/>
-			WebGL対応のブラウザで見て下さい。<br/>
 			左に立方体が表示されればOKです。<br/>
 			ドラッグで回せます。
 			</p>
@@ -314,7 +313,12 @@ div.ref {
                 <img src="./img/double1.png" width="150px" height="100px"/>
                 <img src="./img/double2.png" width="150px" height="100px"/>
 			</a>
-			<p>剛体棒で質点二つをつなげた運動です。4次のルンゲクッタ法で積分しています。簡単な系ながら非常に複雑な運動になります。質点をドラッグして初期位置や剛体棒の長さを変更できます。（タッチ操作未対応）</p>
+			<p>軽い剛体棒で質点二つをつなげた運動です。簡単な系ながら非常に複雑な運動になります。質点をドラッグして初期位置や剛体棒の長さを変更できます。（タッチ操作未対応）</p>
+			<a href="https://physics-sim-ten.vercel.app/">
+				<p>剛体シミュレーション</p>
+                <img src="./img/rigid.png" width="150px" height="100px"/>
+			</a>
+			<p>【開発中】剛体を配置して、バネや関節でジョイントしたり、ピン留めしてトルクを与えたりできます。claudeにコード支援してもらって開発しています。</p>
 			<!-- </div> -->
 		</div>
 		<div class="thermodynamics">
@@ -348,7 +352,7 @@ div.ref {
 			<div id="D1">
 				<h3>１次元</h3>
 				<a href="wave/SpringString/SpringString.html">
-					<p>調和振動子の多体系</p>
+					<p>連続波の観察</p>
 					<img src="./img/ho1.jpg" width="100px" height="100px">
 					<img src="./img/ho2.jpg" width="100px" height="100px">
 					<img src="./img/ho3.jpg" width="100px" height="100px">
