@@ -4,54 +4,54 @@
 //                      //
 //////////////////////////
 //constant value
-var pi = Math.PI;
-var g = 9.80665; 
+const pi = Math.PI;
+const g = 9.80665; 
 
 ////////////////////////////////////
 //time Parameter
-var time = 0;		// time
-var Dt = 0.0001; // Delta t
-var step = 0; //step count
-var _skip = 1; //slow mortion
-var skip = 1/(60*Dt)*_skip;
+let time = 0;		// time
+let Dt = 0.0001; // Delta t
+let step = 0; //step count
+let _skip = 1; //slow mortion
+let skip = 1/(60*Dt)*_skip;
 
 ////////////////////////////////////
 // system parameter
 // constraint length
-var l = 1.0;
-var L = 1.5;
+let l = 1.0;
+let L = 1.5;
 // air resistance param
 
 ////////////////////////////////////
 //Particle parameter
 //mass
-var mass1 = 1.0;
-var mass2 = 1.0;
+let mass1 = 1.0;
+let mass2 = 1.0;
 //draw radius
-var radius1 = 0.1*Math.pow(mass1, 1.0/3.0);
-var radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
+let radius1 = 0.1*Math.pow(mass1, 1.0/3.0);
+let radius2 = 0.1*Math.pow(mass2, 1.0/3.0);
 
 ////////////////////////////////////
 //initial state
-var theta0 = pi/3.0;
-var phi0 = pi/6.0;
-var theta_v0 = 0;
-var phi_v0 = 0;
+let theta0 = pi/3.0;
+let phi0 = pi/6.0;
+const theta_v0 = 0;
+const phi_v0 = 0;
 
 ////////////////////////////////////
 //flag parameter
-var resetFlag = false; // restert flag
-var stopFlag = true; // stop flag
-var contourFlag = true;
+let resetFlag = false; // restert flag
+let stopFlag = true; // stop flag
+let contourFlag = true;
 
 ////////////////////////////////////
 //objects array
-var objects = [];
+let objects = [];
 
 ////////////////////////////////////
 //particle class
-var p1;
-var p2;
+let p1;
+let p2;
 class Particle {
     constructor(radius, mass, angle, angle_v) {
         this.radius = radius;
@@ -72,47 +72,47 @@ Particle.prototype = {
 //time development function
 //calculate force of theta
 function ft(t, p, t_v, p_v, m, M) {
-    var si = Math.sin(t - p);
-    var co = Math.cos(t - p);
+    const si = Math.sin(t - p);
+    const co = Math.cos(t - p);
     //var ta = tan(t - p);
     return (-1.0*M*si*((L/l)*p_v*p_v + co*t_v*t_v)-g*(((m+M)*Math.sin(t)/l)-M*Math.sin(p)*co/l))/(m+M*si*si);
 
 }
 //calculate force of phi
 function fp(t, p, t_v, p_v, m, M) {
-    var si = Math.sin(t - p);
-    var co = Math.cos(t - p);
+    const si = Math.sin(t - p);
+    const co = Math.cos(t - p);
     //var ta = tan(t - p);
     return (si*((m+M)*(l/L)*t_v*t_v+M*co*p_v*p_v) + (m+M)*(g/L)*(Math.sin(t)*co-Math.sin(p)))/(m+M*si*si);
 }
-var debug_flag = 1;
+const debug_flag = 1;
 //runge kutta method
 function timeDevelopment() {
     //current parameter set
-    var t = p1.angle;
-    var p = p2.angle;
-    var tv = p1.angle_v;
-    var pv = p2.angle_v;
-    var m = p1.mass;
-    var M = p2.mass;
+    let t = p1.angle;
+    let p = p2.angle;
+    let tv = p1.angle_v;
+    let pv = p2.angle_v;
+    const m = p1.mass;
+    const M = p2.mass;
 
     //runge kutta var
-    var atv = 0;
-    var apv = 0;
-    var at = 0;
-    var ap = 0;
-    var btv = 0;
-    var bpv = 0;
-    var bt = 0;
-    var bp = 0;
-    var ctv = 0;
-    var cpv = 0;
-    var ct = 0;
-    var cp = 0;
-    var dtv = 0;
-    var dpv = 0;
-    var dt = 0;
-    var dp = 0;
+    let atv = 0;
+    let apv = 0;
+    let at = 0;
+    let ap = 0;
+    let btv = 0;
+    let bpv = 0;
+    let bt = 0;
+    let bp = 0;
+    let ctv = 0;
+    let cpv = 0;
+    let ct = 0;
+    let cp = 0;
+    let dtv = 0;
+    let dpv = 0;
+    let dt = 0;
+    let dp = 0;
 
     atv = ft(t, p, tv, pv, m, M);
     apv = fp(t, p, tv, pv, m, M);
@@ -148,16 +148,16 @@ function timeDevelopment() {
 ////////////////////////////////////////
 // theta, phi --> x, y
 function calculatePosition() {
-    var t = p1.angle;
-    var p = p2.angle;
+    const t = p1.angle;
+    const p = p2.angle;
 
-    var x1 = l*Math.sin(t);
-    var y1 = l*Math.cos(t);
-    var _y1 = -y1;
+    const x1 = l*Math.sin(t);
+    const y1 = l*Math.cos(t);
+    const _y1 = -y1;
 
-    var x2 = x1 + L*Math.sin(p);
-    var y2 = y1 + L*Math.cos(p);
-    var _y2 = -y2;
+    const x2 = x1 + L*Math.sin(p);
+    const y2 = y1 + L*Math.cos(p);
+    const _y2 = -y2;
 
     p1.x = x1;
     p1.y = _y1;
@@ -193,7 +193,7 @@ function initEvent(){
 			step: 0.01,
 			value: _skip,
 			slide: function(_event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				_skip = value;
 				skip = 1/(60*Dt)*_skip;
 				document.getElementById("input_skip").value = value;
@@ -217,7 +217,7 @@ function initEvent(){
 			step: 0.1,
 			value: mass1,
 			slide: function(_event, ui){
-				var value = ui.value;
+				const value = ui.value;
                 document.getElementById("input_mass1").value = value;
 			}
     });
@@ -227,7 +227,7 @@ function initEvent(){
 			step: 0.1,
 			value: mass1,
 			slide: function(_event, ui){
-				var value = ui.value;
+				const value = ui.value;
                 document.getElementById("input_mass2").value = value;
 			}
     });
@@ -269,7 +269,7 @@ function initEvent(){
     */
 	//checkbox interface
 	$('#checkbox_contour').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				contourFlag = true;
 			}
 			else{
@@ -323,7 +323,7 @@ function threeStart(){
 
 ////////////////////////////////////////
 // create renderer, scene, canvasFrame 
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 function initThree(){
@@ -350,12 +350,12 @@ function initThree(){
 ////////////////////////////////////////
 // create camera, trackball
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		 near = 1,
 		 far = 10000;
@@ -393,7 +393,7 @@ function initCamera(){
 ////////////////////////////////////////
 // create light
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
 
 function initLight(){
@@ -420,18 +420,18 @@ function initLight(){
 // global variables
 
 //debug
-var axis;
+let axis;
 
 //particle1
-var sphere1;
+let sphere1;
 //particle2
-var sphere2;
+let sphere2;
 
-var line1;
-var line2;
+let line1;
+let line2;
 
-var contour1;
-var contour2;
+let contour1;
+let contour2;
 
 function initObject(){
 	//create axis object
@@ -457,15 +457,15 @@ function initObject(){
 }
 
 function createShperes() {
-    var geometry1 = new THREE.SphereGeometry(p1.radius, 20, 20);
-    var material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
+    const geometry1 = new THREE.SphereGeometry(p1.radius, 20, 20);
+    const material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
     sphere1.castShadow = true;
     objects.push(sphere1);
 
-    var geometry2 = new THREE.SphereGeometry(p2.radius, 20, 20);
-    var material2 = new THREE.MeshLambertMaterial({color: 0xff0000, ambient: 0xff0000 });
+    const geometry2 = new THREE.SphereGeometry(p2.radius, 20, 20);
+    const material2 = new THREE.MeshLambertMaterial({color: 0xff0000, ambient: 0xff0000 });
     sphere2 = new THREE.Mesh(geometry2, material2);
     scene.add(sphere2);
     sphere2.castShadow = true;
@@ -473,15 +473,15 @@ function createShperes() {
 }
 
 function createLines() {
-    var geometry_line1 = new THREE.Geometry();
+    const geometry_line1 = new THREE.Geometry();
     geometry_line1.vertices.push(new THREE.Vector3(0,0,0));
     geometry_line1.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
 
-    var geometry_line2 = new THREE.Geometry();
+    const geometry_line2 = new THREE.Geometry();
     geometry_line2.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
     geometry_line2.vertices.push(new THREE.Vector3(p2.x, p2.y,0));
 
-    var material_line = new THREE.LineBasicMaterial({color: 0x00ffff, linewidth: 2});
+    const material_line = new THREE.LineBasicMaterial({color: 0x00ffff, linewidth: 2});
 
     line1 = new THREE.Line(geometry_line1, material_line);
     line2 = new THREE.Line(geometry_line2, material_line);
@@ -490,17 +490,17 @@ function createLines() {
     scene.add(line2);
 }
 
-var contour1_vertices = [];
-var contour2_vertices = [];
+let contour1_vertices = [];
+let contour2_vertices = [];
 function createContour() {
-    var geometry_contour1 = new THREE.Geometry();
+    const geometry_contour1 = new THREE.Geometry();
     geometry_contour1.vertices = contour1_vertices;
 
-    var geometry_contour2 = new THREE.Geometry();
+    const geometry_contour2 = new THREE.Geometry();
     geometry_contour2.vertices = contour2_vertices;
 
-    var material_contour1 = new THREE.LineBasicMaterial({color: 0x99ff00, linewidth: 1});
-    var material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
+    const material_contour1 = new THREE.LineBasicMaterial({color: 0x99ff00, linewidth: 1});
+    const material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
 
     contour1 = new THREE.Line(geometry_contour1, material_contour1);
     contour2 = new THREE.Line(geometry_contour2, material_contour2);
@@ -543,7 +543,7 @@ function loop(){
     //update trackball object
     trackball.update();
 
-    if(resetFlag == true){
+    if(resetFlag === true){
         resetParameter();
     }
 
@@ -555,8 +555,8 @@ function loop(){
 
     //time development
     // 	var time = step * dt;
-    if(stopFlag == false){
-        for(var n=0; n<skip; n++){
+    if(stopFlag === false){
+        for(let n=0; n<skip; n++){
             //increment of step
             step++;
             time = Dt * step;
@@ -625,15 +625,15 @@ function resetParameter() {
 
 //////////////////////////////////////////////////////////////
 // mouse event
-var plane = new THREE.Plane();
+const plane = new THREE.Plane();
 
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
-var offset = new THREE.Vector3();
-var intersection = new THREE.Vector3();
+let raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const offset = new THREE.Vector3();
+const intersection = new THREE.Vector3();
 
-var mouseoveredObj;
-var draggedObj;
+let mouseoveredObj;
+let draggedObj;
 function mouseEvent() {
     renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
     renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -641,20 +641,20 @@ function mouseEvent() {
 }
 
 function onDocumentMouseDown(event) {
-    var rect = event.target.getBoundingClientRect();
-    var mx = event.clientX - rect.left;
-    var my = event.clientY - rect.top;
+    const rect = event.target.getBoundingClientRect();
+    let mx = event.clientX - rect.left;
+    let my = event.clientY - rect.top;
 
     mx = (mx / renderer.domElement.width) * 2 - 1;
     my = -(my /renderer.domElement.height) * 2 + 1;
 
-    var pos = new THREE.Vector3(mx, my, 1);
+    let pos = new THREE.Vector3(mx, my, 1);
 
     pos.unproject(camera);
     
     pos = pos.sub(camera.position).normalize();
     raycaster = new THREE.Raycaster( camera.position, pos );
-    var intersects = raycaster.intersectObjects(objects);
+    const intersects = raycaster.intersectObjects(objects);
 
 
     if (intersects.length > 0) {
@@ -671,14 +671,14 @@ function onDocumentMouseDown(event) {
 function onDocumentMouseMove(event) {
     event.preventDefault();
 
-    var rect = event.target.getBoundingClientRect();
-    var mx = event.clientX - rect.left;
-    var my = event.clientY - rect.top;
+    const rect = event.target.getBoundingClientRect();
+    let mx = event.clientX - rect.left;
+    let my = event.clientY - rect.top;
 
     mx = (mx / renderer.domElement.width) * 2 - 1;
     my = -(my /renderer.domElement.height) * 2 + 1;
 
-    var pos = new THREE.Vector3(mx, my, 1);
+    let pos = new THREE.Vector3(mx, my, 1);
 
     pos.unproject(camera);
     
@@ -695,18 +695,18 @@ function onDocumentMouseMove(event) {
             // オブジェクトをplaneに対して平行に移動させる
             draggedObj.position.copy(intersection.sub(offset));
             // オブジェクトの位置を粒子の位置に直す 
-            var x1 = sphere1.position.x;
-            var y1 = -sphere1.position.y;
-            var x2 = sphere2.position.x;
-            var y2 = -sphere2.position.y;
+            const x1 = sphere1.position.x;
+            const y1 = -sphere1.position.y;
+            const x2 = sphere2.position.x;
+            const y2 = -sphere2.position.y;
             l = Math.sqrt(x1*x1 + y1*y1);
             L = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-            var sign_theta0 = 1;
+            let sign_theta0 = 1;
             if(x1 < 0){
                 sign_theta0 = -1;
             }
             theta0 = sign_theta0 * Math.acos(y1/l);
-            var sign_phi0 = 1;
+            let sign_phi0 = 1;
             if(x2-x1 < 0){
                 sign_phi0 = -1;
             }
@@ -723,10 +723,10 @@ function onDocumentMouseMove(event) {
     }
     else {
         // オブジェクトをドラッグしないでマウスを動かしている場合
-        var intersects = raycaster.intersectObjects(objects);
+        const intersects = raycaster.intersectObjects(objects);
 
         if (intersects.length > 0) {
-            if (mouseoveredObj != intersects[0].object) {
+            if (mouseoveredObj !== intersects[0].object) {
                 // マウスオーバー中のオブジェクトを入れ替え
                 mouseoveredObj = intersects[0].object;
 

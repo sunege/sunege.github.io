@@ -4,62 +4,65 @@
 //                      //
 //////////////////////////
 //constant value
-var pi = Math.PI;
-var g = 9.80665; 
+// 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
+let L, l, mass2, phi0, radisu_ball, theta0;
+
+const pi = Math.PI;
+const g = 9.80665; 
 
 ////////////////////////////////////
 //time Parameter
-var time = 0;		// time
-var Dt = 0.0001; // Delta t
-var step = 0; //step count
-var _skip = 1; //slow mortion
-var skip = 1/(60*Dt)*_skip;
+let time = 0;		// time
+let Dt = 0.0001; // Delta t
+let step = 0; //step count
+let _skip = 1; //slow mortion
+let skip = 1/(60*Dt)*_skip;
 
 ////////////////////////////////////
 // system parameter
 // air resistance param
-var gamma = 0;
+const gamma = 0;
 // coefficient of restitution
-var e = 0.4;
+const e = 0.4;
 
 ////////////////////////////////////
 //Particle parameter
 //mass
-var mass_ball = 1.0;
+let mass_ball = 1.0;
 //draw radius
-var radius_ball = 0.0365;
-var x0 = 18.4;
-var y0 = 0;
-var z0 = 0.005;
-var v0_x = -40;
-var v0_y = 0;
-var v0_z = 0;
+const radius_ball = 0.0365;
+const x0 = 18.4;
+const y0 = 0;
+const z0 = 0.005;
+const v0_x = -40;
+const v0_y = 0;
+const v0_z = 0;
 
 
 ////////////////////////////////////
 // bat parameter
-var radius_bat = 0.033;
-var length_bat = 0.3;
-var angle_x = 0.0;
-var angle_y = 0.0;
-var angle_z = pi/12.0;
-var rotation_euler = new THREE.Euler(angle_x, angle_y, angle_z, 'XYZ');
-var center_line = new THREE.Vector3(0, length_bat, 0);
+const radius_bat = 0.033;
+const length_bat = 0.3;
+const angle_x = 0.0;
+const angle_y = 0.0;
+const angle_z = pi/12.0;
+const rotation_euler = new THREE.Euler(angle_x, angle_y, angle_z, 'XYZ');
+const center_line = new THREE.Vector3(0, length_bat, 0);
 center_line.applyEuler(rotation_euler);
 console.log(center_line);
 ////////////////////////////////////
 //flag parameter
-var resetFlag = false; // restert flag
-var stopFlag = true; // stop flag
-var contourFlag = true;
+let resetFlag = false; // restert flag
+let stopFlag = true; // stop flag
+let contourFlag = true;
 
 ////////////////////////////////////
 //objects array
-var objects = [];
+let objects = [];
 
 ////////////////////////////////////
 //particle class
-var ball;
+let ball;
 class Particle {
     constructor(radius, mass, x, y, z, v_x, v_y, v_z) {
         this.radius = radius;
@@ -83,8 +86,8 @@ Particle.prototype = {
 //velocity velret method
 function timeDevelopment() {
     collision();
-    if(ball.collisionFlag == true) {
-        var g = 9.8;
+    if(ball.collisionFlag === true) {
+        const g = 9.8;
         ball.v_z = ball.v_z - g * Dt;
     }
     ball.x = ball.v_x * Dt + ball.x;
@@ -94,24 +97,24 @@ function timeDevelopment() {
 
 //judge collision
 function collision() {
-    if(ball.collisionFlag == false){
-        var b1 = center_line;
+    if(ball.collisionFlag === false){
+        const b1 = center_line;
         // ball position vector
-        var c1 = new THREE.Vector3(ball.x, ball.y, ball.z);
+        const c1 = new THREE.Vector3(ball.x, ball.y, ball.z);
 
-        var k = b1.dot(c1);
+        let k = b1.dot(c1);
         k = k / b1.dot(b1);
         // normal direction vector
-        var normal = new THREE.Vector3().addVectors(c1, new THREE.Vector3(-k*b1.x, -k*b1.y, -k*b1.z));
-        var norm = Math.sqrt(normal.dot(normal));
+        const normal = new THREE.Vector3().addVectors(c1, new THREE.Vector3(-k*b1.x, -k*b1.y, -k*b1.z));
+        const norm = Math.sqrt(normal.dot(normal));
         if(norm <= radius_ball + radius_bat) {
             ball.collisionFlag = true;
             // normalize
             normal.multiplyScalar(1/norm);
             console.log(normal);
-            var v = new THREE.Vector3(ball.v_x, ball.v_y, ball.v_z);
-            var v_n = new THREE.Vector3(normal.x, normal.y, normal.z).multiplyScalar(v.dot(normal));
-            var v_t = new THREE.Vector3(v.x-v_n.x, v.y-v_n.y, v.z-v_n.z);
+            const v = new THREE.Vector3(ball.v_x, ball.v_y, ball.v_z);
+            const v_n = new THREE.Vector3(normal.x, normal.y, normal.z).multiplyScalar(v.dot(normal));
+            const v_t = new THREE.Vector3(v.x-v_n.x, v.y-v_n.y, v.z-v_n.z);
             v_n.multiplyScalar(-e);
             ball.v_x = v_n.x + v_t.x;
             ball.v_y = v_n.y + v_t.y;
@@ -151,7 +154,7 @@ function initEvent(){
 			step: 0.01,
 			value: _skip,
 			slide: function(_event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				_skip = value;
 				skip = 1/(60*Dt)*_skip;
 				document.getElementById("input_skip").value = value;
@@ -175,7 +178,7 @@ function initEvent(){
 			step: 0.1,
 			value: mass_ball,
 			slide: function(_event, ui){
-				var value = ui.value;
+				const value = ui.value;
                 document.getElementById("input_mass_ball").value = value;
 			}
     });
@@ -216,7 +219,7 @@ function initEvent(){
     */
 	//checkbox interface
 	$('#checkbox_contour').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				contourFlag = true;
 			}
 			else{
@@ -270,7 +273,7 @@ function threeStart(){
 
 ////////////////////////////////////////
 // create renderer, scene, canvasFrame 
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 function initThree(){
@@ -297,12 +300,12 @@ function initThree(){
 ////////////////////////////////////////
 // create camera, trackball
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		 near = 0.1,
 		 far = 1000;
@@ -340,7 +343,7 @@ function initCamera(){
 ////////////////////////////////////////
 // create light
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
 
 function initLight(){
@@ -367,19 +370,19 @@ function initLight(){
 // global variables
 
 //debug
-var axis;
+let axis;
 
 //particle1
-var sphere1;
+let sphere1;
 //particle2
 
 //bat
-var cylinder;
+let cylinder;
 
-var line1;
+let line1;
 
-var contour1;
-var contour2;
+let contour1;
+let contour2;
 
 function initObject(){
 	//create axis object
@@ -408,8 +411,8 @@ function initObject(){
 }
 
 function createShperes() {
-    var geometry1 = new THREE.SphereGeometry(ball.radius, 20, 20);
-    var material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
+    const geometry1 = new THREE.SphereGeometry(ball.radius, 20, 20);
+    const material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
     sphere1.castShadow = true;
@@ -418,18 +421,18 @@ function createShperes() {
 }
 
 function createCylinder() {
-    var geometry_bat = new THREE.CylinderGeometry(radius_bat, radius_bat, length_bat, 20, 5);
-    var material_bat = new THREE.MeshLambertMaterial({color: 0x226689, mabient: 0xff0000});
+    const geometry_bat = new THREE.CylinderGeometry(radius_bat, radius_bat, length_bat, 20, 5);
+    const material_bat = new THREE.MeshLambertMaterial({color: 0x226689, mabient: 0xff0000});
     cylinder = new THREE.Mesh(geometry_bat, material_bat);
     scene.add(cylinder);
 }
 
 function createLines() {
-    var geometry_line1 = new THREE.Geometry();
+    const geometry_line1 = new THREE.Geometry();
     geometry_line1.vertices.push(new THREE.Vector3(0,0,0));
     geometry_line1.vertices.push(new THREE.Vector3(ball.x, ball.y,ball.z));
 
-    var material_line = new THREE.LineBasicMaterial();
+    const material_line = new THREE.LineBasicMaterial();
 
 
     line1 = new THREE.Line(geometry_line1, material_line);
@@ -437,17 +440,17 @@ function createLines() {
     scene.add(line1);
 }
 
-var contour1_vertices = [];
-var contour2_vertices = [];
+let contour1_vertices = [];
+let contour2_vertices = [];
 function createContour() {
-    var geometry_contour1 = new THREE.Geometry();
+    const geometry_contour1 = new THREE.Geometry();
     geometry_contour1.vertices = contour1_vertices;
 
-    var geometry_contour2 = new THREE.Geometry();
+    const geometry_contour2 = new THREE.Geometry();
     geometry_contour2.vertices = contour2_vertices;
 
-    var material_contour1 = new THREE.LineBasicMaterial({color: 0xffff00, linewidth: 1});
-    var material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
+    const material_contour1 = new THREE.LineBasicMaterial({color: 0xffff00, linewidth: 1});
+    const material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
 
     contour1 = new THREE.Line(geometry_contour1, material_contour1);
     contour2 = new THREE.Line(geometry_contour2, material_contour2);
@@ -486,7 +489,7 @@ function loop(){
     //update trackball object
     trackball.update();
 
-    if(resetFlag == true){
+    if(resetFlag === true){
         resetParameter();
     }
 
@@ -498,8 +501,8 @@ function loop(){
 
     //time development
     // 	var time = step * dt;
-    if(stopFlag == false){
-        for(var n=0; n<skip; n++){
+    if(stopFlag === false){
+        for(let n=0; n<skip; n++){
             //increment of step
             step++;
             time = Dt * step;
@@ -566,15 +569,15 @@ function resetParameter() {
 
 //////////////////////////////////////////////////////////////
 // mouse event
-var plane = new THREE.Plane();
+const plane = new THREE.Plane();
 
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
-var offset = new THREE.Vector3();
-var intersection = new THREE.Vector3();
+let raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const offset = new THREE.Vector3();
+const intersection = new THREE.Vector3();
 
-var mouseoveredObj;
-var draggedObj;
+let mouseoveredObj;
+let draggedObj;
 function mouseEvent() {
     renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
     renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -582,20 +585,20 @@ function mouseEvent() {
 }
 
 function onDocumentMouseDown(event) {
-    var rect = event.target.getBoundingClientRect();
-    var mx = event.clientX - rect.left;
-    var my = event.clientY - rect.top;
+    const rect = event.target.getBoundingClientRect();
+    let mx = event.clientX - rect.left;
+    let my = event.clientY - rect.top;
 
     mx = (mx / renderer.domElement.width) * 2 - 1;
     my = -(my /renderer.domElement.height) * 2 + 1;
 
-    var pos = new THREE.Vector3(mx, my, 1);
+    let pos = new THREE.Vector3(mx, my, 1);
 
     pos.unproject(camera);
     
     pos = pos.sub(camera.position).normalize();
     raycaster = new THREE.Raycaster( camera.position, pos );
-    var intersects = raycaster.intersectObjects(objects);
+    const intersects = raycaster.intersectObjects(objects);
 
 
     if (intersects.length > 0) {
@@ -612,14 +615,14 @@ function onDocumentMouseDown(event) {
 function onDocumentMouseMove(event) {
     event.preventDefault();
 
-    var rect = event.target.getBoundingClientRect();
-    var mx = event.clientX - rect.left;
-    var my = event.clientY - rect.top;
+    const rect = event.target.getBoundingClientRect();
+    let mx = event.clientX - rect.left;
+    let my = event.clientY - rect.top;
 
     mx = (mx / renderer.domElement.width) * 2 - 1;
     my = -(my /renderer.domElement.height) * 2 + 1;
 
-    var pos = new THREE.Vector3(mx, my, 1);
+    let pos = new THREE.Vector3(mx, my, 1);
 
     pos.unproject(camera);
     
@@ -636,16 +639,16 @@ function onDocumentMouseMove(event) {
             // オブジェクトをplaneに対して平行に移動させる
             draggedObj.position.copy(intersection.sub(offset));
             // オブジェクトの位置を粒子の位置に直す 
-            var x1 = sphere1.position.x;
-            var y1 = -sphere1.position.y;
+            const x1 = sphere1.position.x;
+            const y1 = -sphere1.position.y;
             l = Math.sqrt(x1*x1 + y1*y1);
             L = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-            var sign_theta0 = 1;
+            let sign_theta0 = 1;
             if(x1 < 0){
                 sign_theta0 = -1;
             }
             theta0 = sign_theta0 * Math.acos(y1/l);
-            var sign_phi0 = 1;
+            let sign_phi0 = 1;
             if(x2-x1 < 0){
                 sign_phi0 = -1;
             }
@@ -658,10 +661,10 @@ function onDocumentMouseMove(event) {
     }
     else {
         // オブジェクトをドラッグしないでマウスを動かしている場合
-        var intersects = raycaster.intersectObjects(objects);
+        const intersects = raycaster.intersectObjects(objects);
 
         if (intersects.length > 0) {
-            if (mouseoveredObj != intersects[0].object) {
+            if (mouseoveredObj !== intersects[0].object) {
                 // マウスオーバー中のオブジェクトを入れ替え
                 mouseoveredObj = intersects[0].object;
 

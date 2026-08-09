@@ -5,37 +5,38 @@
 ////////////////////
 
 //System Parameter
-var N = 14;
-var RADIUS = 5;
-var L = 2 * Math.sqrt(2) * RADIUS;
+// 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
+let wall2, wall3, wall4, wall5, wall6;
+
+let N = 14;
+let RADIUS = 5;
+const L = 2 * Math.sqrt(2) * RADIUS;
 
 
-var restartFlag = false;
+let restartFlag = false;
 //particle class
-var Particle = function(parameter){
-    //index
-    this.index = parameter.index;
-    //radius
-    this.radius = parameter.radius;
-
-    //position
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-};
-
-Particle.prototype = {
-    constructor: Particle
-};
+class Particle {
+	constructor(parameter){
+	    //index
+	    this.index = parameter.index;
+	    //radius
+	    this.radius = parameter.radius;
+	
+	    //position
+	    this.x = 0;
+	    this.y = 0;
+	    this.z = 0;
+	}
+}
 
 //particle object
-var p = [];
+const p = [];
 
 ////////////////////////////////////////
 // define window event 
 ////////////////////////////////////////
 window.addEventListener("load", function(){
-        for(var i=0; i<N; i++){
+        for(let i=0; i<N; i++){
             p[i] = new Particle({index: i, radius: RADIUS});
             p[i].x = 0;
             p[i].y = 0;
@@ -115,7 +116,7 @@ function initEvent(){
             step: 0.01,
             value: RADIUS,
             slide: function(event, ui){
-                var value = ui.value;
+                const value = ui.value;
                 document.getElementById("input_radius").value = value;
             }
     });
@@ -125,7 +126,7 @@ function initEvent(){
             step: 1,
             value: N,
             slide: function(event, ui){
-                var value = ui.value;
+                const value = ui.value;
                 document.getElementById("input_N").value = value;
             }
     });
@@ -153,7 +154,7 @@ function threeStart(){
 /*  init Three functions  */
 
 //global variables
-var renderer, // renderer object
+let renderer, // renderer object
     scene, // scene object
     canvasFrame; //DOM element
 
@@ -185,12 +186,12 @@ function initThree(){
 // define initCamera()
 ////////////////////////////////////////
 //global variables
-var camera, // camera object
+let camera, // camera object
     trackball; // trackball object
 
 function initCamera(){
     //create camera object
-    var fov = 45,
+    const fov = 45,
         aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
         near = 1,
         far = 10000;
@@ -229,7 +230,7 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
     ambientLight; // ambientlighLight object
 
 function initLight(){
@@ -255,11 +256,12 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var axis;
-var sphere=[]; //sphere object
-var wall1;
+let axis;
+let sphere=[]; //sphere object
+let wall1;
 
 function initObject(){
+    let geometry, material;
     //create axis object
     axis = new THREE.AxisHelper(100);
     //add axis object to scene
@@ -268,10 +270,10 @@ function initObject(){
     axis.position.set(0, 0, 0);
 
     sphere = [];
-    for(var i=0; i<N; i++){
+    for(let i=0; i<N; i++){
         //create geometry
-        var geometry = new THREE.SphereGeometry(p[i].radius, 40, 40);
-        var material = new THREE.MeshLambertMaterial({color: 0xffffff, ambient: 0xffffff });
+        geometry = new THREE.SphereGeometry(p[i].radius, 40, 40);
+        material = new THREE.MeshLambertMaterial({color: 0xffffff, ambient: 0xffffff });
 
 
 
@@ -284,14 +286,14 @@ function initObject(){
         sphere[i].castShadow = true;
     }
 
-    var v1 = { x: 0, y: 0, z:0 };
-    var v2 = { x: 0, y: L, z:0 };
-    var v3 = { x: 0, y: L, z:L };
-    var v4 = { x: 0, y: 0, z:L };
-    var v5 = { x: L, y: 0, z:0 };
-    var v6 = { x: L, y: L, z:0 };
-    var v7 = { x: L, y: L, z:L };
-    var v8 = { x: L, y: 0, z:L };
+    const v1 = { x: 0, y: 0, z:0 };
+    const v2 = { x: 0, y: L, z:0 };
+    const v3 = { x: 0, y: L, z:L };
+    const v4 = { x: 0, y: 0, z:L };
+    const v5 = { x: L, y: 0, z:0 };
+    const v6 = { x: L, y: L, z:0 };
+    const v7 = { x: L, y: L, z:L };
+    const v8 = { x: L, y: 0, z:L };
     //far
     wall1 = wall(v1, v2, v3, v4);
     scene.add(wall1);
@@ -320,23 +322,23 @@ function initObject(){
 
     geometry = new THREE.BoxGeometry(L,L,L);
     material = new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true});
-    var box = new THREE.Mesh(geometry, material);
+    const box = new THREE.Mesh(geometry, material);
     scene.add(box);
     box.position.set(L/2, L/2, L/2);
 
 }
 
 function wall(v1, v2, v3, v4){
-    var vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
-    var vertex2 = new THREE.Vector3(v2.x, v2.y, v2.z);
-    var vertex3 = new THREE.Vector3(v3.x, v3.y, v3.z);
-    var vertex4 = new THREE.Vector3(v4.x, v4.y, v4.z);
-    var geometry = new THREE.Geometry();
+    const vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
+    const vertex2 = new THREE.Vector3(v2.x, v2.y, v2.z);
+    const vertex3 = new THREE.Vector3(v3.x, v3.y, v3.z);
+    const vertex4 = new THREE.Vector3(v4.x, v4.y, v4.z);
+    const geometry = new THREE.Geometry();
     geometry.vertices.push(vertex1);
     geometry.vertices.push(vertex2);
     geometry.vertices.push(vertex3);
     geometry.vertices.push(vertex4);
-    var face = new THREE.Face3(0, 1, 2);
+    let face = new THREE.Face3(0, 1, 2);
     geometry.faces.push(face);
     face = new THREE.Face3(0, 2, 3);
     geometry.faces.push(face);
@@ -346,7 +348,7 @@ function wall(v1, v2, v3, v4){
     geometry.computeVertexNormals();
 
     //create material
-    var material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
+    const material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
     //create sphere object
     return new THREE.Mesh(geometry, material);
 }
@@ -363,16 +365,16 @@ function loop(){
     // 	sphere.position.set(ball.x, ball.y, ball.z);
 
 
-    if(restartFlag == true){
+    if(restartFlag === true){
         //remove sphere
-        for(var i=0; i<N; i++)
+        for(let i=0; i<N; i++)
             scene.remove(sphere[i]);
 
         //init time param
         RADIUS = parseFloat(document.getElementById("input_radius").value);
         N = parseFloat(document.getElementById("input_N").value);
         //init particle and calculation class
-        for(var i=0; i<N; i++){
+        for(let i=0; i<N; i++){
             p[i] = new Particle({index: i, radius: RADIUS});
         }
         initObject();

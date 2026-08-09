@@ -1,6 +1,9 @@
 ////////////////////////////////////////
 // define window event 
 ////////////////////////////////////////
+// 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
+let line1, line2;
+
 window.addEventListener("load", function(){
 		initThree();
 		initEvent();
@@ -14,18 +17,18 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 // define initEvent()
 ////////////////////////////////////////
-var stopFlag = true;
-var restartFlag = false;
+let stopFlag = true;
+let restartFlag = false;
 
-var line1Flag = false;
-var line2Flag = false;
+let line1Flag = false;
+let line2Flag = false;
 
-var DirichletFlag = false;
-var NeumannFlag = false;
-var nonreflectiveFlag = true;
+let DirichletFlag = false;
+let NeumannFlag = false;
+let nonreflectiveFlag = true;
 
-var pngData;
-var pngName;
+let pngData;
+let pngName;
 function initEvent(){
 
 	mouseEvent();
@@ -51,7 +54,7 @@ function initEvent(){
 
 	//checkbox
 	$('#checkbox_line1').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				line1Flag = true;
 			}
 			else{
@@ -59,7 +62,7 @@ function initEvent(){
 			}
 	});
 	$('#checkbox_line2').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				line2Flag = true;
 			}
 			else{
@@ -74,7 +77,7 @@ function initEvent(){
 			step: 0.01,
 			value: alpha,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				alpha = value;
 				document.getElementById("input_alpha").value = value;
 			}
@@ -87,7 +90,7 @@ function initEvent(){
 			step: 1,
 			value: amp,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				amp = value;
 				document.getElementById("input_amp").value = value;
 			}
@@ -100,7 +103,7 @@ function initEvent(){
 			step: 1,
 			value: sigma,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				sigma = value;
 				document.getElementById("input_sigma").value = value;
 			}
@@ -137,7 +140,7 @@ function initEvent(){
 			step: 1,
 			value: vel,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_vel").value = value;
 			}
 	});
@@ -147,29 +150,29 @@ function initEvent(){
 function mouseEvent(){
 	canvasFrame.addEventListener('mousedown', onDocumentMouseDown, false );
 	function onDocumentMouseDown( event ){
-		var rect = event.target.getBoundingClientRect();
-		var mx = event.clientX - rect.left;
-		var my = event.clientY - rect.top;
+		const rect = event.target.getBoundingClientRect();
+		let mx = event.clientX - rect.left;
+		let my = event.clientY - rect.top;
 
 		mx = (mx / renderer.domElement.width) * 2 - 1;
 		my = -(my /renderer.domElement.height) * 2 + 1;
 
 // 		var mx = (event.clientX / canvasFrame.clientWidth) * 2 - 1;
 // 		var my = -(event.clientY / canvasFrame.clientHeight) * 2 + 1;
-		var pos = new THREE.Vector3(mx, my, 1);
+		let pos = new THREE.Vector3(mx, my, 1);
 
 		pos.unproject(camera);
 		
 		pos = pos.sub(camera.position).normalize();
-		var ray = new THREE.Raycaster( camera.position, pos );
-		var objs = ray.intersectObjects(targetLists);
+		const ray = new THREE.Raycaster( camera.position, pos );
+		const objs = ray.intersectObjects(targetLists);
 
 		if(objs.length > 0){
-			for(var n = 0; n < 3; n++){
-				for(var i=0; i <= N; i++){
-					for(var j=0; j<=N; j++){
-						var x = (-N/2 + i) * l;
-						var y = (-N/2 + j) * l;
+			for(let n = 0; n < 3; n++){
+				for(let i=0; i <= N; i++){
+					for(let j=0; j<=N; j++){
+						const x = (-N/2 + i) * l;
+						const y = (-N/2 + j) * l;
 						u[n][i][j] += gaussian(x,y,objs[0].point.x,objs[0].point.y,amp,sigma);
 					}
 				}
@@ -188,7 +191,7 @@ function threeStart(){
 /*  init Three functions  */
 
 //global variables
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 
@@ -220,12 +223,12 @@ function initThree(){
 // define initCamera()
 ////////////////////////////////////////
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		 near = 1,
 		 far = 10000;
@@ -264,7 +267,7 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 // 	 splotLight,
 // 	 lighthelper,
 	 ambientLight; // ambientlighLight object
@@ -303,11 +306,11 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var axis; //axis object
+let axis; //axis object
 
-var lattice; //lattice object
+let lattice; //lattice object
 //number of object
-var N = 80;
+const N = 80;
 
 //var sphere1;
 //var sphere2;
@@ -318,26 +321,26 @@ var N = 80;
 
 /* Wave format */
 //edge length
-var l = 1;
-var Step = 200;
+const l = 1;
+const Step = 200;
 
 //discreat param
-var dx = 0.1;
-var dt = 0.001;
+const dx = 0.1;
+const dt = 0.001;
 
 //time param
-var Time; //period 
-var time = 0;
-var skip = 3;
+let Time; //period 
+let time = 0;
+const skip = 3;
 
 //wave param
 //var lambda = 1.0; //wave length
 //var _lambda = lambda*(l/dx);
 //var Amp = 11; //ampritude
 //var phi = 0; //phase of source2
-var vel = 15;
-var amp = 4;
-var sigma = 3;
+let vel = 15;
+let amp = 4;
+let sigma = 3;
 //var space = 20;
 //var x1 = space/2; //position of source1
 //var x2 = -space/2; //position of source2
@@ -345,29 +348,29 @@ var sigma = 3;
 // var rho = 0.0007;
 
 //rendering speed
-var Slow = 0;
+const Slow = 0;
 
 //wave
-var u;
+let u;
 
 //wave opacity
-var alpha = 1;
+let alpha = 1;
 
 //click object lists
-var targetLists = new Array();
+const targetLists = new Array();
 
 //init param
 function initWave(){
-	var x0 = -20;
-	var y0 = -20;
+	const x0 = -20;
+	const y0 = -20;
 	//Time = lambda / vel;
-	var nt = 3;
+	const nt = 3;
 	u = new Array(nt);
-	for(var n = 0; n < nt; n++){
+	for(let n = 0; n < nt; n++){
 		u[n] = new Array(N + 1);
-		for(var i=0; i <= N; i++){
+		for(let i=0; i <= N; i++){
 			u[n][i] = new Array(N + 1);
-			for(var j=0; j<=N; j++){
+			for(let j=0; j<=N; j++){
 				u[n][i][j] = 0;
 			}
 		}
@@ -388,7 +391,7 @@ function initWave(){
 
 //gaussian distribution
 function gaussian(x,y,x0,y0,amp,sigma){
-	var f = amp * Math.exp(-(x-x0)*(x-x0)/(2*sigma*sigma)) * Math.exp(-(y-y0)*(y-y0)/(2*sigma*sigma))
+	const f = amp * Math.exp(-(x-x0)*(x-x0)/(2*sigma*sigma)) * Math.exp(-(y-y0)*(y-y0)/(2*sigma*sigma))
 	return f;
 }
 
@@ -400,9 +403,9 @@ function calculate(){
 	
 
 	//calculate vartex
-	var gamma2 = Math.pow(vel*dt/dx, 2);
-	for(var i=1; i <= N-1; i++){
-		for(var j=1; j <= N-1; j++){
+	const gamma2 = Math.pow(vel*dt/dx, 2);
+	for(let i=1; i <= N-1; i++){
+		for(let j=1; j <= N-1; j++){
 // 			if(i==2 || j==2){
 				u[2][i][j] = 2*(1-2*gamma2)*u[1][i][j] - u[0][i][j] + gamma2*(u[1][i+1][j]+u[1][i-1][j]+u[1][i][j+1]+u[1][i][j-1]);
 // 			}
@@ -412,14 +415,14 @@ function calculate(){
 		}
 	}
 	//Dirichlet condition
-	if(DirichletFlag == true){
-		for (var i = 0; i <= N; i++) {
+	if(DirichletFlag === true){
+		for (let i = 0; i <= N; i++) {
 			u[2][i][0] = u[2][i][N] = u[2][0][i] = u[2][N][i] = 0.0;
 		}
 	}
 	//Neumann
-	else if(NeumannFlag == true){
-		for (var i = 1; i <= N - 1; i++) {
+	else if(NeumannFlag === true){
+		for (let i = 1; i <= N - 1; i++) {
 			u[2][i][0] = u[2][i][1];
 			u[2][i][N] = u[2][i][N - 1];
 			u[2][0][i] = u[2][1][i];
@@ -427,8 +430,8 @@ function calculate(){
 		}
 	}
 	//nonreflective
-	else if(nonreflectiveFlag == true){
-		for (var i = 1; i <= N - 1; i++) {
+	else if(nonreflectiveFlag === true){
+		for (let i = 1; i <= N - 1; i++) {
 			u[2][i][0] = u[2][i][0]+vel*(dt/dx)*(u[1][i][1] - u[1][i][0]);
 			u[2][i][N] = u[2][i][N]+vel*(dt/dx)*(u[1][i][N-1] - u[1][i][N]);
 			u[2][0][i] = u[2][0][i]+vel*(dt/dx)*(u[1][1][i] - u[1][0][i]);
@@ -470,8 +473,8 @@ function calculate(){
 	u[2][0][N] = (u[2][0][N - 1] + u[2][1][N]) / 2;
 	u[2][N][0] = (u[2][N - 1][0] + u[2][N][1]) / 2;
 	u[2][N][N] = (u[2][N - 1][N] + u[2][N][N - 1]) / 2;
-	for (var i = 0; i <= N; i++) {
-		for (var j = 0; j <= N; j++) {
+	for (let i = 0; i <= N; i++) {
+		for (let j = 0; j <= N; j++) {
 			u[0][i][j] = u[1][i][j];
 			u[1][i][j] = u[2][i][j];
 		}
@@ -480,6 +483,7 @@ function calculate(){
 }
 
 function initObject(){
+	let x, y;
 	//initWave
 	initWave();
 
@@ -487,21 +491,21 @@ function initObject(){
 	calculate();
 
 	//object create
-	var geometry = new THREE.Geometry();
-	var n=0;
-	for(var j=0; j <= N; j++){
-		for(var i=0; i <= N; i++){
-			var x = (-N/2 + i) * l;
-			var y = (-N/2 + j) * l;
-			var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+	let geometry = new THREE.Geometry();
+	let n=0;
+	for(let j=0; j <= N; j++){
+		for(let i=0; i <= N; i++){
+			x = (-N/2 + i) * l;
+			y = (-N/2 + j) * l;
+			const vertex = new THREE.Vector3(x, y, u[1][i][j]);
 			//add vertex
 			geometry.vertices[n] = vertex;
 			n++;
 		}
 	}
-	for(var j=0; j < N; j++){
-		for(var i=0; i < N; i++){
-			var face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
+	for(let j=0; j < N; j++){
+		for(let i=0; i < N; i++){
+			let face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
 			geometry.faces.push(face);
 			face = new THREE.Face3( (N+1)*j+i, (N+1)*(j+1)+i+1, (N+1)*(j+1)+i );
 			geometry.faces.push(face);
@@ -513,7 +517,7 @@ function initObject(){
 	geometry.computeVertexNormals();
 
 	//create material
-	var material = new THREE.MeshPhongMaterial({ color: 0xBFFFFF, ambient: 0x000050,
+	let material = new THREE.MeshPhongMaterial({ color: 0xBFFFFF, ambient: 0x000050,
 			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250,
 			transparent:true, opacity: alpha});
 
@@ -544,20 +548,20 @@ function initObject(){
 	//DrawLine();
 
 	/*  floar drow  */
-	var yuka_n = 10,
+	const yuka_n = 10,
 		 yuka_w = N*l/10;
-	for(var i=-yuka_n/2; i<=yuka_n/2; i++){
-		for(var j=-yuka_n/2; j<=yuka_n/2; j++){
+	for(let i=-yuka_n/2; i<=yuka_n/2; i++){
+		for(let j=-yuka_n/2; j<=yuka_n/2; j++){
 			//position
-			var x = j*yuka_w;
-			var y = i*yuka_w;
+			x = j*yuka_w;
+			y = i*yuka_w;
 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
-			if(Math.abs(i+j) % 2 == 0){
+			if(Math.abs(i+j) % 2 === 0){
 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
 			}else{
 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
 			}
-			var plane = new THREE.Mesh(geometry, material);
+			const plane = new THREE.Mesh(geometry, material);
 			plane.position.set(x, y, -20);
 			plane.receiveShadow = true;
 			scene.add(plane);
@@ -569,66 +573,67 @@ function initObject(){
 // DrawLine
 ///////////////////
 function DrawLine(){
-	var z_line = 1; //line position z
-	var m1 = 0;
-	var flag1 = false;
-	for(var i=0; m1*lambda/2 <= (dx/l)*space/2; i+=dx){
+	let a2, c2, line1Geometry, line2Geometry, vertex, x, y;
+	const z_line = 1; //line position z
+	let m1 = 0;
+	let flag1 = false;
+	for(let i=0; m1*lambda/2 <= (dx/l)*space/2; i+=dx){
 		m1++;
-		if(m1*lambda/2 == (dx/l)*space/2)
+		if(m1*lambda/2 === (dx/l)*space/2)
 			flag1 = true;
 
 	}
 	line1 = new Array(2*m1-1)
-	var num = 0;
+	let num = 0;
 
-	var line1Material = new THREE.LineBasicMaterial({ color: 0xFF0000, linewidth: 4 });
-	for(var n=0; n<m1; n++){
-		var line1Geometry = new THREE.Geometry();
-		var a2 = Math.pow(n*(l/dx)*lambda/2, 2);
-		var c2 = Math.pow(space/2, 2);
+	const line1Material = new THREE.LineBasicMaterial({ color: 0xFF0000, linewidth: 4 });
+	for(let n=0; n<m1; n++){
+		line1Geometry = new THREE.Geometry();
+		a2 = Math.pow(n*(l/dx)*lambda/2, 2);
+		c2 = Math.pow(space/2, 2);
 
-		if(flag1 == true  && n == m1-1){
-			var vertex = new THREE.Vector3(space/2, 0, z_line);
+		if(flag1 === true  && n === m1-1){
+			vertex = new THREE.Vector3(space/2, 0, z_line);
 			line1Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(N/2, 0, z_line);
+			vertex = new THREE.Vector3(N/2, 0, z_line);
 			line1Geometry.vertices.push(vertex);
 			line1[num] = new THREE.Line(line1Geometry, line1Material);
 			scene.add(line1[num]);
 			num++;
-			var line1Geometry = new THREE.Geometry();
-			var vertex = new THREE.Vector3(-space/2, 0, z_line);
+			line1Geometry = new THREE.Geometry();
+			vertex = new THREE.Vector3(-space/2, 0, z_line);
 			line1Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(-N/2, 0, z_line);
+			vertex = new THREE.Vector3(-N/2, 0, z_line);
 			line1Geometry.vertices.push(vertex);
 			line1[num] = new THREE.Line(line1Geometry, line1Material);
 			scene.add(line1[num]);
 			num++;
 		}
-		for(var j=0; j<=N; j++){
-			var y = (-N/2 + j) * l;
-			if(n==0){
-				var x = 0;
+		for(let j=0; j<=N; j++){
+			y = (-N/2 + j) * l;
+			if(n===0){
+				x = 0;
 			}
 			else{
-				var x = Math.sqrt(a2*(1+y*y/(c2-a2)));
+				x = Math.sqrt(a2*(1+y*y/(c2-a2)));
 			}
-			var vertex = new THREE.Vector3(x, y, z_line);
+			vertex = new THREE.Vector3(x, y, z_line);
 			line1Geometry.vertices.push(vertex);
 		}
 		line1[num] = new THREE.Line(line1Geometry, line1Material);
 		scene.add(line1[num]);
 		num++;
-		if(n != 0){
-			var line1Geometry = new THREE.Geometry();
-			for(var j=0; j<=N; j++){
-				var y = (-N/2 + j) * l;
-				if(n==0){
-					var x = 0;
+		if(n !== 0){
+			line1Geometry = new THREE.Geometry();
+			for(let j=0; j<=N; j++){
+				y = (-N/2 + j) * l;
+				if(n===0){
+					x = 0;
 				}
 				else{
-					var x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
+					x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
 				}
-				var vertex = new THREE.Vector3(x, y, z_line);
+				vertex = new THREE.Vector3(x, y, z_line);
 				line1Geometry.vertices.push(vertex);
 			}
 			line1[num] = new THREE.Line(line1Geometry, line1Material);
@@ -637,53 +642,53 @@ function DrawLine(){
 		}
 	}
 
-	var m2 = 0;
-	var flag2 = false;
-	for(var i=0; (m2+1/2)*lambda/2 <= (dx/l)*space/2; i+=dx){
+	let m2 = 0;
+	let flag2 = false;
+	for(let i=0; (m2+1/2)*lambda/2 <= (dx/l)*space/2; i+=dx){
 		m2++;
-		if((m2+1/2)*lambda/2 == (dx/l)*space/2)
+		if((m2+1/2)*lambda/2 === (dx/l)*space/2)
 			flag2 = true;
 	}
 	line2 = new Array(2*m2);
 	num = 0;
 
-	var line2Material = new THREE.LineBasicMaterial({ color: 0x0000FF, linewidth:4 });
-	for(var n=0; n<m2; n++){
-		var line2Geometry = new THREE.Geometry();
-		var a2 = Math.pow((n+1/2)*(l/dx)*lambda/2, 2);
-		var c2 = Math.pow(space/2, 2);
+	const line2Material = new THREE.LineBasicMaterial({ color: 0x0000FF, linewidth:4 });
+	for(let n=0; n<m2; n++){
+		line2Geometry = new THREE.Geometry();
+		a2 = Math.pow((n+1/2)*(l/dx)*lambda/2, 2);
+		c2 = Math.pow(space/2, 2);
 
-		if(flag2 == true  && n == m2-1){
-			var vertex = new THREE.Vector3(space/2, 0, z_line);
+		if(flag2 === true  && n === m2-1){
+			vertex = new THREE.Vector3(space/2, 0, z_line);
 			line2Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(N/2, 0, z_line);
+			vertex = new THREE.Vector3(N/2, 0, z_line);
 			line2Geometry.vertices.push(vertex);
 			line2[num] = new THREE.Line(line2Geometry, line2Material);
 			scene.add(line2[num]);
 			num++;
-			var line2Geometry = new THREE.Geometry();
-			var vertex = new THREE.Vector3(-space/2, 0, z_line);
+			line2Geometry = new THREE.Geometry();
+			vertex = new THREE.Vector3(-space/2, 0, z_line);
 			line2Geometry.vertices.push(vertex);
-			var vertex = new THREE.Vector3(-N/2, 0, z_line);
+			vertex = new THREE.Vector3(-N/2, 0, z_line);
 			line2Geometry.vertices.push(vertex);
 			line2[num] = new THREE.Line(line2Geometry, line2Material);
 			scene.add(line2[num]);
 			num++;
 		}
-		for(var j=0; j<=N; j++){
-			var y = (-N/2 + j) * l;
-			var x = Math.sqrt(a2*(1+y*y/(c2-a2)));
-			var vertex = new THREE.Vector3(x, y, z_line);
+		for(let j=0; j<=N; j++){
+			y = (-N/2 + j) * l;
+			x = Math.sqrt(a2*(1+y*y/(c2-a2)));
+			vertex = new THREE.Vector3(x, y, z_line);
 			line2Geometry.vertices.push(vertex);
 		}
 		line2[num] = new THREE.Line(line2Geometry, line2Material);
 		scene.add(line2[num]);
 		num++;
-		var line2Geometry = new THREE.Geometry();
-		for(var j=0; j<=N; j++){
-			var y = (-N/2 + j) * l;
-			var x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
-			var vertex = new THREE.Vector3(x, y, z_line);
+		line2Geometry = new THREE.Geometry();
+		for(let j=0; j<=N; j++){
+			y = (-N/2 + j) * l;
+			x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
+			vertex = new THREE.Vector3(x, y, z_line);
 			line2Geometry.vertices.push(vertex);
 		}
 		line2[num] = new THREE.Line(line2Geometry, line2Material);
@@ -695,12 +700,13 @@ function DrawLine(){
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
-var step = 0;
-var slow = 0;
+let step = 0;
+let slow = 0;
 function loop(){
+	let n, vertex, x, y;
 	//update trackball object
 	trackball.update();
-	if(restartFlag == true){
+	if(restartFlag === true){
 		time = 0;
 		//Amp = parseFloat(document.getElementById("input_Amp").value);
 		//_lambda = parseFloat(document.getElementById("input_lambda").value);
@@ -713,19 +719,19 @@ function loop(){
 			//else if(phaseList[i].checked && phaseList[i].value == "r")
 				//phi = Math.PI;
 		//}
-		var boundList =document.getElementsByName("bound"); 
-		for(var i=0; i< boundList.length; i++){
-			if(boundList[i].checked && boundList[i].value == "Dir"){
+		const boundList =document.getElementsByName("bound"); 
+		for(let i=0; i< boundList.length; i++){
+			if(boundList[i].checked && boundList[i].value === "Dir"){
 				DirichletFlag = true;
 				NeumannFlag = false;
 				nonreflectiveFlag = false;
 			}
-			else if(boundList[i].checked && boundList[i].value == "Neu"){
+			else if(boundList[i].checked && boundList[i].value === "Neu"){
 				DirichletFlag = false;
 				NeumannFlag = true;
 				nonreflectiveFlag = false;
 			}
-			else if(boundList[i].checked && boundList[i].value == "Non"){
+			else if(boundList[i].checked && boundList[i].value === "Non"){
 				DirichletFlag = false;
 				NeumannFlag = false;
 				nonreflectiveFlag = true;
@@ -751,23 +757,23 @@ function loop(){
 		step = 0;
 	}
 
-	if(stopFlag == false){
+	if(stopFlag === false){
 
 		if(slow < Slow){
 			slow++;
 		}
 		else{
-			for(var i=0; i<skip; i++){
+			for(let i=0; i<skip; i++){
 				calculate();
 				step++;
 			}
 
-			var n = 0;
-			for(var j=0; j<=N; j++){
-				for(var i=0; i<=N; i++){
-					var x = (-N/2 + i) * l;
-					var y = (-N/2 + j) * l;
-					var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+			n = 0;
+			for(let j=0; j<=N; j++){
+				for(let i=0; i<=N; i++){
+					x = (-N/2 + i) * l;
+					y = (-N/2 + j) * l;
+					vertex = new THREE.Vector3(x, y, u[1][i][j]);
 					lattice.geometry.vertices[n] = vertex;
 					n++;
 				}
@@ -783,12 +789,12 @@ function loop(){
 		}
 	}
 	else{
-		var n = 0;
-		for(var j=0; j<=N; j++){
-			for(var i=0; i<=N; i++){
-				var x = (-N/2 + i) * l;
-				var y = (-N/2 + j) * l;
-				var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+		n = 0;
+		for(let j=0; j<=N; j++){
+			for(let i=0; i<=N; i++){
+				x = (-N/2 + i) * l;
+				y = (-N/2 + j) * l;
+				vertex = new THREE.Vector3(x, y, u[1][i][j]);
 				lattice.geometry.vertices[n] = vertex;
 				n++;
 			}

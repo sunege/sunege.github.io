@@ -10,13 +10,13 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 // define initEvent()
 ////////////////////////////////////////
-var stopFlag = true;
-var resetFlag = false;
-var wave1Flag = true;
-var wave2Flag = false;
-var wave3Flag = false;
-var pngData;
-var pngName;
+let stopFlag = true;
+let resetFlag = false;
+let wave1Flag = true;
+let wave2Flag = false;
+let wave3Flag = false;
+let pngData;
+let pngName;
 function initEvent(){
 	document.getElementById("startButton").addEventListener("click", function(){
 			if(stopFlag){
@@ -39,7 +39,7 @@ function initEvent(){
 
 	//checkbox
 	$('#checkbox_wave1').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				wave1Flag = true;
 			}
 			else{
@@ -47,7 +47,7 @@ function initEvent(){
 			}
 	});
 	$('#checkbox_wave2').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				wave2Flag = true;
 			}
 			else{
@@ -55,7 +55,7 @@ function initEvent(){
 			}
 	});
 	$('#checkbox_wave3').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				wave3Flag = true;
 			}
 			else{
@@ -70,7 +70,7 @@ function initEvent(){
 			step: 2,
 			value: direction1,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				direction1 = value;
 			}
 	});
@@ -80,7 +80,7 @@ function initEvent(){
 			step: 2,
 			value: direction2,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				direction2 = value;
 			}
 	});
@@ -90,7 +90,7 @@ function initEvent(){
 			step: 0.1,
 			value: amp1,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				amp1 = value;
 				document.getElementById("input_amp1").value = value;
 			}
@@ -103,7 +103,7 @@ function initEvent(){
 			step: 0.01,
 			value: lambda1,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				lambda1 = value;
 				document.getElementById("input_lambda1").value = value;
 				freq1 = vel/lambda1;
@@ -119,7 +119,7 @@ function initEvent(){
 			step: 0.1,
 			value: freq1,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				freq1 = value;
 				document.getElementById("input_freq1").value = value;
 				lambda1 = vel/freq1;
@@ -135,7 +135,7 @@ function initEvent(){
 			step: 0.1,
 			value: vel,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				vel = value;
 				document.getElementById("input_vel").value = value;
 			}
@@ -148,7 +148,7 @@ function initEvent(){
 			step: 0.1,
 			value: amp2,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				amp2 = value;
 				document.getElementById("input_amp2").value = value;
 			}
@@ -173,7 +173,7 @@ function initEvent(){
 			step: 0.01,
 			value: lambda2,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				lambda2 = value;
 				document.getElementById("input_lambda2").value = value;
 				freq2 = vel/lambda2;
@@ -189,7 +189,7 @@ function initEvent(){
 			step: 0.1,
 			value: freq2,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				freq2 = value;
 				document.getElementById("input_freq2").value = value;
 				lambda2 = vel/freq2;
@@ -214,7 +214,7 @@ function threeStart(){
 /*  init Three functions  */
 
 //global variables
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 
@@ -246,12 +246,12 @@ function initThree(){
 // define initCamera()
 ////////////////////////////////////////
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		 near = 1,
 		 far = 10000;
@@ -290,7 +290,7 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
 
 function initLight(){
@@ -316,51 +316,52 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var line1; //wave line object
-var line2; //wave line object
-var line3; //wave line object
+let line1; //wave line object
+let line2; //wave line object
+let line3; //wave line object
 
 //number of object
-var N = 800;
+const N = 800;
 
 /* Wave format */
 //wave
-var u1 = new Array(N+1);
-var u2 = new Array(N+1);
-var u3 = new Array(N+1);
+const u1 = new Array(N+1);
+const u2 = new Array(N+1);
+const u3 = new Array(N+1);
 
 //length param
-var l = 10;
-var dx = l/N;
+const l = 10;
+const dx = l/N;
 
 //time param
-var Step = 300;
-var Time = 1;
-var dt = Time / Step;
-var time = 0;
+const Step = 300;
+const Time = 1;
+const dt = Time / Step;
+let time = 0;
 
 //wave param
-var vel = 3;
+let vel = 3;
 //wave1
-var lambda1 = 2; //wave length
-var freq1 = vel/lambda1;
-var amp1 = 1; //ampritude
-var direction1 = 1; //wave direction right:1
+let lambda1 = 2; //wave length
+let freq1 = vel/lambda1;
+let amp1 = 1; //ampritude
+let direction1 = 1; //wave direction right:1
 
 //wave2
-var lambda2 = 2; //wave length
-var freq2 = vel/lambda2;
-var amp2 = 1; //ampritude
-var direction2 = -1; //wave direction left:-1
+let lambda2 = 2; //wave length
+let freq2 = vel/lambda2;
+let amp2 = 1; //ampritude
+let direction2 = -1; //wave direction left:-1
 
 //grid
-var grid;
-var grid_diff = 0.5; //グリッドの間隔
-var num_grid_x = 21; //x方向の本数 奇数を入力
-var num_grid_y = parseInt(l/grid_diff + 1); //y方向の本数
+let grid;
+const grid_diff = 0.5; //グリッドの間隔
+const num_grid_x = 21; //x方向の本数 奇数を入力
+const num_grid_y = parseInt(l/grid_diff + 1); //y方向の本数
 
 
 function initObject(){
+	let gridGeometry, gridMaterial, v1, v2;
 	//calculate wave and create wave
 	calculate();
 	scene.add(line1);
@@ -370,54 +371,54 @@ function initObject(){
 	//create grid
 	grid = new Array(num_grid_x + num_grid_y);
 	//pallarel x axial
-	for(var i=0; i<num_grid_x; i++){
-		var gridGeometry = new THREE.Geometry();
-		var y = (i-(num_grid_x - 1) / 2) * grid_diff
-		var v1 = new THREE.Vector3(0, y, -0.05);  
-		var v2 = new THREE.Vector3(l, y, -0.05);  
+	for(let i=0; i<num_grid_x; i++){
+		gridGeometry = new THREE.Geometry();
+		const y = (i-(num_grid_x - 1) / 2) * grid_diff
+		v1 = new THREE.Vector3(0, y, -0.05);  
+		v2 = new THREE.Vector3(l, y, -0.05);  
 		gridGeometry.vertices.push(v1);
 		gridGeometry.vertices.push(v2);
-		if(i==(num_grid_x - 1) / 2){
-			var gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 2});
+		if(i===(num_grid_x - 1) / 2){
+			gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 2});
 		}
 		else{
-			var gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
+			gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
 		}
 		grid[i] = new THREE.Line(gridGeometry, gridMaterial);
 		scene.add(grid[i]);
 	}
 	//pallarel y axial
-	for(var i=0; i<num_grid_y; i++){
-		var gridGeometry = new THREE.Geometry();
-		var x = i * grid_diff
-		var v1 = new THREE.Vector3(x, (-1)*((num_grid_x - 1) / 2) * grid_diff, -0.05);  
-		var v2 = new THREE.Vector3(x, ((num_grid_x - 1) / 2) * grid_diff, -0.05);  
+	for(let i=0; i<num_grid_y; i++){
+		gridGeometry = new THREE.Geometry();
+		const x = i * grid_diff
+		v1 = new THREE.Vector3(x, (-1)*((num_grid_x - 1) / 2) * grid_diff, -0.05);  
+		v2 = new THREE.Vector3(x, ((num_grid_x - 1) / 2) * grid_diff, -0.05);  
 		gridGeometry.vertices.push(v1);
 		gridGeometry.vertices.push(v2);
-		var gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
+		gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
 		grid[i + num_grid_x] = new THREE.Line(gridGeometry, gridMaterial);
 		scene.add(grid[i + num_grid_x]);
 	}
 
 }
 function calculate(){
-	var geometry1 = new THREE.Geometry(); //geometry object
-	var geometry2 = new THREE.Geometry(); //geometry object
-	var geometry3 = new THREE.Geometry(); //geometry object
-	var n=0;
-	for(var i=0; i<=N; i++){
-		var omega1 = 2*Math.PI*vel/lambda1;
-		var omega2 = 2*Math.PI*vel/lambda2;
-		var k1 = 2*Math.PI/lambda1;
-		var k2 = 2*Math.PI/lambda2;
+	const geometry1 = new THREE.Geometry(); //geometry object
+	const geometry2 = new THREE.Geometry(); //geometry object
+	const geometry3 = new THREE.Geometry(); //geometry object
+	let n=0;
+	for(let i=0; i<=N; i++){
+		const omega1 = 2*Math.PI*vel/lambda1;
+		const omega2 = 2*Math.PI*vel/lambda2;
+		const k1 = 2*Math.PI/lambda1;
+		const k2 = 2*Math.PI/lambda2;
 
-		var x = i*dx;
+		const x = i*dx;
 		u1[i] = amp1 * Math.sin(omega1*time - direction1*k1*x);
 		u2[i] = amp2 * Math.sin(omega2*time - direction2*k2*x);
 		u3[i] = u1[i] + u2[i];
-		var vertex1 = new THREE.Vector3(x, u1[i], 0);
-		var vertex2 = new THREE.Vector3(x, u2[i], 0);
-		var vertex3 = new THREE.Vector3(x, u3[i], 0);
+		const vertex1 = new THREE.Vector3(x, u1[i], 0);
+		const vertex2 = new THREE.Vector3(x, u2[i], 0);
+		const vertex3 = new THREE.Vector3(x, u3[i], 0);
 
 		//add vertex
 		geometry1.vertices[n] = vertex1;
@@ -425,9 +426,9 @@ function calculate(){
 		geometry3.vertices[n] = vertex3;
 		n++;
 	}
-	var line1Material = new THREE.LineBasicMaterial({ color: 0xDD88FF ,linewidth: 4});
-	var line2Material = new THREE.LineBasicMaterial({ color: 0x88DDFF ,linewidth: 4});
-	var line3Material = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 4});
+	const line1Material = new THREE.LineBasicMaterial({ color: 0xDD88FF ,linewidth: 4});
+	const line2Material = new THREE.LineBasicMaterial({ color: 0x88DDFF ,linewidth: 4});
+	const line3Material = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 4});
 	line1 = new THREE.Line(geometry1, line1Material);
 	line2 = new THREE.Line(geometry2, line2Material);
 	line3 = new THREE.Line(geometry3, line3Material);
@@ -437,14 +438,14 @@ function calculate(){
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
-var step = 0;
-var png_count = 0;
+let step = 0;
+let png_count = 0;
 function loop(){
 	//update trackball object
 	trackball.update();
 
 	//reset
-	if(resetFlag == true){
+	if(resetFlag === true){
 		time = 0;
 		png_count = 0;
 		//wave1
@@ -486,7 +487,7 @@ function loop(){
 	scene.remove(line2);
 	scene.remove(line3);
 
-	if(stopFlag == false){
+	if(stopFlag === false){
 		step++;
 		time += dt;
 	}

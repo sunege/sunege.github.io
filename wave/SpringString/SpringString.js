@@ -5,77 +5,74 @@
 ////////////////////
 
 //System Parameter
-var time = 0;		// time
-var dt = 0.0001; // Delta t
-var N = 100;	   // number of particle
-var L = 50;	   // System length
-var dl = L / (N-1); //discreat space
-var step = 0; //step count
-var skip = 100;
+let time = 0;		// time
+let dt = 0.0001; // Delta t
+let N = 100;	   // number of particle
+const L = 50;	   // System length
+let dl = L / (N-1); //discreat space
+let step = 0; //step count
+let skip = 100;
 
 //oscillation
-var A = 1;
+let A = 1;
 
 //Field parameter
-var gamma = 0; // air resistance param
-var gravity = 0; // gravitational accelaration
+let gamma = 0; // air resistance param
+let gravity = 0; // gravitational accelaration
 
 
 //Particle parameter
-var MASS = 1;
-var RADIUS = 0.45*dl;
+let MASS = 1;
+const RADIUS = 0.45*dl;
 
 //boundary condition
-var boundary="d";
+let boundary="d";
 
 //Spring param
 //natural length
-var nl = 0.2;
+let nl = 0.2;
 
-var spring = { k: 1000, l: nl*dl };
+const spring = { k: 1000, l: nl*dl };
 
-var freq = 1;
-var phi = 0;
-var m=8; // mode
+let freq = 1;
+let phi = 0;
+const m=8; // mode
 //particle class
-var Particle = function(parameter){
-	//index
-	this.index = parameter.index;
-	//radius
-	this.radius = parameter.radius;
-	//mass
-	this.mass = parameter.mass;
-	//position vector
-	this.x = parameter.x || 0;
-	this.y = parameter.y || 0;
-	this.z = parameter.z || 0;
-	//velocity vector
-	this.vx = parameter.vx || 0;
-	this.vy = parameter.vy || 0;
-	this.vz = parameter.vz || 0;
-	//force vector
-	this.fx; 
-	this.fy; 
-	this.fz; 
-	//kinetic energy
-	this.kinetic = 0;
-	//freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
-};
-
-Particle.prototype = {
-	constructor: Particle
-};
+class Particle {
+	constructor(parameter){
+		//index
+		this.index = parameter.index;
+		//radius
+		this.radius = parameter.radius;
+		//mass
+		this.mass = parameter.mass;
+		//position vector
+		this.x = parameter.x || 0;
+		this.y = parameter.y || 0;
+		this.z = parameter.z || 0;
+		//velocity vector
+		this.vx = parameter.vx || 0;
+		this.vy = parameter.vy || 0;
+		this.vz = parameter.vz || 0;
+		//force vector
+		this.fx; 
+		this.fy; 
+		this.fz; 
+		//kinetic energy
+		this.kinetic = 0;
+		//freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
+	}
+}
 
 //calculation class
-var Calculation = function(p){
-	this.initParticle(p);
-};
+class Calculation {
+	constructor(p){
+		this.initParticle(p);
+	}
 
-Calculation.prototype = {
-	constructor: Calculation,
 	//init Particles
-	initParticle: function(p){
-		for(var i=0; i<p.length; i++){
+	initParticle(p){
+		for(let i=0; i<p.length; i++){
 			p[i].mass = MASS;
 			p[i].x = 0;
 			p[i].y = i * dl;
@@ -88,21 +85,22 @@ Calculation.prototype = {
 			p[i].fz = 0;
 			this.calculateForce(p);
 		}
-	},
+	}
+
 	//calculation Force
-	calculateForce: function(p){
-		var force01,force10;
-		var d_r;
+	calculateForce(p){
+		let force01,force10;
+		let d_r;
 		force01={ x: 0, y: 0, z: 0 };
 		force10={ x: 0, y: 0, z: 0 };
 		d_r={ x: 0, y: 0, z: 0, norm: 0 };
-		for(var i=0; i<N; i++){
-			if(i != 0){
+		for(let i=0; i<N; i++){
+			if(i !== 0){
 				force10.x = -force01.x;
 				force10.y = -force01.y;
 				force10.z = -force01.z;
 			}
-			if(i != N-1){
+			if(i !== N-1){
 				d_r.x = p[i+1].x - p[i].x;
 				d_r.y = p[i+1].y - p[i].y;
 				d_r.z = p[i+1].z - p[i].z;
@@ -112,12 +110,12 @@ Calculation.prototype = {
 				force01.z = -spring.k*(spring.l-d_r.norm)*d_r.z/d_r.norm;
 			}
 			//gravity and resistance
-			if( i == 0 ){
+			if( i === 0 ){
 				p[i].fx = force01.x-gamma*p[i].vx;
 				p[i].fy = force01.y-gamma*p[i].vy;
 				p[i].fz = force01.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
-			else if( i == N-1 ){
+			else if( i === N-1 ){
 				p[i].fx = force10.x-gamma*p[i].vx;
 				p[i].fy = force10.y-gamma*p[i].vy;
 				p[i].fz = force10.z-gravity*p[i].mass-gamma*p[i].vz;
@@ -128,15 +126,16 @@ Calculation.prototype = {
 				p[i].fz = force01.z+force10.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
 		}
-	},
-	//Velocity Verlet method
-	timeDevelopment: function(p){
-		// conserve f(t)
-		var old_fx = [];
-		var old_fy = [];
-		var old_fz = [];
+	}
 
-		for(var i=0; i<p.length; i++){
+	//Velocity Verlet method
+	timeDevelopment(p){
+		// conserve f(t)
+		const old_fx = [];
+		const old_fy = [];
+		const old_fz = [];
+
+		for(let i=0; i<p.length; i++){
 			//x(t+dt) = x(t) + v(t)*dt + f(t)*dt*dt/2m
 			p[i].x = p[i].x + p[i].vx*dt + p[i].fx*dt*dt/(2*p[i].mass);
 			p[i].y = p[i].y + p[i].vy*dt + p[i].fy*dt*dt/(2*p[i].mass);
@@ -151,92 +150,29 @@ Calculation.prototype = {
 		this.calculateForce(p);
 
 		//v(t+dt) = v(t) + (f(t) + f(t+dt))*dt/2m
-		for(var i=0; i<p.length; i++){
+		for(let i=0; i<p.length; i++){
 			p[i].vx = p[i].vx + ( old_fx[i] + p[i].fx )*dt/(2*p[i].mass); 
 			p[i].vy = p[i].vy + ( old_fy[i] + p[i].fy )*dt/(2*p[i].mass); 
 			p[i].vz = p[i].vz + ( old_fz[i] + p[i].fz )*dt/(2*p[i].mass); 
 		}
 		//p[0] = { vx: 0, vy: 0, vz: 0};
-	},
-	calculateKinetic: function(p){
-		for(var i=0; i<p.length; i++){
+	}
+
+calculateKinetic(p){
+		for(let i=0; i<p.length; i++){
 			p[i].kinetic = p[i].mass*(p[i].vx*p[i].vx + p[i].vy*p[i].vy + p[i].vz*p[i].vz)/2;
 		}
 	}
-};
+}
 
 //particle object
-var p = [];
+const p = [];
 
 
 //calculation object
-var cal;
-
-////////////////////////////////////////
-// define physics system
-////////////////////////////////////////
-//class ball
-var Ball = function(parameter){
-	this.radius = parameter.radius;
-	this.mass = parameter.mass;
-	this.x = parameter.x;
-	this.y = parameter.y;
-	this.z = parameter.z;
-	this.vx = parameter.vx;
-	this.vy = parameter.vy;
-	this.vz = parameter.vz;
-	this.ax = parameter.ax;
-	this.ay = parameter.ay;
-	this.az = parameter.az;
+let cal;
 
 
-};
-//add Method
-Ball.prototype = {
-	constructor: Ball,
-	//Euler method
-	timeEvolution: function(dt){
-		//force
-		f = this.calculateForce();
-
-		//acceleration
-		this.ax = f.x / this.mass;
-		this.ay = f.y / this.mass;
-		this.az = f.z / this.mass;
-
-		//velocity
-		this.vx += this.ax * dt;
-		this.vy += this.ay * dt;
-		this.vz += this.az * dt;
-
-		//position
-		this.x += this.vx * dt;
-		this.y += this.vy * dt;
-		this.z += this.vz * dt;
-
-		//border
-		if(this.z < this.radius){
-			this.z  = this.radius;
-			this.vz = -this.vz;
-		}
-	},
-
-	//calculateforce
-	calculateForce: function(){
-		var fx = 0;
-		var fy = 0;
-		var fz = -this.mass*g;
-		return { x: fx, y: fy, z: fz };
-	},
-
-	//calculateEnergy
-	calculateEnergy: function(){
-		var v2 = this.vx*this.vx + this.vy*this.vy + this.vz*this.vz;
-		var kinetic = 1/2 * this.mass * v2;
-		var potential = this.mass*g*this.z;
-		return { kinetic: kinetic, potential: potential };
-	}
-};
 
 
 /*------- create ball object ---------*/
@@ -251,8 +187,8 @@ Ball.prototype = {
 // });
 
 //stop flag
-var restartFlag = false; // restert flag
-var stopFlag = true; // stop flag
+let restartFlag = false; // restert flag
+let stopFlag = true; // stop flag
 // var pulseFlag = false;
 
 
@@ -260,7 +196,7 @@ var stopFlag = true; // stop flag
 // define window event 
 ////////////////////////////////////////
 window.addEventListener("load", function(){
-		for(var i=0; i<N; i++)
+		for(let i=0; i<N; i++)
 			p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
 		cal = new Calculation(p);
 		initEvent();
@@ -279,7 +215,7 @@ function initEvent(){
 			step: 1,
 			value: skip,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				skip = value;
 				document.getElementById("input_skip").value = value;
 			}
@@ -290,7 +226,7 @@ function initEvent(){
 			step: 0.01,
 			value: MASS,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_mass").value = value;
 			}
 	});
@@ -300,7 +236,7 @@ function initEvent(){
 			step: 1,
 			value: N,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_N").value = value;
 			}
 	});
@@ -310,7 +246,7 @@ function initEvent(){
 			step: 0.0001,
 			value: freq,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				phi = 2*Math.PI*time*(freq - value) + phi;
 				freq = value;
 				document.getElementById("input_freq").value = value;
@@ -322,7 +258,7 @@ function initEvent(){
 			step: 0.1,
 			value: A,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				A = value;
 				document.getElementById("input_A").value = value;
 			}
@@ -333,7 +269,7 @@ function initEvent(){
 			step: 10,
 			value: spring.k,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_k").value = value;
 			}
 	});
@@ -343,7 +279,7 @@ function initEvent(){
 			step: 0.01,
 			value: nl,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_nl").value = value;
 			}
 	});
@@ -353,7 +289,7 @@ function initEvent(){
 			step: 0.01,
 			value: gamma,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				gamma = value;
 				document.getElementById("input_gamma").value = value;
 			}
@@ -361,7 +297,7 @@ function initEvent(){
 	
 	//checkbox
 	$('#checkbox_gravity').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				gravity = 9.8;
 			}
 			else{
@@ -425,7 +361,7 @@ function threeStart(){
 /*  init Three functions  */
 
 //global variables
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 
@@ -457,12 +393,12 @@ function initThree(){
 // define initCamera()
 ////////////////////////////////////////
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 	aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		near = 1,
 		far = 10000;
@@ -501,7 +437,7 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
 
 function initLight(){
@@ -527,8 +463,8 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var axis;
-var sphere=[]; //sphere object
+let axis;
+let sphere=[]; //sphere object
 
 function initObject(){
 	//create axis object
@@ -539,11 +475,11 @@ function initObject(){
 	axis.position.set(0, 0, 0);
 
 	sphere = [];
-	for(var i=0; i<N; i++){
+	for(let i=0; i<N; i++){
 		//create geometry
-		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
+		const geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//create material
-		var material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
+		const material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
 		//create object
 		sphere[i] = new THREE.Mesh(geometry, material);
 		//add object
@@ -563,9 +499,9 @@ function loop(){
 	trackball.update();
 
 
-	if(restartFlag == true){
+	if(restartFlag === true){
 		//remove sphere
-		for(var i=0; i<N; i++)
+		for(let i=0; i<N; i++)
 			scene.remove(sphere[i]);
 
 		//init time param
@@ -582,8 +518,8 @@ function loop(){
 		gamma = parseFloat(document.getElementById("input_gamma").value);
 
 		//update boundary condition
-		var radioList = document.getElementsByName("boundary");
-		for(var i=0; i<radioList.length; i++){
+		const radioList = document.getElementsByName("boundary");
+		for(let i=0; i<radioList.length; i++){
 			if(radioList[i].checked){
 				boundary = radioList[i].value;
 			}
@@ -595,7 +531,7 @@ function loop(){
 		spring.l = nl*dl;
 
 		//init particle and calculation class
-		for(var i=0; i<N; i++){
+		for(let i=0; i<N; i++){
 			p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
 		}
 		cal = new Calculation(p);
@@ -618,8 +554,8 @@ function loop(){
 
 	//time development
 	// 	var time = step * dt;
-	if(stopFlag == false){
-		for(var n=0; n<skip; n++){
+	if(stopFlag === false){
+		for(let n=0; n<skip; n++){
 			//increment of step
 			step++;
 			time = dt * step;
@@ -643,14 +579,14 @@ function loop(){
 // 					pulseFlag = false;
 // 				}
 // 			}
-			if(boundary == "d"){
+			if(boundary === "d"){
 				p[N-1].x = 0;
 				p[N-1].y = L;
 				p[N-1].z = 0;
 				p[N-1].vx = 0;
 				p[N-1].vy = 0;
 				p[N-1].vz = 0;
-			}else if(boundary == "n"){
+			}else if(boundary === "n"){
 				p[N-1].x = 0;
 				p[N-1].y = L;
 				p[N-1].vx = 0;
@@ -660,7 +596,7 @@ function loop(){
 		}
 	}
 	//set draw object
-	for(var i=0; i<N; i++){
+	for(let i=0; i<N; i++){
 		sphere[i].position.set(p[i].x, p[i].y, p[i].z);
 	}
 

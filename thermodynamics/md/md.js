@@ -5,95 +5,96 @@
 ////////////////////
 
 //System Parameter
-var time = 0;		// time
-var dt = 0.0001; // Delta t
-var N = 50;	   // number of particle
-var L = 20;	   // System length
-var dl = L / (N-1); //discreat space
-var step = 0; //step count
-var skip = 5;
-var _skip = 0.1;
+// 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
+let wall2, wall3, wall4, wall5, wall6;
+
+let time = 0;		// time
+let dt = 0.0001; // Delta t
+let N = 50;	   // number of particle
+const L = 20;	   // System length
+const dl = L / (N-1); //discreat space
+let step = 0; //step count
+let skip = 5;
+let _skip = 0.1;
 
 //oscillation
-var A = 0;
+const A = 0;
 
 //Field parameter
-var T = 300; // temp
-var k_B = 1.38e-23;
-var gamma = 0.5; // air resistance param
-var gravity = 0; // gravitational accelaration
+let T = 300; // temp
+const k_B = 1.38e-23;
+const gamma = 0.5; // air resistance param
+const gravity = 0; // gravitational accelaration
 
 
 //Particle parameter
-var MASS = 4.67e-26;
-var RADIUS = 0.3;
-var vel = 0; // avg vel
+let MASS = 4.67e-26;
+let RADIUS = 0.3;
+let vel = 0; // avg vel
 
 //boundary condition
-var boundary="d";
+const boundary="d";
 
 //Spring param
 //natural length
-var nl = 0.7;
+const nl = 0.7;
 
-var spring = { k: 1000, l: nl*dl };
+const spring = { k: 1000, l: nl*dl };
 
-var freq = 1;
-var m=8; // mode
+const freq = 1;
+const m=8; // mode
 //particle class
-var Particle = function(parameter){
-	//index
-	this.index = parameter.index;
-	//radius
-	this.radius = parameter.radius;
-	//mass
-	this.mass = parameter.mass;
-	//position vector
-	this.x = parameter.x || 0;
-	this.y = parameter.y || 0;
-	this.z = parameter.z || 0;
-	//temp position vector
-	this.tempx = parameter.x || 0;
-	this.tempy = parameter.y || 0;
-	this.tempz = parameter.z || 0;
-	//velocity vector
-	this.vx = parameter.vx || 0;
-	this.vy = parameter.vy || 0;
-	this.vz = parameter.vz || 0;
-	this.v = 0;
-	//force vector
-	this.fx; 
-	this.fy; 
-	this.fz; 
-	//kinetic energy
-	this.kinetic = 0;
-	//freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
-};
-
-Particle.prototype = {
-	constructor: Particle
-};
+class Particle {
+	constructor(parameter){
+		//index
+		this.index = parameter.index;
+		//radius
+		this.radius = parameter.radius;
+		//mass
+		this.mass = parameter.mass;
+		//position vector
+		this.x = parameter.x || 0;
+		this.y = parameter.y || 0;
+		this.z = parameter.z || 0;
+		//temp position vector
+		this.tempx = parameter.x || 0;
+		this.tempy = parameter.y || 0;
+		this.tempz = parameter.z || 0;
+		//velocity vector
+		this.vx = parameter.vx || 0;
+		this.vy = parameter.vy || 0;
+		this.vz = parameter.vz || 0;
+		this.v = 0;
+		//force vector
+		this.fx; 
+		this.fy; 
+		this.fz; 
+		//kinetic energy
+		this.kinetic = 0;
+		//freq = m*Math.sqrt(spring.k*Math.abs((nl - 1))/(MASS * (N) * (N-1)))/2;
+	}
+}
 
 //calculation class
-var Calculation = function(p){
-	this.initParticle(p);
-};
+class Calculation {
+	constructor(p){
+		this.initParticle(p);
+	}
 
-Calculation.prototype = {
-	constructor: Calculation,
 	//init Particles
-	initParticle: function(p){
-		for(var i=0; i<N; i++){
+	initParticle(p){
+		let i;
+		for(i=0; i<N; i++){
 			//カットオフv_maxの設定
-			var v=0.0;		//計算用の変数
-			var dv=30;		//計算用のステップ
-			var f=0.0;		//分布関数の保存用
-			var f_max=0.0;	//分布関数の最大値
-			var v_max;	//速度のカットオフ
-			var loop_flag = true;	//ループを抜けるフラグ
+			let v=0.0;		//計算用の変数
+			const dv=30;		//計算用のステップ
+			let f=0.0;		//分布関数の保存用
+			let f_max=0.0;	//分布関数の最大値
+			let v_max;	//速度のカットオフ
+			let loop_flag = true;	//ループを抜けるフラグ
 
 			//値が最大値の1/1000倍になったらその時のvをv_maxに記録してループを抜ける
-			while(loop_flag == true){
+			while(loop_flag === true){
 				f = this.maxwell_distribution(v);
 				if(f >= f_max){
 					f_max = f;
@@ -108,24 +109,24 @@ Calculation.prototype = {
 			}
 
 			//モンテカルロ法（分布関数内に入っていたらその数値を採用する）
-			for(var i=0; i<N; i++){
+			for(i=0; i<N; i++){
 				loop_flag=true;
-				while(loop_flag == true){
-					var v_rand = this.rand(v_max, 1.0);
-					var f_rand = this.rand(f_max, 0.0);
-					var f_flag = this.maxwell_distribution(v_rand);
+				while(loop_flag === true){
+					const v_rand = this.rand(v_max, 1.0);
+					const f_rand = this.rand(f_max, 0.0);
+					const f_flag = this.maxwell_distribution(v_rand);
 					if(f_rand <= f_flag){
 // 						var theta = this.rand(2*Math.PI,0.0);
 // 						var phi = this.rand(2*Math.PI, 0.0);
 // 						var vx = v_rand*Math.sin(theta)*Math.cos(phi);
 // 						var vy = v_rand*Math.sin(theta)*Math.sin(phi);
 // 						var vz = v_rand*Math.cos(theta);
-						var theta = this.rand(2*Math.PI,0.0);
-						var phi = this.rand(2*Math.PI,0.0);
-						var psi = this.rand(2*Math.PI,0.0);
-						var vx = (this.c(theta)*this.c(phi)*this.c(psi)-this.s(phi)*this.s(psi))*v_rand;
-						var vy = (-this.c(theta)*this.c(phi)*this.s(psi)-this.s(phi)*this.c(psi))*v_rand;
-						var vz = this.s(theta)*this.c(phi)*v_rand;
+						const theta = this.rand(2*Math.PI,0.0);
+						const phi = this.rand(2*Math.PI,0.0);
+						const psi = this.rand(2*Math.PI,0.0);
+						const vx = (this.c(theta)*this.c(phi)*this.c(psi)-this.s(phi)*this.s(psi))*v_rand;
+						const vy = (-this.c(theta)*this.c(phi)*this.s(psi)-this.s(phi)*this.c(psi))*v_rand;
+						const vz = this.s(theta)*this.c(phi)*v_rand;
 						p[i].mass = MASS;
 						p[i].x = this.rand(RADIUS, L-RADIUS);
 						p[i].y = this.rand(RADIUS, L-RADIUS);
@@ -144,40 +145,44 @@ Calculation.prototype = {
 			//this.calculateForce(p);
 		}
 		vel = 0;
-		for(var i=0; i<N; i++){
+		for(i=0; i<N; i++){
 			vel += Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
 		}
 		vel = vel/N;
 
-	},
-	rand: function(min, max){
+	}
+
+rand(min, max){
 		return Math.random()*(max-min)+min;
-	},
-	maxwell_distribution: function(v){
-		var f = 4*Math.PI*v*v*Math.pow(MASS/(2*Math.PI*k_B*T),1.5)*Math.exp(-MASS*v*v/(2*k_B*T));
+	}
+
+maxwell_distribution(v){
+		const f = 4*Math.PI*v*v*Math.pow(MASS/(2*Math.PI*k_B*T),1.5)*Math.exp(-MASS*v*v/(2*k_B*T));
 		return f;
-	},
-	s: function(theta){
+	}
+
+s(theta){
 		return Math.sin(theta);
-	},
-	c: function(theta){
+	}
+
+c(theta){
 		return Math.cos(theta);
-	},
+	}
 
 		//calculation Force
-	calculateForce: function(p){
-		var force01,force10;
-		var d_r;
+	calculateForce(p){
+		let force01,force10;
+		let d_r;
 		force01={ x: 0, y: 0, z: 0 };
 		force10={ x: 0, y: 0, z: 0 };
 		d_r={ x: 0, y: 0, z: 0, norm: 0 };
-		for(var i=0; i<N; i++){
-			if(i != 0){
+		for(let i=0; i<N; i++){
+			if(i !== 0){
 				force10.x = -force01.x;
 				force10.y = -force01.y;
 				force10.z = -force01.z;
 			}
-			if(i != N-1){
+			if(i !== N-1){
 				d_r.x = p[i+1].x - p[i].x;
 				d_r.y = p[i+1].y - p[i].y;
 				d_r.z = p[i+1].z - p[i].z;
@@ -202,12 +207,12 @@ Calculation.prototype = {
 			////////			p[i].fz = force01.z+force10.z;
 			////////		}
 			//gravity and resistance
-			if( i == 0 ){
+			if( i === 0 ){
 				p[i].fx = force01.x-gamma*p[i].vx;
 				p[i].fy = force01.y-gamma*p[i].vy;
 				p[i].fz = force01.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
-			else if( i == N-1 ){
+			else if( i === N-1 ){
 				p[i].fx = force10.x-gamma*p[i].vx;
 				p[i].fy = force10.y-gamma*p[i].vy;
 				p[i].fz = force10.z-gravity*p[i].mass-gamma*p[i].vz;
@@ -218,15 +223,16 @@ Calculation.prototype = {
 				p[i].fz = force01.z+force10.z-gravity*p[i].mass-gamma*p[i].vz;
 			}
 		}
-	},
-		//Velocity Verlet method
-	timeDevelopment: function(p){
-		// conserve f(t)
-		var old_fx = [];
-		var old_fy = [];
-		var old_fz = [];
+	}
 
-		for(var i=0; i<N; i++){
+		//Velocity Verlet method
+	timeDevelopment(p){
+		// conserve f(t)
+		const old_fx = [];
+		const old_fy = [];
+		const old_fz = [];
+
+		for(let i=0; i<N; i++){
 			//x(t+dt) = x(t) + v(t)*dt + f(t)*dt*dt/2m
 			p[i].x = p[i].x + p[i].vx*dt + p[i].fx*dt*dt/(2*p[i].mass);
 			p[i].y = p[i].y + p[i].vy*dt + p[i].fy*dt*dt/(2*p[i].mass);
@@ -241,16 +247,17 @@ Calculation.prototype = {
 		//this.calculateForce(p);
 
 		//v(t+dt) = v(t) + (f(t) + f(t+dt))*dt/2m
-		for(var i=0; i<N; i++){
+		for(let i=0; i<N; i++){
 			p[i].vx = p[i].vx + ( old_fx[i] + p[i].fx )*dt/(2*p[i].mass); 
 			p[i].vy = p[i].vy + ( old_fy[i] + p[i].fy )*dt/(2*p[i].mass); 
 			p[i].vz = p[i].vz + ( old_fz[i] + p[i].fz )*dt/(2*p[i].mass); 
 		}
 		//p[0] = { vx: 0, vy: 0, vz: 0};
 		this.border(p);
-	},
-	border: function(p){
-		for(var i=0; i<N; i++){
+	}
+
+border(p){
+		for(let i=0; i<N; i++){
 			if(p[i].x < RADIUS){
 				p[i].x = RADIUS;
 				p[i].vx = -p[i].vx;
@@ -276,120 +283,58 @@ Calculation.prototype = {
 				p[i].vz = -p[i].vz;
 			}
 		}
-	},
-	calculateKinetic: function(p){
-		for(var i=0; i<p.length; i++){
+	}
+
+calculateKinetic(p){
+		for(let i=0; i<p.length; i++){
 			p[i].kinetic = p[i].mass*(p[i].vx*p[i].vx + p[i].vy*p[i].vy + p[i].vz*p[i].vz)/2;
 		}
-	},
-	histgram: function(p){
-		var delta_v = 100;
-		var v_max = 3000;
-		var hist = [];
-		var n_max = parseInt(v_max/delta_v, 10)
-		for(var n=0; n < n_max; n++){
+	}
+
+histgram(p){
+		const delta_v = 100;
+		const v_max = 3000;
+		const hist = [];
+		const n_max = parseInt(v_max/delta_v, 10)
+		for(let n=0; n < n_max; n++){
 			hist[n] = { v: n*delta_v, particle_id: new Array() };
-			for(var i=0; i<N; i++){
+			for(let i=0; i<N; i++){
 				if(p[i].v > n*delta_v && p[i].v < (n+1)*delta_v){
 					hist[n].particle_id.push(i);
 				}
 			}
 		}
-		var _delta_v = 1.5*L/n_max;
-		for(var n=0; n < n_max; n++){
-			for(var m=0; m < hist[n].particle_id.length; m++){
+		const _delta_v = 1.5*L/n_max;
+		for(let n=0; n < n_max; n++){
+			for(let m=0; m < hist[n].particle_id.length; m++){
 				p[hist[n].particle_id[m]].tempx = L+2;
 				p[hist[n].particle_id[m]].tempy = _delta_v*(n+1);
 				p[hist[n].particle_id[m]].tempz = m*2.1*RADIUS;
 			}
 		}
 	}
-};
+}
 
 //particle object
-var p = [];
+const p = [];
 
 
 //calculation object
-var cal;
-
-////////////////////////////////////////
-// define physics system
-////////////////////////////////////////
-//class ball
-var Ball = function(parameter){
-	this.radius = parameter.radius;
-	this.mass = parameter.mass;
-	this.x = parameter.x;
-	this.y = parameter.y;
-	this.z = parameter.z;
-	this.vx = parameter.vx;
-	this.vy = parameter.vy;
-	this.vz = parameter.vz;
-	this.ax = parameter.ax;
-	this.ay = parameter.ay;
-	this.az = parameter.az;
+let cal;
 
 
-};
-//add Method
-Ball.prototype = {
-	constructor: Ball,
-	//Euler method
-	timeEvolution: function(dt){
-		//force
-		f = this.calculateForce();
-
-		//acceleration
-		this.ax = f.x / this.mass;
-		this.ay = f.y / this.mass;
-		this.az = f.z / this.mass;
-
-		//velocity
-		this.vx += this.ax * dt;
-		this.vy += this.ay * dt;
-		this.vz += this.az * dt;
-
-		//position
-		this.x += this.vx * dt;
-		this.y += this.vy * dt;
-		this.z += this.vz * dt;
-
-		//border
-		if(this.z < this.radius){
-			this.z  = this.radius;
-			this.vz = -this.vz;
-		}
-	},
-
-	//calculateforce
-	calculateForce: function(){
-		var fx = 0;
-		var fy = 0;
-		var fz = -this.mass*g;
-		return { x: fx, y: fy, z: fz };
-	},
-
-		//calculateEnergy
-	calculateEnergy: function(){
-		var v2 = this.vx*this.vx + this.vy*this.vy + this.vz*this.vz;
-		var kinetic = 1/2 * this.mass * v2;
-		var potential = this.mass*g*this.z;
-		return { kinetic: kinetic, potential: potential };
-	}
-};
 
 
 //stop flag
-var restartFlag = false; // restert flag
-var stopFlag = false; // stop flag
+let restartFlag = false; // restert flag
+let stopFlag = false; // stop flag
 
 
 ////////////////////////////////////////
 // define window event 
 ////////////////////////////////////////
 window.addEventListener("load", function(){
-	for(var i=0; i<N; i++)
+	for(let i=0; i<N; i++)
 		p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
 	cal = new Calculation(p);
 	initEvent();
@@ -408,7 +353,7 @@ function initEvent(){
 		step: 0.01,
 		value: _skip,
 		slide: function(event, ui){
-			var value = ui.value;
+			const value = ui.value;
 			_skip = value;
 			skip = 1/(60*dt)*_skip;
 			document.getElementById("input_skip").value = value;
@@ -421,7 +366,7 @@ function initEvent(){
 		step: 0.01,
 		value: RADIUS,
 		slide: function(event, ui){
-			var value = ui.value;
+			const value = ui.value;
 			document.getElementById("input_radius").value = value;
 		}
 	});
@@ -441,7 +386,7 @@ function initEvent(){
 		step: 1,
 		value: N,
 		slide: function(event, ui){
-			var value = ui.value;
+			const value = ui.value;
 			document.getElementById("input_N").value = value;
 		}
 	});
@@ -451,7 +396,7 @@ function initEvent(){
 		step: 1,
 		value: T,
 		slide: function(event, ui){
-			var value = ui.value;
+			const value = ui.value;
 			document.getElementById("input_temp").value = value;
 		}
 	});
@@ -497,7 +442,7 @@ function threeStart(){
 /*  init Three functions  */
 
 //global variables
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 
@@ -529,12 +474,12 @@ function initThree(){
 // define initCamera()
 ////////////////////////////////////////
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 	aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		near = 1,
 		far = 10000;
@@ -573,7 +518,7 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
 
 function initLight(){
@@ -599,11 +544,12 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var axis;
-var sphere=[]; //sphere object
-var wall1;
+let axis;
+let sphere=[]; //sphere object
+let wall1;
 
 function initObject(){
+	let blue_hex, geometry, green_hex, material, red_hex;
 	//create geometry
 	// 	var geometry = new THREE.SphereGeometry( ball.radius, 20, 20 );
 	//create material
@@ -646,9 +592,9 @@ function initObject(){
 	axis.position.set(0, 0, 0);
 
 	sphere = [];
-	for(var i=0; i<N; i++){
+	for(let i=0; i<N; i++){
 		//create geometry
-		var geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
+		geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//create material
 		//
 		/*	
@@ -674,48 +620,48 @@ function initObject(){
 		*/
 	  //速度によって色変化
 		
-		var velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
-		var v_center = 1200;
-		var v_ratio = parseFloat(velocity / v_center, 10);
+		const velocity = Math.sqrt(p[i].vx*p[i].vx+p[i].vy*p[i].vy+p[i].vz*p[i].vz);
+		const v_center = 1200;
+		const v_ratio = parseFloat(velocity / v_center, 10);
 		if(v_ratio > 1){
-			var red_hex = "ff";
-			var blue_hex = "00";
+			red_hex = "ff";
+			blue_hex = "00";
 
 			if(v_ratio > 2){
 				green_hex = "00";
 			}
 			else{
-				var green = parseInt(254 - 254*(v_ratio - 1), 10);
+				const green = parseInt(254 - 254*(v_ratio - 1), 10);
 				if(green < 16){
-					var green_hex = "0" + green.toString(16);
+					green_hex = "0" + green.toString(16);
 				}
 				else{
-					var green_hex = green.toString(16);
+					green_hex = green.toString(16);
 				}
 			}
 		}
 		else{
-			var red = parseInt(254 * v_ratio, 10);
+			const red = parseInt(254 * v_ratio, 10);
 			if(red < 16){
-				var red_hex = "0" + red.toString(16);
+				red_hex = "0" + red.toString(16);
 			}
 			else{
-				var red_hex = red.toString(16);
+				red_hex = red.toString(16);
 			}
 
-			var green_hex = "ff";
+			green_hex = "ff";
 
-			var blue = parseInt(254 * (1-v_ratio), 10);
+			const blue = parseInt(254 * (1-v_ratio), 10);
 			if(blue < 16){
-				var blue_hex = "0" + blue.toString(16);
+				blue_hex = "0" + blue.toString(16);
 			}
 			else{
-				var blue_hex = blue.toString(16);
+				blue_hex = blue.toString(16);
 			}
 		}
 
-		var color_code = red_hex + green_hex + blue_hex;
-		var material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
+		const color_code = red_hex + green_hex + blue_hex;
+		material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
 
 
 
@@ -728,14 +674,14 @@ function initObject(){
 		sphere[i].castShadow = true;
 	}
 
-	var v1 = { x: 0, y: 0, z:0 };
-	var v2 = { x: 0, y: L, z:0 };
-	var v3 = { x: 0, y: L, z:L };
-	var v4 = { x: 0, y: 0, z:L };
-	var v5 = { x: L, y: 0, z:0 };
-	var v6 = { x: L, y: L, z:0 };
-	var v7 = { x: L, y: L, z:L };
-	var v8 = { x: L, y: 0, z:L };
+	const v1 = { x: 0, y: 0, z:0 };
+	const v2 = { x: 0, y: L, z:0 };
+	const v3 = { x: 0, y: L, z:L };
+	const v4 = { x: 0, y: 0, z:L };
+	const v5 = { x: L, y: 0, z:0 };
+	const v6 = { x: L, y: L, z:0 };
+	const v7 = { x: L, y: L, z:L };
+	const v8 = { x: L, y: 0, z:L };
 	//far
 	wall1 = wall(v1, v2, v3, v4);
 	scene.add(wall1);
@@ -764,23 +710,23 @@ function initObject(){
 
 	geometry = new THREE.BoxGeometry(L,L,L);
 	material = new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true});
-	var box = new THREE.Mesh(geometry, material);
+	const box = new THREE.Mesh(geometry, material);
 	scene.add(box);
 	box.position.set(L/2, L/2, L/2);
 
 }
 
 function wall(v1, v2, v3, v4){
-	var vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
-	var vertex2 = new THREE.Vector3(v2.x, v2.y, v2.z);
-	var vertex3 = new THREE.Vector3(v3.x, v3.y, v3.z);
-	var vertex4 = new THREE.Vector3(v4.x, v4.y, v4.z);
-	var geometry = new THREE.Geometry();
+	const vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
+	const vertex2 = new THREE.Vector3(v2.x, v2.y, v2.z);
+	const vertex3 = new THREE.Vector3(v3.x, v3.y, v3.z);
+	const vertex4 = new THREE.Vector3(v4.x, v4.y, v4.z);
+	const geometry = new THREE.Geometry();
 	geometry.vertices.push(vertex1);
 	geometry.vertices.push(vertex2);
 	geometry.vertices.push(vertex3);
 	geometry.vertices.push(vertex4);
-	var face = new THREE.Face3(0, 1, 2);
+	let face = new THREE.Face3(0, 1, 2);
 	geometry.faces.push(face);
 	face = new THREE.Face3(0, 2, 3);
 	geometry.faces.push(face);
@@ -790,7 +736,7 @@ function wall(v1, v2, v3, v4){
 	geometry.computeVertexNormals();
 
 	//create material
-	var material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
+	const material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
 	//create sphere object
 	return new THREE.Mesh(geometry, material);
 }
@@ -807,9 +753,9 @@ function loop(){
 	// 	sphere.position.set(ball.x, ball.y, ball.z);
 
 
-	if(restartFlag == true){
+	if(restartFlag === true){
 		//remove sphere
-		for(var i=0; i<N; i++)
+		for(let i=0; i<N; i++)
 			scene.remove(sphere[i]);
 
 		//init time param
@@ -823,7 +769,7 @@ function loop(){
 		document.getElementById("temp").innerHTML = T.toFixed(0);
 
 		//init particle and calculation class
-		for(var i=0; i<N; i++){
+		for(let i=0; i<N; i++){
 			p[i] = new Particle({index: i, radius: RADIUS, mass: MASS});
 		}
 		cal = new Calculation(p);
@@ -837,7 +783,7 @@ function loop(){
 	if(stopFlag){
 		cal.histgram(p);
 		//set draw object
-		for(var i=0; i<N; i++){
+		for(let i=0; i<N; i++){
 			sphere[i].position.set(p[i].tempx, p[i].tempy, p[i].tempz);
 		}
 		document.getElementById("stopButton").value = "start";
@@ -847,8 +793,8 @@ function loop(){
 
 	//time development
 	// 	var time = step * dt;
-	if(stopFlag == false){
-		for(var n=0; n<skip; n++){
+	if(stopFlag === false){
+		for(let n=0; n<skip; n++){
 			//increment of step
 			step++;
 			time = dt * step;
@@ -856,7 +802,7 @@ function loop(){
 			cal.timeDevelopment(p);
 		}
 		//set draw object
-		for(var i=0; i<N; i++){
+		for(let i=0; i<N; i++){
 			sphere[i].position.set(p[i].x, p[i].y, p[i].z);
 		}
 	}

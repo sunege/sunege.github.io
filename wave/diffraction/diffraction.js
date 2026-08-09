@@ -1,6 +1,9 @@
 ////////////////////////////////////////
 // define window event 
 ////////////////////////////////////////
+// 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
+let geometry, material;
+
 window.addEventListener("load", function(){
 		initEvent();
 		threeStart();
@@ -10,20 +13,20 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 // define initEvent()
 ////////////////////////////////////////
-var stopFlag = true;
-var restartFlag = false;
+let stopFlag = true;
+let restartFlag = false;
 
-var line1Flag = false;
-var line2Flag = false;
+let line1Flag = false;
+let line2Flag = false;
 
-var DirichletFlag = false;
-var NeumannFlag = false;
-var nonreflectiveFlag = true;
+let DirichletFlag = false;
+let NeumannFlag = false;
+let nonreflectiveFlag = true;
 
-var boxFlag = false;
+let boxFlag = false;
 
-var pngData;
-var pngName;
+let pngData;
+let pngName;
 function initEvent(){
 	document.getElementById("startButton").addEventListener("click", function(){
 			if(stopFlag){
@@ -46,7 +49,7 @@ function initEvent(){
 
 	//checkbox
 	$('#checkbox_line1').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				line1Flag = true;
 			}
 			else{
@@ -54,7 +57,7 @@ function initEvent(){
 			}
 	});
 	$('#checkbox_line2').click(function(){
-			if($(this).prop('checked') == true){
+			if($(this).prop('checked') === true){
 				line2Flag = true;
 			}
 			else{
@@ -69,7 +72,7 @@ function initEvent(){
 			step: 0.01,
 			value: alpha,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				alpha = value;
 				document.getElementById("input_alpha").value = value;
 			}
@@ -81,7 +84,7 @@ function initEvent(){
 			step: 1,
 			value: Amp,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_Amp").value = value;
 			}
 	});
@@ -93,7 +96,7 @@ function initEvent(){
 			step: 1,
 			value: _lambda,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_lambda").value = value;
 			}
 	});
@@ -105,7 +108,7 @@ function initEvent(){
 			step: 2,
 			value: space,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_space").value = value;
 			}
 	});
@@ -117,7 +120,7 @@ function initEvent(){
 			step: 1,
 			value: vel,
 			slide: function(event, ui){
-				var value = ui.value;
+				const value = ui.value;
 				document.getElementById("input_vel").value = value;
 			}
 	});
@@ -138,7 +141,7 @@ function threeStart(){
 /*  init Three functions  */
 
 //global variables
-var renderer, // renderer object
+let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
 
@@ -170,12 +173,12 @@ function initThree(){
 // define initCamera()
 ////////////////////////////////////////
 //global variables
-var camera, // camera object
+let camera, // camera object
 	 trackball; // trackball object
 
 function initCamera(){
 	//create camera object
-	var fov = 45,
+	const fov = 45,
 		 aspect = canvasFrame.clientWidth/canvasFrame.clientHeight,
 		 near = 1,
 		 far = 10000;
@@ -214,7 +217,7 @@ function initCamera(){
 // define initLight()
 ////////////////////////////////////////
 //global variables
-var directionalLight, //directionalLight object
+let directionalLight, //directionalLight object
 // 	 splotLight,
 // 	 lighthelper,
 	 ambientLight; // ambientlighLight object
@@ -253,68 +256,68 @@ function initLight(){
 // define initObject()
 ////////////////////////////////////////
 //global variables
-var axis; //axis object
+let axis; //axis object
 
-var lattice; //lattice object
+let lattice; //lattice object
 //number of object
-var N = 80;
+const N = 80;
 
-var sphere1;
-var sphere2;
+let sphere1;
+let sphere2;
 
-var box1;
-var box2;
+let box1;
+let box2;
 
-var line0;
-var line1;
-var line2;
+let line0;
+let line1;
+let line2;
 
 /* Wave format */
 //edge length
-var l = 1;
-var Step = 200;
+const l = 1;
+const Step = 200;
 
 //discreat param
-var dx = 0.1;
-var dt = 0.001;
+const dx = 0.1;
+const dt = 0.001;
 
 //time param
-var Time; //period 
-var time = 0;
-var skip = 3;
+let Time; //period 
+let time = 0;
+const skip = 3;
 
 //wave param
-var lambda = 1.0; //wave length
-var _lambda = lambda*(l/dx);
-var Amp = 2; //ampritude
-var phi = 0; //phase of source2
-var vel = 7;
-var space = 10;
-var box_width = 10;
-var x1 = space/2; //position of source1
-var x2 = -space/2; //position of source2
+let lambda = 1.0; //wave length
+let _lambda = lambda*(l/dx);
+let Amp = 2; //ampritude
+let phi = 0; //phase of source2
+let vel = 7;
+let space = 10;
+const box_width = 10;
+let x1 = space/2; //position of source1
+let x2 = -space/2; //position of source2
 // var d = 15;
 // var rho = 0.0007;
 
 //rendering speed
-var Slow = 0;
+const Slow = 0;
 
 //wave
-var u;
+let u;
 
 //wave opacity
-var alpha = 1;
+let alpha = 1;
 
 //init param
 function initWave(){
 	Time = lambda / vel;
-	var nt = 3;
+	const nt = 3;
 	u = new Array(nt);
-	for(var n = 0; n < nt; n++){
+	for(let n = 0; n < nt; n++){
 		u[n] = new Array(N + 1);
-		for(var i=0; i <= N; i++){
+		for(let i=0; i <= N; i++){
 			u[n][i] = new Array(N + 1);
-			for(var j=0; j<=N; j++){
+			for(let j=0; j<=N; j++){
 				u[n][i][j] = 0;
 			}
 		}
@@ -327,16 +330,16 @@ function initWave(){
 //numerical calculation of wave function
 function calculate(){
 	//source
-	for(var i=0; i<=N; i++){
+	for(let i=0; i<=N; i++){
 		u[0][0][i] = Amp * Math.sin(2 * Math.PI * (-dt)/Time);
 		u[1][0][i] = Amp * Math.sin(2 * Math.PI * time/Time);
 	}
 
 	//calculate vartex
-	var gamma2 = Math.pow(vel*dt/dx, 2);
-	if(boxFlag==false){
-		for(var i=1; i <= N-1; i++){
-			for(var j=1; j <= N-1; j++){
+	const gamma2 = Math.pow(vel*dt/dx, 2);
+	if(boxFlag===false){
+		for(let i=1; i <= N-1; i++){
+			for(let j=1; j <= N-1; j++){
 				if(i>=(N-box_width)/2 && i<=(N+box_width)/2){
 					if(j<=(N-space)/2 || j>=(N+space)/2){
 						continue;
@@ -346,9 +349,9 @@ function calculate(){
 			}
 		}
 	}
-	else if(boxFlag==true){
-		for(var i=1; i <= N-1; i++){
-			for(var j=1; j <= N-1; j++){
+	else if(boxFlag===true){
+		for(let i=1; i <= N-1; i++){
+			for(let j=1; j <= N-1; j++){
 				if(i>=(N-box_width)/2 && i<=(N+box_width)/2){
 					if(j>=(N-space)/2 && j<=(N+space)/2){
 						continue;
@@ -359,14 +362,14 @@ function calculate(){
 		}
 	}
 	//Dirichlet condition
-	if(DirichletFlag == true){
-		for (var i = 0; i <= N; i++) {
+	if(DirichletFlag === true){
+		for (let i = 0; i <= N; i++) {
 			u[2][i][0] = u[2][i][N] = u[2][0][i] = u[2][N][i] = 0.0;
 		}
 	}
 	//Neumann
-	else if(NeumannFlag == true){
-		for (var i = 1; i <= N - 1; i++) {
+	else if(NeumannFlag === true){
+		for (let i = 1; i <= N - 1; i++) {
 			u[2][i][0] = u[2][i][1];
 			u[2][i][N] = u[2][i][N - 1];
 			u[2][0][i] = u[2][1][i];
@@ -374,51 +377,51 @@ function calculate(){
 		}
 	}
 	//nonreflective
-	else if(nonreflectiveFlag == true){
+	else if(nonreflectiveFlag === true){
 		//edge condition
 		//around box object
-		if(boxFlag == false){
+		if(boxFlag === false){
 			//Neumann
-			for(var i=1; i<(N-box_width)/2; i++){
+			for(let i=1; i<(N-box_width)/2; i++){
 				u[2][i][0] = u[2][i][1];
 				u[2][i][N] = u[2][i][N - 1];
 			}
 			//nonreflective
-			for(var i=(N+box_width)/2; i<N; i++){
+			for(let i=(N+box_width)/2; i<N; i++){
 				u[2][i][0] = u[2][i][0]+vel*(dt/dx)*(u[1][i][1] - u[1][i][0]);
 				u[2][i][N] = u[2][i][N]+vel*(dt/dx)*(u[1][i][N-1] - u[1][i][N]);
 			}
-			for (var i = 1; i <= N - 1; i++) {
+			for (let i = 1; i <= N - 1; i++) {
 				u[2][N][i] = u[2][N][i]+vel*(dt/dx)*(u[1][N-1][i] - u[1][N][i]);
 			}
-			for(var i=1; i<(N-space)/2; i++){
+			for(let i=1; i<(N-space)/2; i++){
 				u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
 				u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
 			}
-			for(var i=(N+space)/2+1; i<N; i++){
+			for(let i=(N+space)/2+1; i<N; i++){
 				u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
 				u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
 			}
-			for(var i=(N-box_width)/2+1; i<(N+box_width)/2; i++){
+			for(let i=(N-box_width)/2+1; i<(N+box_width)/2; i++){
 				u[2][i][(N-space)/2] = u[2][i][(N-space)/2+1];
 				u[2][i][(N+space)/2] = u[2][i][(N+space)/2-1];
 			}
 		}
-		else if(boxFlag == true){
+		else if(boxFlag === true){
 			//Neumann
-			for(var i=1; i<N; i++){
+			for(let i=1; i<N; i++){
 				u[2][i][0] = u[2][i][1];
 				u[2][i][N] = u[2][i][N - 1];
 			}
 			//nonreflective
-			for (var i = 1; i <= N - 1; i++) {
+			for (let i = 1; i <= N - 1; i++) {
 				u[2][N][i] = u[2][N][i]+vel*(dt/dx)*(u[1][N-1][i] - u[1][N][i]);
 			}
-			for(var i=(N-space)/2+1; i<(N+space)/2; i++){
+			for(let i=(N-space)/2+1; i<(N+space)/2; i++){
 				u[2][(N-box_width)/2][i] = u[2][(N-box_width)/2-1][i];
 				u[2][(N+box_width)/2][i] = u[2][(N+box_width)/2+1][i];
 			}
-			for(var i=(N-box_width)/2; i<(N+box_width)/2; i++){
+			for(let i=(N-box_width)/2; i<(N+box_width)/2; i++){
 				u[2][i][(N-space)/2] = u[2][i][(N-space)/2-1];
 				u[2][i][(N+space)/2] = u[2][i][(N+space)/2+1];
 			}
@@ -430,7 +433,7 @@ function calculate(){
 	u[2][0][N] = (u[2][0][N - 1] + u[2][1][N]) / 2;
 	u[2][N][0] = (u[2][N - 1][0] + u[2][N][1]) / 2;
 	u[2][N][N] = (u[2][N - 1][N] + u[2][N][N - 1]) / 2;
-	if(boxFlag==false){
+	if(boxFlag===false){
 		u[2][(N-box_width)/2][0] = (u[2][(N-box_width)/2-1][0] + u[2][(N-box_width)/2][1]) / 2;
 		u[2][(N+box_width)/2][0] = (u[2][(N+box_width)/2+1][0] + u[2][(N+box_width)/2][1]) / 2;
 		u[2][(N-box_width)/2][N] = (u[2][(N-box_width)/2-1][N] + u[2][(N-box_width)/2][N-1]) / 2;
@@ -440,15 +443,15 @@ function calculate(){
 		u[2][(N-box_width)/2][(N+space)/2] = (u[2][(N-box_width)/2+1][(N+space)/2] + u[2][(N-box_width)/2][(N+space)/2+1]) / 2;
 		u[2][(N+box_width)/2][(N+space)/2] = (u[2][(N+box_width)/2-1][(N+space)/2] + u[2][(N+box_width)/2][(N+space)/2+1]) / 2;
 	}
-	else if(boxFlag==true){
+	else if(boxFlag===true){
 		u[2][(N-box_width)/2][(N-space)/2] = (u[2][(N-box_width)/2+1][(N-space)/2] + u[2][(N-box_width)/2][(N-space)/2+1]) / 2;
 		u[2][(N+box_width)/2][(N-space)/2] = (u[2][(N+box_width)/2-1][(N-space)/2] + u[2][(N+box_width)/2][(N-space)/2+1]) / 2;
 		u[2][(N-box_width)/2][(N+space)/2] = (u[2][(N-box_width)/2+1][(N+space)/2] + u[2][(N-box_width)/2][(N+space)/2-1]) / 2;
 		u[2][(N+box_width)/2][(N+space)/2] = (u[2][(N+box_width)/2-1][(N+space)/2] + u[2][(N+box_width)/2][(N+space)/2-1]) / 2;
 	}
 
-	for (var i = 0; i <= N; i++) {
-		for (var j = 0; j <= N; j++) {
+	for (let i = 0; i <= N; i++) {
+		for (let j = 0; j <= N; j++) {
 			u[0][i][j] = u[1][i][j];
 			u[1][i][j] = u[2][i][j];
 		}
@@ -457,6 +460,7 @@ function calculate(){
 }
 
 function initObject(){
+	let x, y;
 	//initWave
 	initWave();
 
@@ -464,21 +468,21 @@ function initObject(){
 	calculate();
 
 	//object create
-	var geometry = new THREE.Geometry();
-	var n=0;
-	for(var j=0; j <= N; j++){
-		for(var i=0; i <= N; i++){
-			var x = (-N/2 + i) * l;
-			var y = (-N/2 + j) * l;
-			var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+	let geometry = new THREE.Geometry();
+	let n=0;
+	for(let j=0; j <= N; j++){
+		for(let i=0; i <= N; i++){
+			x = (-N/2 + i) * l;
+			y = (-N/2 + j) * l;
+			const vertex = new THREE.Vector3(x, y, u[1][i][j]);
 			//add vertex
 			geometry.vertices[n] = vertex;
 			n++;
 		}
 	}
-	for(var j=0; j < N; j++){
-		for(var i=0; i < N; i++){
-			var face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
+	for(let j=0; j < N; j++){
+		for(let i=0; i < N; i++){
+			let face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
 			geometry.faces.push(face);
 			face = new THREE.Face3( (N+1)*j+i, (N+1)*(j+1)+i+1, (N+1)*(j+1)+i );
 			geometry.faces.push(face);
@@ -507,7 +511,7 @@ function initObject(){
 	// 	}
 
 	//create material
-	var material = new THREE.MeshPhongMaterial({
+	let material = new THREE.MeshPhongMaterial({
 			color: 0xBFFFFF, ambient: 0x000050,
 			side: THREE.DoubleSide,
 			specular: 0xFFFFFF, shininess: 190, 
@@ -535,8 +539,8 @@ function initObject(){
 	// 	sphere2.position.set(x2, 0, 0);
 
 	//box object
-	if(boxFlag==false){
-		var box_length = (l*N-space)/2;
+	if(boxFlag===false){
+		const box_length = (l*N-space)/2;
 		geometry = new THREE.BoxGeometry(box_width,box_length, 30);
 		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
 
@@ -560,20 +564,20 @@ function initObject(){
 	// 	DrawLine();
 
 	/*  floar drow  */
-	var yuka_n = 10,
+	const yuka_n = 10,
 		 yuka_w = N*l/10;
-	for(var i=-yuka_n/2; i<=yuka_n/2; i++){
-		for(var j=-yuka_n/2; j<=yuka_n/2; j++){
+	for(let i=-yuka_n/2; i<=yuka_n/2; i++){
+		for(let j=-yuka_n/2; j<=yuka_n/2; j++){
 			//position
-			var x = j*yuka_w;
-			var y = i*yuka_w;
+			x = j*yuka_w;
+			y = i*yuka_w;
 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
-			if(Math.abs(i+j) % 2 == 0){
+			if(Math.abs(i+j) % 2 === 0){
 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
 			}else{
 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
 			}
-			var plane = new THREE.Mesh(geometry, material);
+			const plane = new THREE.Mesh(geometry, material);
 			plane.position.set(x, y, -20);
 			plane.receiveShadow = true;
 			scene.add(plane);
@@ -585,49 +589,49 @@ function initObject(){
 ////////////////////////////////////////
 // define loop()
 ////////////////////////////////////////
-var step = 0;
-var slow = 0;
-var png_count = 0;
+let step = 0;
+let slow = 0;
+let png_count = 0;
 function loop(){
 	//update trackball object
 	trackball.update();
-	if(restartFlag == true){
+	if(restartFlag === true){
 		time = 0;
 		Amp = parseFloat(document.getElementById("input_Amp").value);
 		_lambda = parseFloat(document.getElementById("input_lambda").value);
 		space = parseInt(document.getElementById("input_space").value);
 		vel = parseInt(document.getElementById("input_vel").value);
-		var phaseList =document.getElementsByName("phase"); 
-		for(var i=0; i< phaseList.length; i++){
-			if(phaseList[i].checked && phaseList[i].value == "s")
+		const phaseList =document.getElementsByName("phase"); 
+		for(let i=0; i< phaseList.length; i++){
+			if(phaseList[i].checked && phaseList[i].value === "s")
 				phi = 0;
-			else if(phaseList[i].checked && phaseList[i].value == "r")
+			else if(phaseList[i].checked && phaseList[i].value === "r")
 				phi = Math.PI;
 		}
-		var boundList =document.getElementsByName("bound"); 
-		for(var i=0; i< boundList.length; i++){
-			if(boundList[i].checked && boundList[i].value == "Dir"){
+		const boundList =document.getElementsByName("bound"); 
+		for(let i=0; i< boundList.length; i++){
+			if(boundList[i].checked && boundList[i].value === "Dir"){
 				DirichletFlag = true;
 				NeumannFlag = false;
 				nonreflectiveFlag = false;
 			}
-			else if(boundList[i].checked && boundList[i].value == "Neu"){
+			else if(boundList[i].checked && boundList[i].value === "Neu"){
 				DirichletFlag = false;
 				NeumannFlag = true;
 				nonreflectiveFlag = false;
 			}
-			else if(boundList[i].checked && boundList[i].value == "Non"){
+			else if(boundList[i].checked && boundList[i].value === "Non"){
 				DirichletFlag = false;
 				NeumannFlag = false;
 				nonreflectiveFlag = true;
 			}
 		}
-		var ObjList = document.getElementsByName("Obj");
-		for(var i=0; i< ObjList.length; i++){
-			if(ObjList[i].checked && ObjList[i].value == "Space"){
+		const ObjList = document.getElementsByName("Obj");
+		for(let i=0; i< ObjList.length; i++){
+			if(ObjList[i].checked && ObjList[i].value === "Space"){
 				boxFlag = false;
 			}
-			else if(ObjList[i].checked && ObjList[i].value == "Box"){
+			else if(ObjList[i].checked && ObjList[i].value === "Box"){
 				boxFlag = true;
 			}
 		}
@@ -638,8 +642,8 @@ function loop(){
 
 		scene.remove(box1);
 		scene.remove(box2);
-		if(boxFlag==false){
-			var box_length = (l*N-space)/2;
+		if(boxFlag===false){
+			const box_length = (l*N-space)/2;
 			geometry = new THREE.BoxGeometry(box_width,box_length, 30);
 			material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
 
@@ -650,7 +654,7 @@ function loop(){
 			scene.add(box1);
 			scene.add(box2);
 		}
-		else if(boxFlag==true){
+		else if(boxFlag===true){
 			geometry = new THREE.BoxGeometry(box_width,space, 30);
 			material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
 
@@ -668,23 +672,23 @@ function loop(){
 		step = 0;
 	}
 
-	if(stopFlag == false){
+	if(stopFlag === false){
 
 		if(slow < Slow){
 			slow++;
 		}
 		else{
-			for(var i=0; i<skip; i++){
+			for(let i=0; i<skip; i++){
 				calculate();
 				step++;
 			}
 
-			var n = 0;
-			for(var j=0; j<=N; j++){
-				for(var i=0; i<=N; i++){
-					var x = (-N/2 + i) * l;
-					var y = (-N/2 + j) * l;
-					var vertex = new THREE.Vector3(x, y, u[1][i][j]);
+			let n = 0;
+			for(let j=0; j<=N; j++){
+				for(let i=0; i<=N; i++){
+					const x = (-N/2 + i) * l;
+					const y = (-N/2 + j) * l;
+					const vertex = new THREE.Vector3(x, y, u[1][i][j]);
 					lattice.geometry.vertices[n] = vertex;
 					n++;
 				}
