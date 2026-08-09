@@ -584,19 +584,23 @@ const mouse = new THREE.Vector2();
 const offset = new THREE.Vector3();
 const intersection = new THREE.Vector3();
 
-let mouseoveredObj;
 let draggedObj;
 function mouseEvent() {
-    renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-    renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    // mouseup は canvas ではなく window で受ける。canvas に付けていると、
-    // ボールを canvas の外まで運んでからボタンを離した場合に mouseup が
-    // 飛んでこず、ボールがマウスに追従したままになる。
-    window.addEventListener( 'mouseup', onDocumentMouseUp, false );
+    // TrackballControls も canvas の pointerdown を見ている。ボールを掴んだ
+    // ときだけそちらへイベントを渡さないようにしたいので、window の capture
+    // フェーズで先に受ける（同じ要素の listener では先に登録した
+    // TrackballControls が先に走ってしまうため）。
+    window.addEventListener( 'pointerdown', onDragPointerDown, true );
+    renderer.domElement.addEventListener( 'pointermove', onDragPointerMove, false );
+    // 掴んだあと canvas の外で離されることがあるので window で受ける。
+    // canvas に付けていると mouseup が飛んでこず、ボールが追従したままになる。
+    window.addEventListener( 'pointerup', onDragPointerUp, false );
+    window.addEventListener( 'pointercancel', onDragPointerUp, false );
 }
 
-function onDocumentMouseDown(event) {
-    const rect = event.target.getBoundingClientRect();
+// canvas 上の位置からカメラを通る ray を作り、objects との交点を返す
+function raycastFromEvent(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
     let mx = event.clientX - rect.left;
     let my = event.clientY - rect.top;
 
@@ -606,104 +610,89 @@ function onDocumentMouseDown(event) {
     let pos = new THREE.Vector3(mx, my, 1);
 
     pos.unproject(camera);
-    
+
     pos = pos.sub(camera.position).normalize();
     raycaster = new THREE.Raycaster( camera.position, pos );
-    const intersects = raycaster.intersectObjects(objects);
-
-
-    if (intersects.length > 0) {
-
-        draggedObj = intersects[0].object;
-
-        // rayとplaneの交点を求めてintersectionに設定
-        if (raycaster.ray.intersectPlane(plane, intersection)) {
-            // ドラッグ中のオブジェクトとplaneの距離
-            offset.copy(intersection).sub(draggedObj.position);
-        }
-    }
+    return raycaster.intersectObjects(objects);
 }
-function onDocumentMouseMove(event) {
+
+function onDragPointerDown(event) {
+    if (event.target !== renderer.domElement) return;
+
+    const intersects = raycastFromEvent(event);
+    // ボール以外を掴んだときは何もしない。イベントはそのまま
+    // TrackballControls へ流れ、これまで通り視点を回せる。
+    if (intersects.length === 0) return;
+
+    draggedObj = intersects[0].object;
+
+    // TrackballControls に渡さない。掴んでいる間は視点が回らなくなる。
+    event.stopPropagation();
+
+    // 掴んだ時点で plane をカメラに正対させる。以前はマウスオーバー時の分岐で
+    // しか設定しておらず、ボールの上を通らずに掴むと plane が初期値のままで、
+    // 交点が意図しない場所になっていた。
+    camera.getWorldDirection(plane.normal);
+
+    // rayとplaneの交点を求めてintersectionに設定
+    if (raycaster.ray.intersectPlane(plane, intersection)) {
+        // ドラッグ中のオブジェクトとplaneの距離
+        offset.copy(intersection).sub(draggedObj.position);
+    }
+
+    // ポインタを canvas に固定し、canvas の外へ出ても pointermove を受け取る。
+    // 掴む処理そのものは済ませたあとに呼ぶ（ここが失敗しても canvas 内では
+    // 通常どおりドラッグできる）。
+    renderer.domElement.setPointerCapture(event.pointerId);
+}
+function onDragPointerMove(event) {
+    // 掴んでいないときは何もしない。掴んだ時点で plane を設定するように
+    // したので、マウスオーバーを追いかける必要がなくなった。
+    if (!draggedObj) return;
+
     event.preventDefault();
 
-    const rect = event.target.getBoundingClientRect();
-    let mx = event.clientX - rect.left;
-    let my = event.clientY - rect.top;
+    raycastFromEvent(event);
 
-    mx = (mx / renderer.domElement.width) * 2 - 1;
-    my = -(my /renderer.domElement.height) * 2 + 1;
-
-    let pos = new THREE.Vector3(mx, my, 1);
-
-    pos.unproject(camera);
-    
-    pos = pos.sub(camera.position).normalize();
-    raycaster = new THREE.Raycaster( camera.position, pos );
-
-   // raycaster.setFromCamera(camera.position, pos);
-
-    if (draggedObj) {
-        // オブジェクトをドラッグして移動させているとき
-
-        // rayとplaneの交点をintersectionに設定
-        if (raycaster.ray.intersectPlane(plane, intersection)) {
-            // オブジェクトをplaneに対して平行に移動させる
-            draggedObj.position.copy(intersection.sub(offset));
-            // オブジェクトの位置を粒子の位置に直す 
-            const x1 = sphere1.position.x;
-            const y1 = -sphere1.position.y;
-            const x2 = sphere2.position.x;
-            const y2 = -sphere2.position.y;
-            l = Math.sqrt(x1*x1 + y1*y1);
-            L = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-            let sign_theta0 = 1;
-            if(x1 < 0){
-                sign_theta0 = -1;
-            }
-            theta0 = sign_theta0 * Math.acos(y1/l);
-            let sign_phi0 = 1;
-            if(x2-x1 < 0){
-                sign_phi0 = -1;
-            }
-            phi0 = sign_phi0 * Math.acos((y2-y1)/L);
-            p1.angle = theta0;
-            p1.angle_v = 0;
-            p2.angle = phi0;
-            p2.angle_v = 0;
-            calculatePosition();
-            scene.remove(line1);
-            scene.remove(line2);
-            createLines();
+    // rayとplaneの交点をintersectionに設定
+    if (raycaster.ray.intersectPlane(plane, intersection)) {
+        // オブジェクトをplaneに対して平行に移動させる
+        draggedObj.position.copy(intersection.sub(offset));
+        // オブジェクトの位置を粒子の位置に直す
+        const x1 = sphere1.position.x;
+        const y1 = -sphere1.position.y;
+        const x2 = sphere2.position.x;
+        const y2 = -sphere2.position.y;
+        l = Math.sqrt(x1*x1 + y1*y1);
+        L = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+        let sign_theta0 = 1;
+        if(x1 < 0){
+            sign_theta0 = -1;
         }
-    }
-    else {
-        // オブジェクトをドラッグしないでマウスを動かしている場合
-        const intersects = raycaster.intersectObjects(objects);
-
-        if (intersects.length > 0) {
-            if (mouseoveredObj !== intersects[0].object) {
-                // マウスオーバー中のオブジェクトを入れ替え
-                mouseoveredObj = intersects[0].object;
-
-                // plane.normalにカメラの方向ベクトルを設定
-                // 平面の角度をカメラの向きに対して垂直に維持する
-                camera.getWorldDirection(plane.normal);
-            }
+        theta0 = sign_theta0 * Math.acos(y1/l);
+        let sign_phi0 = 1;
+        if(x2-x1 < 0){
+            sign_phi0 = -1;
         }
-        else {
-            mouseoveredObj = null;
-        }
+        phi0 = sign_phi0 * Math.acos((y2-y1)/L);
+        p1.angle = theta0;
+        p1.angle_v = 0;
+        p2.angle = phi0;
+        p2.angle_v = 0;
+        calculatePosition();
+        scene.remove(line1);
+        scene.remove(line2);
+        createLines();
     }
 }
 
-function onDocumentMouseUp(event) {
-    event.preventDefault();
+function onDragPointerUp(event) {
+    if (!draggedObj) return;
 
-    trackball.enabled = true;
-
-    // mouseoveredObj が入っているときだけ解除していたが、これはドラッグ中に
-    // 更新されない（更新するのは「ドラッグしていないとき」の分岐だけ）。
-    // ボールの上を通らずに掴んだ場合などは null のままなので解除されず、
-    // ボールがマウスに追従し続けていた。ボタンを離したら常に解除する。
+    // 指やボタンを離したら必ず追従を切る
     draggedObj = null;
+
+    if (renderer.domElement.hasPointerCapture(event.pointerId)) {
+        renderer.domElement.releasePointerCapture(event.pointerId);
+    }
 }
