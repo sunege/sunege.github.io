@@ -6,6 +6,7 @@
 
 //System Parameter
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { lineGeometry } from '../../js/common/geometry.js';
 
 let time = 0;		// time
 let dt = 0.0001; // Delta t
@@ -466,24 +467,24 @@ let text_zero; //text object
 function initObject(){
     let origin, scale;
     //center line
-    const center_geometry = new THREE.Geometry();
-    center_geometry.vertices.push(new THREE.Vector3(-50, 0, 0));
-    center_geometry.vertices.push(new THREE.Vector3(50, 0, 0));
-    const center_line = new THREE.Line(center_geometry, new THREE.LineBasicMaterial({color: 0x99ff00}));
+    const center_geometry = [];
+    center_geometry.push(new THREE.Vector3(-50, 0, 0));
+    center_geometry.push(new THREE.Vector3(50, 0, 0));
+    const center_line = new THREE.Line(lineGeometry(center_geometry), new THREE.LineBasicMaterial({color: 0x99ff00}));
     scene.add(center_line);
 
     //upper line
-    const upper_geometry = new THREE.Geometry();
-    upper_geometry.vertices.push(new THREE.Vector3(-50, A, 0));
-    upper_geometry.vertices.push(new THREE.Vector3(50, A, 0));
-    const upper_line = new THREE.Line(upper_geometry, new THREE.LineBasicMaterial({color: 0x99ff00}));
+    const upper_geometry = [];
+    upper_geometry.push(new THREE.Vector3(-50, A, 0));
+    upper_geometry.push(new THREE.Vector3(50, A, 0));
+    const upper_line = new THREE.Line(lineGeometry(upper_geometry), new THREE.LineBasicMaterial({color: 0x99ff00}));
     scene.add(upper_line);
 
     //bottom line
-    const bottom_geometry = new THREE.Geometry();
-    bottom_geometry.vertices.push(new THREE.Vector3(-50, -A, 0));
-    bottom_geometry.vertices.push(new THREE.Vector3(50, -A, 0));
-    const bottom_line = new THREE.Line(bottom_geometry, new THREE.LineBasicMaterial({color: 0x99ff00}));
+    const bottom_geometry = [];
+    bottom_geometry.push(new THREE.Vector3(-50, -A, 0));
+    bottom_geometry.push(new THREE.Vector3(50, -A, 0));
+    const bottom_line = new THREE.Line(lineGeometry(bottom_geometry), new THREE.LineBasicMaterial({color: 0x99ff00}));
     scene.add(bottom_line);
 	//create axis object
 // 	axis = new THREE.AxisHelper(100);
@@ -670,11 +671,11 @@ function initObject(){
     orbital_vertices = [];
     orbital_geometry = [];
     for(let i=0; i<N; i++){
-        orbital_geometry[i] = new THREE.Geometry();
+        orbital_geometry[i] = [];
         orbital_vertices[i] = new Array();
         orbital_vertices[i].push(new THREE.Vector3(p[i].x, p[i].y, p[i].z));
-        orbital_geometry[i].vertices.push(orbital_vertices[i][0]);
-        orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
+        orbital_geometry[i].push(orbital_vertices[i][0]);
+        orbital[i] = new THREE.Line(lineGeometry(orbital_geometry[i]), orbital_material);
         scene.add(orbital[i]);
     }
 
@@ -770,10 +771,9 @@ function update_object(){
         //orbital
         scene.remove(orbital[i]);
         //add vertex
-        orbital_geometry[i] = new THREE.Geometry();
         orbital_vertices[i].push(new THREE.Vector3(p[i].x, p[i].y, p[i].z));
-        orbital_geometry[i].vertices = orbital_vertices[i];
-        orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
+        orbital_geometry[i] = orbital_vertices[i];
+        orbital[i] = new THREE.Line(lineGeometry(orbital_geometry[i]), orbital_material);
         if(orbital_flag === true){
             scene.add(orbital[i]);
         }

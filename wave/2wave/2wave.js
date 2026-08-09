@@ -2,6 +2,7 @@
 // define window event 
 ////////////////////////////////////////
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { gridGeometry, fillGrid, lineGeometry } from '../../js/common/geometry.js';
 
 window.addEventListener("load", function(){
 		initEvent();
@@ -216,7 +217,6 @@ function initObject(){
 
 	for(let step=0; step < Step; step++){
 		f[step] = new Array(N + 1);
-		geometry = new THREE.Geometry();
 
 		for(let i=0; i <= N; i++){
 			f[step][i] = new Array(N + 1);
@@ -230,29 +230,9 @@ function initObject(){
 		}
 		time += dt;
 	}
-	let n=0;
-	for(let j=0; j <= N; j++){
-		for(let i=0; i <= N; i++){
-			x = (-N/2 + i) * l;
-			y = (-N/2 + j) * l;
-			const vertex = new THREE.Vector3(x, y, f[0][i][j]);
-			//add vertex
-			geometry.vertices[n] = vertex;
-			n++;
-		}
-	}
-	for(let j=0; j < N; j++){
-		for(let i=0; i < N; i++){
-			let face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
-			geometry.faces.push(face);
-			face = new THREE.Face3( (N+1)*j+i, (N+1)*(j+1)+i+1, (N+1)*(j+1)+i );
-			geometry.faces.push(face);
-		}
-	}
-	//calculate surface normal
-	geometry.computeFaceNormals();
-	//calculate vertex normal vector
-	geometry.computeVertexNormals();
+	//add vertices and calculate vertex normal vector
+	geometry = gridGeometry(N);
+	fillGrid(geometry, N, (i, j) => [(-N/2 + i) * l, (-N/2 + j) * l, f[0][i][j]]);
 
 	//create material
 	let material = new THREE.MeshPhongMaterial({ color: 0x88DDFF, ambient: 0x000000,
@@ -287,7 +267,7 @@ function initObject(){
 // DrawLine
 ///////////////////
 function DrawLine(){
-	let a2, c2, line1Geometry, line2Geometry, vertex, x, y;
+	let a2, c2, line1Points, line2Points, vertex, x, y;
 	const z_line = 0.10; //line position z
 	let m1 = 0;
 	let flag1 = false;
@@ -302,24 +282,24 @@ function DrawLine(){
 
 	const line1Material = new THREE.LineBasicMaterial({ color: 0xFF0000 ,linewidth: 4});
 	for(let n=0; n<m1; n++){
-		line1Geometry = new THREE.Geometry();
+		line1Points = [];
 		a2 = Math.pow(n*lambda/2, 2);
 		c2 = Math.pow(space/2, 2);
 
 		if(flag1 === true  && n === m1-1){
 			vertex = new THREE.Vector3(space/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
+			line1Points.push(vertex);
 			vertex = new THREE.Vector3(N/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
-			line1[num] = new THREE.Line(line1Geometry, line1Material);
+			line1Points.push(vertex);
+			line1[num] = new THREE.Line(lineGeometry(line1Points), line1Material);
 			scene.add(line1[num]);
 			num++;
-			line1Geometry = new THREE.Geometry();
+			line1Points = [];
 			vertex = new THREE.Vector3(-space/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
+			line1Points.push(vertex);
 			vertex = new THREE.Vector3(-N/2, 0, z_line);
-			line1Geometry.vertices.push(vertex);
-			line1[num] = new THREE.Line(line1Geometry, line1Material);
+			line1Points.push(vertex);
+			line1[num] = new THREE.Line(lineGeometry(line1Points), line1Material);
 			scene.add(line1[num]);
 			num++;
 
@@ -333,13 +313,13 @@ function DrawLine(){
 				x = Math.sqrt(a2*(1+y*y/(c2-a2)));
 			}
 			vertex = new THREE.Vector3(x, y, z_line);
-			line1Geometry.vertices.push(vertex);
+			line1Points.push(vertex);
 		}
-		line1[num] = new THREE.Line(line1Geometry, line1Material);
+		line1[num] = new THREE.Line(lineGeometry(line1Points), line1Material);
 		scene.add(line1[num]);
 		num++;
 		if(n !== 0){
-			line1Geometry = new THREE.Geometry();
+			line1Points = [];
 			for(let j=0; j<=N; j++){
 				y = (-N/2 + j) * l;
 				if(n===0){
@@ -349,9 +329,9 @@ function DrawLine(){
 					x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
 				}
 				vertex = new THREE.Vector3(x, y, z_line);
-				line1Geometry.vertices.push(vertex);
+				line1Points.push(vertex);
 			}
-			line1[num] = new THREE.Line(line1Geometry, line1Material);
+			line1[num] = new THREE.Line(lineGeometry(line1Points), line1Material);
 			scene.add(line1[num]);
 			num++;
 		}
@@ -369,24 +349,24 @@ function DrawLine(){
 
 	const line2Material = new THREE.LineBasicMaterial({ color: 0x0000FF, linewidth: 4 });
 	for(let n=0; n<m2; n++){
-		line2Geometry = new THREE.Geometry();
+		line2Points = [];
 		a2 = Math.pow((n+1/2)*lambda/2, 2);
 		c2 = Math.pow(space/2, 2);
 
 		if(flag2 === true  && n === m2-1){
 			vertex = new THREE.Vector3(space/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
+			line2Points.push(vertex);
 			vertex = new THREE.Vector3(N/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
-			line2[num] = new THREE.Line(line2Geometry, line2Material);
+			line2Points.push(vertex);
+			line2[num] = new THREE.Line(lineGeometry(line2Points), line2Material);
 			scene.add(line2[num]);
 			num++;
-			line2Geometry = new THREE.Geometry();
+			line2Points = [];
 			vertex = new THREE.Vector3(-space/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
+			line2Points.push(vertex);
 			vertex = new THREE.Vector3(-N/2, 0, z_line);
-			line2Geometry.vertices.push(vertex);
-			line2[num] = new THREE.Line(line2Geometry, line2Material);
+			line2Points.push(vertex);
+			line2[num] = new THREE.Line(lineGeometry(line2Points), line2Material);
 			scene.add(line2[num]);
 			num++;
 		}
@@ -394,19 +374,19 @@ function DrawLine(){
 			y = (-N/2 + j) * l;
 			x = Math.sqrt(a2*(1+y*y/(c2-a2)));
 			vertex = new THREE.Vector3(x, y, z_line);
-			line2Geometry.vertices.push(vertex);
+			line2Points.push(vertex);
 		}
-		line2[num] = new THREE.Line(line2Geometry, line2Material);
+		line2[num] = new THREE.Line(lineGeometry(line2Points), line2Material);
 		scene.add(line2[num]);
 		num++;
-		line2Geometry = new THREE.Geometry();
+		line2Points = [];
 		for(let j=0; j<=N; j++){
 			y = (-N/2 + j) * l;
 			x = -Math.sqrt(a2*(1+y*y/(c2-a2)));
 			vertex = new THREE.Vector3(x, y, z_line);
-			line2Geometry.vertices.push(vertex);
+			line2Points.push(vertex);
 		}
-		line2[num] = new THREE.Line(line2Geometry, line2Material);
+		line2[num] = new THREE.Line(lineGeometry(line2Points), line2Material);
 		scene.add(line2[num]);
 		num++;
 	}
@@ -467,30 +447,13 @@ function loop(){
 			else{
 
 				step++;
-				n = 0;
-				for(let j=0; j<=N; j++){
-					for(let i=0; i<=N; i++){
-						x = (-N/2 + i) * l;
-						y = (-N/2 + j) * l;
-						const vertex = new THREE.Vector3(x, y, f[step%Step][i][j]);
-						lattice.geometry.vertices[n] = vertex;
-						n++;
-					}
-				}
+				fillGrid(lattice.geometry, N, (i, j) => [(-N/2 + i) * l, (-N/2 + j) * l, f[step%Step][i][j]]);
 				sphere1.position.set(x1, 0, Amp*Math.sin(2*Math.PI*time/Time));
 				sphere2.position.set(x2, 0, Amp*Math.sin(2*Math.PI*time/Time + phi));
 // 				sphere2.position.set(x2, 0, f[step%Step][N/2 - space/2][N/2]);
-				lattice.geometry.verticesNeedUpdate = true;
-				lattice.geometry.normalsNeedUpdate = true;
-				lattice.geometry.computeFaceNormals();
-				lattice.geometry.computeVertexNormals();
 				time += dt;
 				slow = 0;
 			}
-		}
-		else{
-			lattice.geometry.verticesNeedUpdate = false;
-			lattice.geometry.normalsNeedUpdate = false;
 		}
 
 		if(line1Flag === false){

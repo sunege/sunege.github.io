@@ -6,6 +6,7 @@
 //constant value
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { lineGeometry } from '../../js/common/geometry.js';
 
 let L, l, mass2, phi0, radisu_ball, theta0;
 
@@ -385,14 +386,14 @@ function createCylinder() {
 }
 
 function createLines() {
-    const geometry_line1 = new THREE.Geometry();
-    geometry_line1.vertices.push(new THREE.Vector3(0,0,0));
-    geometry_line1.vertices.push(new THREE.Vector3(ball.x, ball.y,ball.z));
+    const geometry_line1 = [];
+    geometry_line1.push(new THREE.Vector3(0,0,0));
+    geometry_line1.push(new THREE.Vector3(ball.x, ball.y,ball.z));
 
     const material_line = new THREE.LineBasicMaterial();
 
 
-    line1 = new THREE.Line(geometry_line1, material_line);
+    line1 = new THREE.Line(lineGeometry(geometry_line1), material_line);
 
     scene.add(line1);
 }
@@ -400,17 +401,15 @@ function createLines() {
 let contour1_vertices = [];
 let contour2_vertices = [];
 function createContour() {
-    const geometry_contour1 = new THREE.Geometry();
-    geometry_contour1.vertices = contour1_vertices;
+    const geometry_contour1 = contour1_vertices;
 
-    const geometry_contour2 = new THREE.Geometry();
-    geometry_contour2.vertices = contour2_vertices;
+    const geometry_contour2 = contour2_vertices;
 
     const material_contour1 = new THREE.LineBasicMaterial({color: 0xffff00, linewidth: 1});
     const material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
 
-    contour1 = new THREE.Line(geometry_contour1, material_contour1);
-    contour2 = new THREE.Line(geometry_contour2, material_contour2);
+    contour1 = new THREE.Line(lineGeometry(geometry_contour1), material_contour1);
+    contour2 = new THREE.Line(lineGeometry(geometry_contour2), material_contour2);
 
     if( contour1_vertices.length >= 2 && contourFlag ) {
         scene.add(contour1);

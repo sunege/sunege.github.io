@@ -5,6 +5,7 @@
 //////////////////////////
 //constant value
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { lineGeometry } from '../../js/common/geometry.js';
 
 const pi = Math.PI;
 const g = 9.80665; 
@@ -430,18 +431,18 @@ function createShperes() {
 }
 
 function createLines() {
-    const geometry_line1 = new THREE.Geometry();
-    geometry_line1.vertices.push(new THREE.Vector3(0,0,0));
-    geometry_line1.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
+    const geometry_line1 = [];
+    geometry_line1.push(new THREE.Vector3(0,0,0));
+    geometry_line1.push(new THREE.Vector3(p1.x, p1.y,0));
 
-    const geometry_line2 = new THREE.Geometry();
-    geometry_line2.vertices.push(new THREE.Vector3(p1.x, p1.y,0));
-    geometry_line2.vertices.push(new THREE.Vector3(p2.x, p2.y,0));
+    const geometry_line2 = [];
+    geometry_line2.push(new THREE.Vector3(p1.x, p1.y,0));
+    geometry_line2.push(new THREE.Vector3(p2.x, p2.y,0));
 
     const material_line = new THREE.LineBasicMaterial({color: 0x00ffff, linewidth: 2});
 
-    line1 = new THREE.Line(geometry_line1, material_line);
-    line2 = new THREE.Line(geometry_line2, material_line);
+    line1 = new THREE.Line(lineGeometry(geometry_line1), material_line);
+    line2 = new THREE.Line(lineGeometry(geometry_line2), material_line);
 
     scene.add(line1);
     scene.add(line2);
@@ -450,17 +451,15 @@ function createLines() {
 let contour1_vertices = [];
 let contour2_vertices = [];
 function createContour() {
-    const geometry_contour1 = new THREE.Geometry();
-    geometry_contour1.vertices = contour1_vertices;
+    const geometry_contour1 = contour1_vertices;
 
-    const geometry_contour2 = new THREE.Geometry();
-    geometry_contour2.vertices = contour2_vertices;
+    const geometry_contour2 = contour2_vertices;
 
     const material_contour1 = new THREE.LineBasicMaterial({color: 0x99ff00, linewidth: 1});
     const material_contour2 = new THREE.LineBasicMaterial({color: 0xff9900, linewidth: 1});
 
-    contour1 = new THREE.Line(geometry_contour1, material_contour1);
-    contour2 = new THREE.Line(geometry_contour2, material_contour2);
+    contour1 = new THREE.Line(lineGeometry(geometry_contour1), material_contour1);
+    contour2 = new THREE.Line(lineGeometry(geometry_contour2), material_contour2);
 
     if( contour1_vertices.length >= 2 && contourFlag ) {
         scene.add(contour1);

@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { gridGeometry, fillGrid } from '../../js/common/geometry.js';
 
 let geometry, material;
 
@@ -414,30 +415,8 @@ function initObject(){
 	calculate();
 
 	//object create
-	let geometry = new THREE.Geometry();
-	let n=0;
-	for(let j=0; j <= N; j++){
-		for(let i=0; i <= N; i++){
-			x = (-N/2 + i) * l;
-			y = (-N/2 + j) * l;
-			const vertex = new THREE.Vector3(x, y, u[1][i][j]);
-			//add vertex
-			geometry.vertices[n] = vertex;
-			n++;
-		}
-	}
-	for(let j=0; j < N; j++){
-		for(let i=0; i < N; i++){
-			let face = new THREE.Face3( (N+1)*j+i, (N+1)*j+i+1,  (N+1)*(j+1)+i+1 );
-			geometry.faces.push(face);
-			face = new THREE.Face3( (N+1)*j+i, (N+1)*(j+1)+i+1, (N+1)*(j+1)+i );
-			geometry.faces.push(face);
-		}
-	}
-	//calculate surface normal
-	geometry.computeFaceNormals();
-	//calculate vertex normal vector
-	geometry.computeVertexNormals();
+	let geometry = gridGeometry(N);
+	fillGrid(geometry, N, (i, j) => [(-N/2 + i) * l, (-N/2 + j) * l, u[1][i][j]]);
 
 	// 	for(var n=0; n < geometry.faces.length/2; n++){
 	// 		for(var i=0; i<N; i++){
@@ -629,29 +608,12 @@ function loop(){
 				step++;
 			}
 
-			let n = 0;
-			for(let j=0; j<=N; j++){
-				for(let i=0; i<=N; i++){
-					const x = (-N/2 + i) * l;
-					const y = (-N/2 + j) * l;
-					const vertex = new THREE.Vector3(x, y, u[1][i][j]);
-					lattice.geometry.vertices[n] = vertex;
-					n++;
-				}
-			}
+			fillGrid(lattice.geometry, N, (i, j) => [(-N/2 + i) * l, (-N/2 + j) * l, u[1][i][j]]);
 			sphere1.position.set(x1, 0, u[1][N/2 + space/2][N/2]);
 			sphere2.position.set(x2, 0, u[1][N/2 - space/2][N/2]);
-			lattice.geometry.verticesNeedUpdate = true;
-			lattice.geometry.normalsNeedUpdate = true;
-			lattice.geometry.computeFaceNormals();
-			lattice.geometry.computeVertexNormals();
 			lattice.material.opacity = alpha;
 			slow = 0;
 		}
-	}
-	else{
-		lattice.geometry.verticesNeedUpdate = false;
-		lattice.geometry.normalsNeedUpdate = false;
 	}
 
 	//init clear color

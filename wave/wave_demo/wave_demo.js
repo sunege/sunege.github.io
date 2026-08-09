@@ -6,6 +6,7 @@
 
 //System Parameter
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { lineGeometry } from '../../js/common/geometry.js';
 
 const time = 0;		// time
 let dt = 2; // Delta t
@@ -526,11 +527,11 @@ function initObject(){
 	orbital_vertices = [];
 	orbital_geometry = [];
 	for(let i=0; i<N; i++){
-		orbital_geometry[i] = new THREE.Geometry();
+		orbital_geometry[i] = [];
 		orbital_vertices[i] = new Array();
 		orbital_vertices[i].push(new THREE.Vector3(p[i].x, p[i].y, p[i].z));
-		orbital_geometry[i].vertices.push(orbital_vertices[i][0]);
-		orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
+		orbital_geometry[i].push(orbital_vertices[i][0]);
+		orbital[i] = new THREE.Line(lineGeometry(orbital_geometry[i]), orbital_material);
 		scene.add(orbital[i]);
 	}
 
@@ -565,10 +566,9 @@ function update_object(){
 		//orbital
 		scene.remove(orbital[i]);
 		//add vertex
-		orbital_geometry[i] = new THREE.Geometry();
 		orbital_vertices[i].push(new THREE.Vector3(p[i].x, p[i].y, p[i].z));
-		orbital_geometry[i].vertices = orbital_vertices[i];
-		orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
+		orbital_geometry[i] = orbital_vertices[i];
+		orbital[i] = new THREE.Line(lineGeometry(orbital_geometry[i]), orbital_material);
 		if(orbital_flag === true){
 			scene.add(orbital[i]);
 		}
@@ -659,10 +659,10 @@ function loop(){
 // 			orbital
 // 			scene.remove(orbital[i]);
 			//add vertex
-// 			orbital_geometry[i] = new THREE.Geometry();
+// 			orbital_geometry[i] = [];
 // 			orbital_vertices[i].push(new THREE.Vector3(0,i*100/N,5*Math.sin(time+i)));
-// 			orbital_geometry[i].vertices = orbital_vertices[i];
-// 			orbital[i] = new THREE.Line(orbital_geometry[i], orbital_material);
+// 			orbital_geometry[i] = orbital_vertices[i];
+// 			orbital[i] = new THREE.Line(lineGeometry(orbital_geometry[i]), orbital_material);
 // 			if(orbital_flag == true){
 // 				scene.add(orbital[i]);
 // 			}

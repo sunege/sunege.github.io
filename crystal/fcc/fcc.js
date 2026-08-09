@@ -7,6 +7,7 @@
 //System Parameter
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { quadGeometry } from '../../js/common/geometry.js';
 
 let wall2, wall3, wall4, wall5, wall6;
 
@@ -286,23 +287,7 @@ function initObject(){
 }
 
 function wall(v1, v2, v3, v4){
-    const vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
-    const vertex2 = new THREE.Vector3(v2.x, v2.y, v2.z);
-    const vertex3 = new THREE.Vector3(v3.x, v3.y, v3.z);
-    const vertex4 = new THREE.Vector3(v4.x, v4.y, v4.z);
-    const geometry = new THREE.Geometry();
-    geometry.vertices.push(vertex1);
-    geometry.vertices.push(vertex2);
-    geometry.vertices.push(vertex3);
-    geometry.vertices.push(vertex4);
-    let face = new THREE.Face3(0, 1, 2);
-    geometry.faces.push(face);
-    face = new THREE.Face3(0, 2, 3);
-    geometry.faces.push(face);
-    //calculate surface normal
-    geometry.computeFaceNormals();
-    //calculate vertex normal vector
-    geometry.computeVertexNormals();
+    const geometry = quadGeometry([v1, v2, v3, v4]);
 
     //create material
     const material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });

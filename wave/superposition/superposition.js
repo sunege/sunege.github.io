@@ -2,6 +2,7 @@
 // define window event 
 ////////////////////////////////////////
 import { initThree, initLight } from '../../js/common/three-setup.js';
+import { lineGeometry } from '../../js/common/geometry.js';
 
 window.addEventListener("load", function(){
 		initEvent();
@@ -329,39 +330,39 @@ function initObject(){
 	grid = new Array(num_grid_x + num_grid_y);
 	//pallarel x axial
 	for(let i=0; i<num_grid_x; i++){
-		gridGeometry = new THREE.Geometry();
+		gridGeometry = [];
 		const y = (i-(num_grid_x - 1) / 2) * grid_diff
 		v1 = new THREE.Vector3(0, y, -0.05);  
 		v2 = new THREE.Vector3(l, y, -0.05);  
-		gridGeometry.vertices.push(v1);
-		gridGeometry.vertices.push(v2);
+		gridGeometry.push(v1);
+		gridGeometry.push(v2);
 		if(i===(num_grid_x - 1) / 2){
 			gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 2});
 		}
 		else{
 			gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
 		}
-		grid[i] = new THREE.Line(gridGeometry, gridMaterial);
+		grid[i] = new THREE.Line(lineGeometry(gridGeometry), gridMaterial);
 		scene.add(grid[i]);
 	}
 	//pallarel y axial
 	for(let i=0; i<num_grid_y; i++){
-		gridGeometry = new THREE.Geometry();
+		gridGeometry = [];
 		const x = i * grid_diff
 		v1 = new THREE.Vector3(x, (-1)*((num_grid_x - 1) / 2) * grid_diff, -0.05);  
 		v2 = new THREE.Vector3(x, ((num_grid_x - 1) / 2) * grid_diff, -0.05);  
-		gridGeometry.vertices.push(v1);
-		gridGeometry.vertices.push(v2);
+		gridGeometry.push(v1);
+		gridGeometry.push(v2);
 		gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
-		grid[i + num_grid_x] = new THREE.Line(gridGeometry, gridMaterial);
+		grid[i + num_grid_x] = new THREE.Line(lineGeometry(gridGeometry), gridMaterial);
 		scene.add(grid[i + num_grid_x]);
 	}
 
 }
 function calculate(){
-	const geometry1 = new THREE.Geometry(); //geometry object
-	const geometry2 = new THREE.Geometry(); //geometry object
-	const geometry3 = new THREE.Geometry(); //geometry object
+	const geometry1 = []; //geometry object
+	const geometry2 = []; //geometry object
+	const geometry3 = []; //geometry object
 	let n=0;
 	for(let i=0; i<=N; i++){
 		const omega1 = 2*Math.PI*vel/lambda1;
@@ -378,17 +379,17 @@ function calculate(){
 		const vertex3 = new THREE.Vector3(x, u3[i], 0);
 
 		//add vertex
-		geometry1.vertices[n] = vertex1;
-		geometry2.vertices[n] = vertex2;
-		geometry3.vertices[n] = vertex3;
+		geometry1[n] = vertex1;
+		geometry2[n] = vertex2;
+		geometry3[n] = vertex3;
 		n++;
 	}
 	const line1Material = new THREE.LineBasicMaterial({ color: 0xDD88FF ,linewidth: 4});
 	const line2Material = new THREE.LineBasicMaterial({ color: 0x88DDFF ,linewidth: 4});
 	const line3Material = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 4});
-	line1 = new THREE.Line(geometry1, line1Material);
-	line2 = new THREE.Line(geometry2, line2Material);
-	line3 = new THREE.Line(geometry3, line3Material);
+	line1 = new THREE.Line(lineGeometry(geometry1), line1Material);
+	line2 = new THREE.Line(lineGeometry(geometry2), line2Material);
+	line3 = new THREE.Line(lineGeometry(geometry3), line3Material);
 }
 
 
