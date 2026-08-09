@@ -5,6 +5,8 @@
 ////////////////////
 
 //System Parameter
+import { initThree, initLight } from '../../js/common/three-setup.js';
+
 let time = 0;		// time
 let dt = 0.0001; // Delta t
 let N = 100;	   // number of particle
@@ -350,10 +352,10 @@ function initEvent(){
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
-	initThree();
+	({ renderer, scene, canvasFrame } = initThree());
 // 	mouseEvent();
 	initCamera();
-	initLight();
+	initLight(scene, { positions: [[100, 100, 100]] });
 	initObject();
 	loop();
 }
@@ -363,33 +365,7 @@ function threeStart(){
 //global variables
 let renderer, // renderer object
 	 scene, // scene object
-	 canvasFrame; //DOM element
-
-////////////////////////////////////////
-// define initThree()
-////////////////////////////////////////
-function initThree(){
-	canvasFrame = document.getElementById('canvas-frame');
-
-	//create renderer object
-	renderer = new THREE.WebGLRenderer({ antialias: true });
-	if(!renderer) alert('Fale: init three.js');
-
-	//set renderer size
-	renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
-
-	//add canvas element to DOM
-	canvasFrame.appendChild(renderer.domElement);
-
-	//set renderer options
-	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true;
-
-	//create scene object
-	scene = new THREE.Scene();
-}
-
-////////////////////////////////////////
+	 canvasFrame;////////////////////////////////////////
 // define initCamera()
 ////////////////////////////////////////
 //global variables
@@ -439,25 +415,6 @@ function initCamera(){
 //global variables
 let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
-
-function initLight(){
-	//create directionalLight object
-	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-
-	//set directionalLight options
-	directionalLight.position.set(100, 100, 100);
-
-	directionalLight.castShadow = true;
-
-	//add scene
-	scene.add(directionalLight);
-
-	//create ambientLight object
-	ambientLight = new THREE.AmbientLight(0x777777);
-
-	//add scene
-	scene.add(ambientLight);
-}
 
 ////////////////////////////////////////
 // define initObject()

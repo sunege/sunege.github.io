@@ -4,7 +4,7 @@
 //                //
 ////////////////////
 
-'use strict';
+import { initThree, initLight } from '../../js/common/three-setup.js';
 
 //System Parameter
 let time = 0;		// time
@@ -316,10 +316,10 @@ function mouseEvent(){
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
-	initThree();
+	({ renderer, scene, canvasFrame } = initThree());
 	mouseEvent();
 	initCamera();
-	initLight();
+	initLight(scene, { positions: [[100, 100, 100]] });
 	initObject();
 	loop();
 }
@@ -330,30 +330,6 @@ function threeStart(){
 let renderer, // renderer object
 	 scene, // scene object
 	 canvasFrame; //DOM element
-
-////////////////////////////////////////
-// define initThree()
-////////////////////////////////////////
-function initThree(){
-	canvasFrame = document.getElementById('canvas-frame');
-
-	//create renderer object
-	renderer = new THREE.WebGLRenderer({ antialias: true });
-	if(!renderer) alert('Fale: init three.js');
-
-	//set renderer size
-	renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
-
-	//add canvas element to DOM
-	canvasFrame.appendChild(renderer.domElement);
-
-	//set renderer options
-	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true;
-
-	//create scene object
-	scene = new THREE.Scene();
-}
 
 ////////////////////////////////////////
 // define initCamera()
@@ -397,28 +373,6 @@ function initCamera(){
 	trackball.staticMoving = true;
 
 	trackball.dynamicDampingFactor = 0.3;
-}
-
-////////////////////////////////////////
-// define initLight()
-////////////////////////////////////////
-function initLight(){
-	//create directionalLight object
-	const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-
-	//set directionalLight options
-	directionalLight.position.set(100, 100, 100);
-
-	directionalLight.castShadow = true;
-
-	//add scene
-	scene.add(directionalLight);
-
-	//create ambientLight object
-	const ambientLight = new THREE.AmbientLight(0x777777);
-
-	//add scene
-	scene.add(ambientLight);
 }
 
 ////////////////////////////////////////

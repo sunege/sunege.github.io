@@ -5,6 +5,8 @@
 ////////////////////
 
 //System Parameter
+import { initThree, initLight } from '../../js/common/three-setup.js';
+
 let time = 0;		// time
 let dt = 0.0001; // Delta t
 let N = 50;	   // number of particle
@@ -344,10 +346,10 @@ function mouseEvent(){
 // define threeStart()
 ////////////////////////////////////////
 function threeStart(){
-	initThree();
+	({ renderer, scene, canvasFrame } = initThree());
 	mouseEvent();
 	initCamera();
-	initLight();
+	initLight(scene, { positions: [[0, -100, 0], [0, 100, 0]] });
 	initObject();
 	loop();
 }
@@ -357,33 +359,7 @@ function threeStart(){
 //global variables
 let renderer, // renderer object
 	 scene, // scene object
-	 canvasFrame; //DOM element
-
-////////////////////////////////////////
-// define initThree()
-////////////////////////////////////////
-function initThree(){
-	canvasFrame = document.getElementById('canvas-frame');
-
-	//create renderer object
-	renderer = new THREE.WebGLRenderer({ antialias: true });
-	if(!renderer) alert('Fale: init three.js');
-
-	//set renderer size
-	renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
-
-	//add canvas element to DOM
-	canvasFrame.appendChild(renderer.domElement);
-
-	//set renderer options
-	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true;
-
-	//create scene object
-	scene = new THREE.Scene();
-}
-
-////////////////////////////////////////
+	 canvasFrame;////////////////////////////////////////
 // define initCamera()
 ////////////////////////////////////////
 //global variables
@@ -434,29 +410,6 @@ function initCamera(){
 let directionalLight1, //directionalLight object
 	directionalLight2, //directionalLight object
 	 ambientLight; // ambientlighLight object
-
-function initLight(){
-	//create directionalLight object
-	directionalLight1 = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-	directionalLight2 = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-
-	//set directionalLight options
-	directionalLight1.position.set(0, -100, 0);
-	directionalLight2.position.set(0, 100, 0);
-
-	directionalLight1.castShadow = true;
-	directionalLight2.castShadow = true;
-
-	//add scene
-	scene.add(directionalLight1);
-	scene.add(directionalLight2);
-
-	//create ambientLight object
-	ambientLight = new THREE.AmbientLight(0x777777);
-
-	//add scene
-	scene.add(ambientLight);
-}
 
 ////////////////////////////////////////
 // define initObject()

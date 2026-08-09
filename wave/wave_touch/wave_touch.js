@@ -2,13 +2,15 @@
 // define window event 
 ////////////////////////////////////////
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
+import { initThree, initLight } from '../../js/common/three-setup.js';
+
 let line1, line2;
 
 window.addEventListener("load", function(){
-		initThree();
+		({ renderer, scene, canvasFrame } = initThree());
 		initEvent();
 		initCamera();
-		initLight();
+		initLight(scene, { positions: [[10, -10, 100]], ambient: 0x222222, shadowCameraNear: 50 });
 		initObject();
 		loop();
 });
@@ -193,33 +195,7 @@ function threeStart(){
 //global variables
 let renderer, // renderer object
 	 scene, // scene object
-	 canvasFrame; //DOM element
-
-////////////////////////////////////////
-// define initThree()
-////////////////////////////////////////
-function initThree(){
-	canvasFrame = document.getElementById('canvas-frame');
-
-	//create renderer object
-	renderer = new THREE.WebGLRenderer({ antialias: true });
-	if(!renderer) alert('Fale: init three.js');
-
-	//set renderer size
-	renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
-
-	//add canvas element to DOM
-	canvasFrame.appendChild(renderer.domElement);
-
-	//set renderer options
-	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true;
-
-	//create scene object
-	scene = new THREE.Scene();
-}
-
-////////////////////////////////////////
+	 canvasFrame;////////////////////////////////////////
 // define initCamera()
 ////////////////////////////////////////
 //global variables
@@ -271,36 +247,6 @@ let directionalLight, //directionalLight object
 // 	 splotLight,
 // 	 lighthelper,
 	 ambientLight; // ambientlighLight object
-
-function initLight(){
-	//create directionalLight object
-	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-
-	//set directionalLight options
-	directionalLight.position.set(10, -10, 100);
-
-	directionalLight.castShadow = true;
-
-// 	directionalLight.dhadowCameraVisible = true;
-	directionalLight.shadowCameraNear = 50;
-	directionalLight.shadowCmeraFar = 300;
-	//add scene
-	scene.add(directionalLight);
-
-	//create spotlLight object
-// 	spotLight = new THREE.SpotLight(0xFFFFFF, 1.0, 0, Math.PI/6, 40);
-// 	spotLight.position.set(30, 30, 100);
-// 	scene.add(spotLight);
-
-// 	lighthelper = new THREE.SpotLightHelper(spotLight,10);
-// 	scene.add(lighthelper);
-
-	//create ambientLight object
-	ambientLight = new THREE.AmbientLight(0x222222);
-
-	//add scene
-	scene.add(ambientLight);
-}
 
 ////////////////////////////////////////
 // define initObject()

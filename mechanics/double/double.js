@@ -4,6 +4,8 @@
 //                      //
 //////////////////////////
 //constant value
+import { initThree, initLight } from '../../js/common/three-setup.js';
+
 const pi = Math.PI;
 const g = 9.80665; 
 
@@ -63,10 +65,6 @@ class Particle {
         this.z = 0;
     }
 }
-
-Particle.prototype = {
-	constructor: Particle
-};
 
 ////////////////////////////////////
 //time development function
@@ -310,10 +308,10 @@ function initEvent(){
 ////////////////////////////////////////
 // define threeStart()
 function threeStart(){
-	initThree();
+	({ renderer, scene, canvasFrame } = initThree());
     mouseEvent();
 	initCamera();
-	initLight();
+	initLight(scene);
     initObject();
     //main loop
 	loop();
@@ -325,29 +323,7 @@ function threeStart(){
 // create renderer, scene, canvasFrame 
 let renderer, // renderer object
 	 scene, // scene object
-	 canvasFrame; //DOM element
-function initThree(){
-	canvasFrame = document.getElementById('canvas-frame');
-
-	//create renderer object
-	renderer = new THREE.WebGLRenderer({ antialias: true });
-	if(!renderer) alert('Fale: init three.js');
-
-	//set renderer size
-	renderer.setSize(canvasFrame.clientWidth, canvasFrame.clientHeight);
-
-	//add canvas element to DOM
-	canvasFrame.appendChild(renderer.domElement);
-
-	//set renderer options
-	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true;
-
-	//create scene object
-	scene = new THREE.Scene();
-}
-
-////////////////////////////////////////
+	 canvasFrame;////////////////////////////////////////
 // create camera, trackball
 //global variables
 let camera, // camera object
@@ -395,25 +371,6 @@ function initCamera(){
 //global variables
 let directionalLight, //directionalLight object
 	 ambientLight; // ambientlighLight object
-
-function initLight(){
-	//create directionalLight object
-	directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-
-	//set directionalLight options
-	directionalLight.position.set(40, 80, 100);
-
-	directionalLight.castShadow = true;
-
-	//add scene
-	scene.add(directionalLight);
-
-	//create ambientLight object
-	ambientLight = new THREE.AmbientLight(0x777777);
-
-	//add scene
-	scene.add(ambientLight);
-}
 
 ////////////////////////////////////////
 // create objects 
