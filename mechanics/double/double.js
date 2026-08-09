@@ -4,7 +4,9 @@
 //                      //
 //////////////////////////
 //constant value
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
 
 const pi = Math.PI;
@@ -341,16 +343,10 @@ function initCamera(){
 	//set camera options
     camera.position.set(0.0, 0.0, 10.0);
 	camera.up.set(0, 1, 0);
-	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
+	camera.lookAt(0.0, 0.0, 0.0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = true;
 	trackball.rotateSpeed = 2.0;
@@ -393,7 +389,7 @@ let contour2;
 
 function initObject(){
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 	scene.add(axis);
 	//set axis position
@@ -416,14 +412,14 @@ function initObject(){
 
 function createShperes() {
     const geometry1 = new THREE.SphereGeometry(p1.radius, 20, 20);
-    const material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
+    const material1 = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0x00ff00}), 0x00ff00);
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
     sphere1.castShadow = true;
     objects.push(sphere1);
 
     const geometry2 = new THREE.SphereGeometry(p2.radius, 20, 20);
-    const material2 = new THREE.MeshLambertMaterial({color: 0xff0000, ambient: 0xff0000 });
+    const material2 = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0xff0000}), 0xff0000);
     sphere2 = new THREE.Mesh(geometry2, material2);
     scene.add(sphere2);
     sphere2.castShadow = true;

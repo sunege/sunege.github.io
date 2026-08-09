@@ -1,28 +1,28 @@
 // THREE.Geometry / THREE.Face3 は r125 で削除された。その置き換えとなる
 // BufferGeometry の組み立てをここにまとめる。
 //
-// r70 と最新版では属性を設定するメソッド名が違う（addAttribute / setAttribute、
-// index の持ち方）。その差をこのファイルの setAttribute() と setIndex() に
-// 閉じ込めてあるので、three.js 本体を上げるときに書き換えるのはこの 2 つだけで済む。
+// 属性を設定するメソッド名は r70 と最新版で違う（addAttribute / setAttribute、
+// index の持ち方）。その差はこのファイルの setAttribute() と setIndex() だけに
+// 閉じ込めてある。
+
+import * as THREE from 'three';
 
 /**
- * 頂点属性を設定する。
- * 最新版では geometry.setAttribute(name, ...) に改名されている。
+ * 頂点属性を設定する。r70 では addAttribute() という名前だった。
  * @returns {object} 追加した BufferAttribute
  */
 export function setAttribute(geometry, name, array, itemSize) {
-	geometry.addAttribute(name, new THREE.BufferAttribute(array, itemSize));
+	geometry.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
 	return geometry.attributes[name];
 }
 
 /**
- * 頂点インデックスを設定する。
- * 最新版では geometry.setIndex(new THREE.BufferAttribute(array, 1)) になる。
+ * 頂点インデックスを設定する。r70 では 'index' という名前の属性だった。
  * @returns {object} 追加した BufferAttribute
  */
 export function setIndex(geometry, array) {
-	geometry.addAttribute('index', new THREE.BufferAttribute(array, 1));
-	return geometry.attributes.index;
+	geometry.setIndex(new THREE.BufferAttribute(array, 1));
+	return geometry.index;
 }
 
 /**
@@ -125,7 +125,7 @@ export function gridGeometry(N) {
  */
 export function computeVertexNormalsFaceAverage(geometry) {
 	const position = geometry.attributes.position.array;
-	const index = geometry.attributes.index.array;
+	const index = geometry.index.array;
 
 	if (geometry.attributes.normal === undefined) {
 		setAttribute(geometry, 'normal', new Float32Array(position.length), 3);

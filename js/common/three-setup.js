@@ -1,5 +1,16 @@
 // 各シミュレーションで同一だった three.js の初期化処理をまとめたもの。
-// THREE は three.js を通常のスクリプトとして読み込んだグローバルを参照する。
+
+import * as THREE from 'three';
+
+// r152 で色管理が入り、r155 で光源の強度の解釈が変わった。どちらも
+// 有効にすると 24 本すべての色と明るさが変わってしまうため、旧来の
+// 見た目を保つ設定をここに集約する。将来まとめて切り替えられるように、
+// 個々のシミュレーション側には出さない。
+THREE.ColorManagement.enabled = false;
+
+// r155 以降、平行光源・環境光の intensity はそのまま使われる。r70 は内部で
+// π 倍していたので、同じ明るさにするにはこちらで掛ける必要がある。
+const LEGACY_LIGHT_SCALE = Math.PI;
 
 /**
  * レンダラーとシーンを作り、canvas を DOM に追加する。
@@ -21,7 +32,8 @@ export function initThree(canvasFrameId = 'canvas-frame') {
 
 	//set renderer options
 	renderer.setClearColor(0x000000, 1.0);
-	renderer.shadowMapEnabled = true; // three.js r70 の API（Step 4 で shadowMap.enabled に変更予定）
+	renderer.shadowMap.enabled = true;
+	renderer.outputColorSpace = THREE.LinearSRGBColorSpace; // r152 以前と同じ出力にする
 
 	//create scene object
 	const scene = new THREE.Scene();
@@ -46,14 +58,41 @@ export function initLight(scene, options = {}) {
 	} = options;
 
 	for (const [x, y, z] of positions) {
-		const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
+		const directionalLight = new THREE.DirectionalLight(0xFFFFFF, LEGACY_LIGHT_SCALE);
 		directionalLight.position.set(x, y, z);
 		directionalLight.castShadow = true;
 		if (shadowCameraNear !== undefined) {
-			directionalLight.shadowCameraNear = shadowCameraNear;
+			directionalLight.shadow.camera.near = shadowCameraNear;
 		}
 		scene.add(directionalLight);
 	}
 
-	scene.add(new THREE.AmbientLight(ambient));
+	// AmbientLight は「置かない」。理由は applyLegacyAmbient() を参照。
+	ambientColor.set(ambient);
+}
+
+// initLight() に渡された環境光の色。applyLegacyAmbient() が参照する。
+const ambientColor = new THREE.Color(0x000000);
+const materialAmbient = new THREE.Color();
+
+/**
+ * r70 の material.ambient を最新版で再現する。
+ *
+ * r70 の陰影計算は `emissive + 拡散 + ambientLightColor * material.ambient` で、
+ * 環境光は material.color とは別の material.ambient に掛かっていた。最新版に
+ * material.ambient は無く、AmbientLight は material.color に掛かるため、
+ * そのまま移すと環境光の項が別物になる（例: 2wave の格子は ambient が
+ * 0x000000 なのに color は 0x88DDFF で、放っておくと明るく浮いてしまう）。
+ *
+ * 環境光の項は物の向きに依らない定数なので、AmbientLight を置く代わりに
+ * その値を emissive に入れれば r70 と同じ式になる。
+ *
+ * @param {object} material 対象のマテリアル（Lambert / Phong）
+ * @param {number} [ambient] 旧 material.ambient。r70 の既定値は 0xffffff
+ * @returns {object} 渡された material
+ */
+export function applyLegacyAmbient(material, ambient = 0xffffff) {
+	materialAmbient.set(ambient);
+	material.emissive.copy(ambientColor).multiply(materialAmbient);
+	return material;
 }

@@ -38,8 +38,9 @@ div#controller div.slider#slider_direction2{
 <script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
 
 <!-- Three -->
-<script type="text/javascript" src="../../js/Three/build/three.js"></script>
-<script type="text/javascript" src="../../js/Three/src/controls/TrackballControls.js"></script>
+		<script type="importmap">
+		{ "imports": { "three": "../../js/vendor/three/build/three.module.min.js" } }
+		</script>
 
 <!-- Main script -->
 <script type="module" src="eigenstate.js"></script>

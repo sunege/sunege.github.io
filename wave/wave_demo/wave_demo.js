@@ -5,7 +5,9 @@
 //////////////////////////
 
 //System Parameter
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
 
 const time = 0;		// time
@@ -346,16 +348,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(70,50,0);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
+	camera.lookAt(0.0, 0.0, 0.0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = false;
 	trackball.rotateSpeed = 2.0;
@@ -407,7 +403,7 @@ function initObject(){
 	//create geometry
 	// 	var geometry = new THREE.SphereGeometry( ball.radius, 20, 20 );
 	//create material
-	// 	var material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
+	// 	var material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0xFF0000}), 0x880000);
 
 	//create sphere object
 	// 	sphere = new THREE.Mesh(geometry, material);
@@ -428,9 +424,9 @@ function initObject(){
 	// 			var y = i*yuka_w;
 	// 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
 	// 			if(Math.abs(i+j) % 2 == 0){
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
+	// 				material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x999999}), 0x050505);
 	// 			}else{
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
+	// 				material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x4d4d4d}), 0x050505);
 	// 			}
 	// 			var plane = new THREE.Mesh(geometry, material);
 	// 			plane.position.set(x, y, 0);
@@ -439,7 +435,7 @@ function initObject(){
 	// 		}
 	// 	}
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 	//scene.add(axis);
 	//set axis position
@@ -492,7 +488,7 @@ function initObject(){
 		}
 
 		const color_code = red_hex + green_hex + blue_hex;
-		const material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
+		const material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: parseInt(color_code, 16)}), parseInt(color_code, 16));
 
 
 
@@ -546,7 +542,7 @@ function initObject(){
 // 					font: "helvetiker_regular",
 // 					weight : "regular",
 // 			});
-// 			var textMaterial = new THREE.MeshLambertMaterial({color:0x00ff00});
+// 			var textMaterial = applyLegacyAmbient(new THREE.MeshLambertMaterial({color:0x00ff00}));
 // 			text_zero = new THREE.Mesh( textGeometry, textMaterial);
 // 			scene.add(text_zero);
 // 	});

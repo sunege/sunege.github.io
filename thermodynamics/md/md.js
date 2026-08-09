@@ -6,7 +6,9 @@
 
 //System Parameter
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { quadGeometry } from '../../js/common/geometry.js';
 
 let wall2, wall3, wall4, wall5, wall6;
@@ -465,16 +467,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(L*2.5,L*0.8,L*0.7);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: L/2, y:L/2, z: L/2});
+	camera.lookAt(L/2, L/2, L/2);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = false;
 	trackball.rotateSpeed = 2.0;
@@ -511,7 +507,7 @@ function initObject(){
 	//create geometry
 	// 	var geometry = new THREE.SphereGeometry( ball.radius, 20, 20 );
 	//create material
-	// 	var material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
+	// 	var material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0xFF0000}), 0x880000);
 
 	//create sphere object
 	// 	sphere = new THREE.Mesh(geometry, material);
@@ -532,9 +528,9 @@ function initObject(){
 	// 			var y = i*yuka_w;
 	// 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
 	// 			if(Math.abs(i+j) % 2 == 0){
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
+	// 				material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x999999}), 0x050505);
 	// 			}else{
-	// 				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
+	// 				material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x4d4d4d}), 0x050505);
 	// 			}
 	// 			var plane = new THREE.Mesh(geometry, material);
 	// 			plane.position.set(x, y, 0);
@@ -543,7 +539,7 @@ function initObject(){
 	// 		}
 	// 	}
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 	scene.add(axis);
 	//set axis position
@@ -573,7 +569,7 @@ function initObject(){
 		var blue_hex = blue.toString(16);
 
 		var color_code = red_hex + green_hex + blue_hex;
-		var material = new THREE.MeshPhongMaterial({ color: color_code, ambient: color_code, side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: shine});
+		var material = applyLegacyAmbient(new THREE.MeshPhongMaterial({ color: color_code, side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: shine}), color_code);
 
 		*/
 	  //速度によって色変化
@@ -619,7 +615,7 @@ function initObject(){
 		}
 
 		const color_code = red_hex + green_hex + blue_hex;
-		material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
+		material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: parseInt(color_code, 16)}), parseInt(color_code, 16));
 
 
 
@@ -667,7 +663,7 @@ function initObject(){
 	wall6.castShadow = true;
 
 	geometry = new THREE.BoxGeometry(L,L,L);
-	material = new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true});
+	material = applyLegacyAmbient(new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true}));
 	const box = new THREE.Mesh(geometry, material);
 	scene.add(box);
 	box.position.set(L/2, L/2, L/2);
@@ -678,7 +674,7 @@ function wall(v1, v2, v3, v4){
 	const geometry = quadGeometry([v1, v2, v3, v4]);
 
 	//create material
-	const material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555577 });
+	const material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0xaaaabb}), 0x555577);
 	//create sphere object
 	return new THREE.Mesh(geometry, material);
 }

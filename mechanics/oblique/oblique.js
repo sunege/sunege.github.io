@@ -5,7 +5,9 @@
 //////////////////////////
 
 //System Parameter
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
 
 let time = 0;		// time
@@ -358,16 +360,10 @@ function initCamera(){
 	//set camera options
     camera.position.set(vel_init * vel_init * Math.sin(2*theta)/(2*gravity),5.0,30.0);
 	camera.up.set(0,1,0);
-	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
+	camera.lookAt(0.0, 0.0, 0.0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = true;
 	trackball.rotateSpeed = 2.0;
@@ -429,7 +425,7 @@ let text_zero; //text object
 function initObject(){
 	let blue_hex, green_hex, red_hex;
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 	scene.add(axis);
 	//set axis position
@@ -529,7 +525,7 @@ function initObject(){
         }
 
         const color_code = red_hex + green_hex + blue_hex;
-        const material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
+        const material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: parseInt(color_code, 16)}), parseInt(color_code, 16));
 
 
 
@@ -583,7 +579,7 @@ function initObject(){
     // 					font: "helvetiker_regular",
     // 					weight : "regular",
     // 			});
-    // 			var textMaterial = new THREE.MeshLambertMaterial({color:0x00ff00});
+    // 			var textMaterial = applyLegacyAmbient(new THREE.MeshLambertMaterial({color:0x00ff00}));
     // 			text_zero = new THREE.Mesh( textGeometry, textMaterial);
     // 			scene.add(text_zero);
     // 	});

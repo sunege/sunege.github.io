@@ -2,7 +2,9 @@
 // define window event 
 ////////////////////////////////////////
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { gridGeometry, fillGrid } from '../../js/common/geometry.js';
 
 let geometry, material;
@@ -164,16 +166,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(60, -90, 30);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: 0, y:0, z: -25});
+	camera.lookAt(0, 0, -25);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = false;
 	trackball.rotateSpeed = 2.0;
@@ -436,13 +432,13 @@ function initObject(){
 	// 	}
 
 	//create material
-	let material = new THREE.MeshPhongMaterial({
-			color: 0xBFFFFF, ambient: 0x000050,
+	let material = applyLegacyAmbient(new THREE.MeshPhongMaterial({
+			color: 0xBFFFFF,
 			side: THREE.DoubleSide,
 			specular: 0xFFFFFF, shininess: 190, 
 			// 		map: THREE.ImageUtils.loadTexture('0014.jpg'),
 			transparent: true, opacity: alpha
-	});
+	}), 0x000050);
 
 	//create sphere object
 	lattice = new THREE.Mesh(geometry, material);
@@ -452,7 +448,7 @@ function initObject(){
 
 	//source object
 	geometry = new THREE.SphereGeometry( 2, 20, 20 );
-	material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
+	material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0xFF0000}), 0x880000);
 
 	sphere1 = new THREE.Mesh(geometry, material);
 	sphere2 = new THREE.Mesh(geometry, material);
@@ -467,7 +463,7 @@ function initObject(){
 	if(boxFlag===false){
 		const box_length = (l*N-space)/2;
 		geometry = new THREE.BoxGeometry(box_width,box_length, 30);
-		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+		material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x0088FF}), 0x000088);
 
 		box1 = new THREE.Mesh(geometry, material);
 		box2 = new THREE.Mesh(geometry, material);
@@ -478,7 +474,7 @@ function initObject(){
 	}
 	else{
 		geometry = new THREE.BoxGeometry(box_width, space, 30);
-		material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+		material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x0088FF}), 0x000088);
 		box1 = new THREE.Mesh(geometry, material);
 		box1.position.set(l/2-dl, l/2-dl, -5)
 		scene.add(box1);
@@ -498,9 +494,9 @@ function initObject(){
 			y = i*yuka_w;
 			geometry = new THREE.PlaneGeometry(yuka_w, yuka_w);
 			if(Math.abs(i+j) % 2 === 0){
-				material = new THREE.MeshLambertMaterial({ color: 0x999999, ambient: 0x050505});
+				material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x999999}), 0x050505);
 			}else{
-				material = new THREE.MeshLambertMaterial({ color: 0x4d4d4d, ambient: 0x050505});
+				material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x4d4d4d}), 0x050505);
 			}
 			const plane = new THREE.Mesh(geometry, material);
 			plane.position.set(x, y, -20);
@@ -570,7 +566,7 @@ function loop(){
 		if(boxFlag===false){
 			const box_length = (l*N-space)/2;
 			geometry = new THREE.BoxGeometry(box_width,box_length, 30);
-			material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+			material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x0088FF}), 0x000088);
 
 			box1 = new THREE.Mesh(geometry, material);
 			box2 = new THREE.Mesh(geometry, material);
@@ -581,7 +577,7 @@ function loop(){
 		}
 		else if(boxFlag===true){
 			geometry = new THREE.BoxGeometry(box_width,space, 30);
-			material = new THREE.MeshLambertMaterial({ color: 0x0088FF, ambient: 0x000088 });
+			material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0x0088FF}), 0x000088);
 
 			box1 = new THREE.Mesh(geometry, material);
 			box1.position.set(l/2,l/2,-5);

@@ -5,7 +5,9 @@
 ////////////////////
 
 //System Parameter
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 
 let time = 0;		// time
 let dt = 0.0001; // Delta t
@@ -383,16 +385,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(50, L/2, 0);
 	camera.up.set(0,0,1);
-	camera.lookAt({x: 0, y:L/2, z: 0});
+	camera.lookAt(0, L/2, 0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = true;//false;
 	trackball.rotateSpeed = 2.0;
@@ -425,7 +421,7 @@ let sphere=[]; //sphere object
 
 function initObject(){
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 	scene.add(axis);
 	//set axis position
@@ -436,7 +432,7 @@ function initObject(){
 		//create geometry
 		const geometry = new THREE.SphereGeometry(p[i].radius, 20, 20);
 		//create material
-		const material = new THREE.MeshLambertMaterial({color: 0x88eeFF, ambient: 0x88FFFF });
+		const material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0x88eeFF}), 0x88FFFF);
 		//create object
 		sphere[i] = new THREE.Mesh(geometry, material);
 		//add object

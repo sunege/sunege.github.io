@@ -106,11 +106,18 @@ div.ref {
 	</style>
 
 
-	<script type="text/javascript" src="./js/Three/build/three.min.js"></script>
-	<script type="text/javascript" src="./js/Three/src/controls/TrackballControls.js"></script>
+		<script type="importmap">
+		{ "imports": { "three": "./js/vendor/three/build/three.module.min.js" } }
+		</script>
 
 	<!-- demo script -->
-	<script type="text/javascript">
+	<script type="module">
+		import * as THREE from 'three';
+		import { TrackballControls } from './js/vendor/three/controls/TrackballControls.js';
+
+		// r152 の色管理を切り、旧来の見た目を保つ（js/common/three-setup.js と同じ方針）
+		THREE.ColorManagement.enabled = false;
+
 		window.addEventListener("load", function (){
 			threeStart(); //three.js start
 		});
@@ -146,6 +153,7 @@ div.ref {
 			canvasFrame.appendChild(renderer.domElement);
 			//set renderer clear color
 			renderer.setClearColor(0x000000, 1.0);
+			renderer.outputColorSpace = THREE.LinearSRGBColorSpace; // r152 以前と同じ出力にする
 			//create scene object
 			scene = new THREE.Scene();
 		}
@@ -167,15 +175,10 @@ div.ref {
 			//camera up vector
 			camera.up.set(0, 0, 1);
 			//camera center vector
-			camera.lookAt({x: 0, y: 0, z: 0});
+			camera.lookAt(0, 0, 0);
 			//create trackball object
-			trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-			//set trackball options
-			trackball.screen.width = canvasFrame.clientWidth;
-			trackball.screen.height = canvasFrame.clientHeight;
-			trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-			trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+			// screen は TrackballControls が構築時に handleResize() で埋める
+			trackball = new TrackballControls(camera, canvasFrame);
 
 			trackball.noRotate = false;
 			trackball.rotateSpeed = 2.0;
@@ -221,7 +224,8 @@ div.ref {
 
 		function initLight(){
 			//create object
-			directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+			// r155 以降 intensity の解釈が変わったので、r70 と同じ明るさになるよう π 倍する
+			directionalLight = new THREE.DirectionalLight(0xFFFFFF, Math.PI);
 			//light position
 			directionalLight.position.set(50, 50, 100);
 			//add light

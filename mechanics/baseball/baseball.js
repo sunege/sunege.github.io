@@ -5,7 +5,9 @@
 //////////////////////////
 //constant value
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
 
 let L, l, mass2, phi0, radisu_ball, theta0;
@@ -291,16 +293,10 @@ function initCamera(){
 	//set camera options
     camera.position.set(-1.5, -0.5, 0.3);
 	camera.up.set(0, 0, 1);
-	camera.lookAt({x: 0.0, y: 0.0, z: 0.0});
+	camera.lookAt(0.0, 0.0, 0.0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = false;
 	trackball.rotateSpeed = 2.0;
@@ -344,7 +340,7 @@ let contour2;
 
 function initObject(){
 	//create axis object
-	axis = new THREE.AxisHelper(100);
+	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 	scene.add(axis);
 	//set axis position
@@ -370,7 +366,7 @@ function initObject(){
 
 function createShperes() {
     const geometry1 = new THREE.SphereGeometry(ball.radius, 20, 20);
-    const material1 = new THREE.MeshLambertMaterial({color: 0x00ff00, ambient: 0x00ff00 });
+    const material1 = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0x00ff00}), 0x00ff00);
     sphere1 = new THREE.Mesh(geometry1, material1);
     scene.add(sphere1);
     sphere1.castShadow = true;
@@ -380,7 +376,7 @@ function createShperes() {
 
 function createCylinder() {
     const geometry_bat = new THREE.CylinderGeometry(radius_bat, radius_bat, length_bat, 20, 5);
-    const material_bat = new THREE.MeshLambertMaterial({color: 0x226689, mabient: 0xff0000});
+    const material_bat = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0x226689, mabient: 0xff0000}));
     cylinder = new THREE.Mesh(geometry_bat, material_bat);
     scene.add(cylinder);
 }

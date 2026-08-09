@@ -1,6 +1,8 @@
 ////////////////////////////////////////
 // define window event 
 ////////////////////////////////////////
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
 
@@ -237,16 +239,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(l/2, 0, 10);
 	camera.up.set(0,1,0);
-	camera.lookAt({x: l/2, y:0, z: 0});
+	camera.lookAt(l/2, 0, 0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
     trackball.noRotate = true;
 	trackball.rotateSpeed = 2.0;

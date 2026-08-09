@@ -1,7 +1,9 @@
 ////////////////////////////////////////
 // define window event 
 ////////////////////////////////////////
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { gridGeometry, fillGrid, lineGeometry } from '../../js/common/geometry.js';
 
 window.addEventListener("load", function(){
@@ -129,16 +131,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(0, 0, 120);
 	camera.up.set(0,1,0);
-	camera.lookAt({x: 0, y:0, z: 0});
+	camera.lookAt(0, 0, 0);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = false;
 	trackball.rotateSpeed = 2.0;
@@ -206,7 +202,7 @@ const f = new Array(Step);
 function initObject(){
 	let geometry, x, y;
 	//create axis object
-// 	axis = new THREE.AxisHelper(100);
+// 	axis = new THREE.AxesHelper(100);
 	//add axis object to scene
 // 	scene.add(axis);
 	//set axis position
@@ -235,8 +231,8 @@ function initObject(){
 	fillGrid(geometry, N, (i, j) => [(-N/2 + i) * l, (-N/2 + j) * l, f[0][i][j]]);
 
 	//create material
-	let material = new THREE.MeshPhongMaterial({ color: 0x88DDFF, ambient: 0x000000,
-			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250 });
+	let material = applyLegacyAmbient(new THREE.MeshPhongMaterial({ color: 0x88DDFF,
+			side: THREE.DoubleSide, specular: 0xFFFFFF, shininess: 250 }), 0x000000);
 
 	//create sphere object
 	lattice = new THREE.Mesh(geometry, material);
@@ -246,7 +242,7 @@ function initObject(){
 
 	//source object
 	geometry = new THREE.SphereGeometry( lambda / 3, 20, 20 );
-	material = new THREE.MeshLambertMaterial({ color: 0xFF0000, ambient: 0x880000 });
+	material = applyLegacyAmbient(new THREE.MeshLambertMaterial({ color: 0xFF0000}), 0x880000);
 
 	sphere1 = new THREE.Mesh(geometry, material);
 	sphere2 = new THREE.Mesh(geometry, material);

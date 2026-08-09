@@ -6,7 +6,9 @@
 
 //System Parameter
 // 暗黙のグローバルだった変数（strictモードのクラス内から代入されるため明示宣言）
-import { initThree, initLight } from '../../js/common/three-setup.js';
+import * as THREE from 'three';
+import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
+import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { quadGeometry } from '../../js/common/geometry.js';
 
 let color_code, reflect_x_flag, reflect_y_flag, velocity_limit_flag, wall2, wall3, wall4, wall6;
@@ -568,16 +570,10 @@ function initCamera(){
 	//set camera options
 	camera.position.set(L*draw_scale/2,L*draw_scale/2,L*draw_scale*2.5);
 	camera.up.set(0,1,0);
-	camera.lookAt({x: L*draw_scale/2, y:L*draw_scale/2, z: L*draw_scale/2});
+	camera.lookAt(L*draw_scale/2, L*draw_scale/2, L*draw_scale/2);
 
 	//create trackball object
-	trackball = new THREE.TrackballControls(camera, canvasFrame);
-
-	//set trackball options
-	trackball.screen.width = canvasFrame.clientWidth;
-	trackball.screen.height = canvasFrame.clientHeight;
-	trackball.screen.offsetLeft = canvasFrame.getBoundingClientRect().left;
-	trackball.screen.offsetTop = canvasFrame.getBoundingClientRect().top;
+	trackball = new TrackballControls(camera, canvasFrame);
 
 	trackball.noRotate = true;
 	trackball.rotateSpeed = 2.0;
@@ -673,7 +669,7 @@ function initObject(){
 		}
 
 		const color_code = red_hex + green_hex + blue_hex;
-		const material = new THREE.MeshLambertMaterial({color: parseInt(color_code, 16), ambient: parseInt(color_code, 16) });
+		const material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: parseInt(color_code, 16)}), parseInt(color_code, 16));
 
 
 
@@ -732,7 +728,7 @@ function wall(v1, v2, v3, v4){
 	const geometry = quadGeometry([v1, v2, v3, v4]);
 
 	//create material
-	const material = new THREE.MeshLambertMaterial({color: 0xaaaabb, ambient: 0x555555 });
+	const material = applyLegacyAmbient(new THREE.MeshLambertMaterial({color: 0xaaaabb}), 0x555555);
 	//create sphere object
 	return new THREE.Mesh(geometry, material);
 }
@@ -767,10 +763,10 @@ function loop(){
         wall2.material.color.set(color_code);
         wall3.material.color.set(color_code);
         wall4.material.color.set(color_code);
-        wall1.material.ambient.set(color_code);
-        wall2.material.ambient.set(color_code);
-        wall3.material.ambient.set(color_code);
-        wall4.material.ambient.set(color_code);
+        applyLegacyAmbient(wall1.material, color_code);
+        applyLegacyAmbient(wall2.material, color_code);
+        applyLegacyAmbient(wall3.material, color_code);
+        applyLegacyAmbient(wall4.material, color_code);
     }
 
     if(compare_gamma !== pre_gamma){
@@ -785,7 +781,7 @@ function loop(){
             color_code6 = 0xaaaabb;
         }
         wall6.material.color.set(color_code6);
-        wall6.material.ambient.set(color_code6);
+        applyLegacyAmbient(wall6.material, color_code6);
     }
 
     /*
@@ -829,11 +825,11 @@ function loop(){
         wall3.material.color.set(color_code);
         wall4.material.color.set(color_code);
         wall6.material.color.set(color_code6);
-        wall1.material.ambient.set(color_code);
-        wall2.material.ambient.set(color_code);
-        wall3.material.ambient.set(color_code);
-        wall4.material.ambient.set(color_code);
-        wall6.material.ambient.set(color_code6);
+        applyLegacyAmbient(wall1.material, color_code);
+        applyLegacyAmbient(wall2.material, color_code);
+        applyLegacyAmbient(wall3.material, color_code);
+        applyLegacyAmbient(wall4.material, color_code);
+        applyLegacyAmbient(wall6.material, color_code6);
         restartFlag = false;
         stopFlag = false;
 
