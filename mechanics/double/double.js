@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
+import { slider, checkbox } from '../../js/common/ui.js';
 
 const pi = Math.PI;
 const g = 9.80665; 
@@ -188,13 +189,12 @@ function initEvent(){
 
 
 	//slider interface
-	$('#slider_skip').slider({
+	slider('slider_skip', {
 			min: 0.01,
 			max: 5.00,
 			step: 0.01,
 			value: _skip,
-			slide: function(_event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				_skip = value;
 				skip = 1/(60*Dt)*_skip;
 				document.getElementById("input_skip").value = value;
@@ -202,55 +202,50 @@ function initEvent(){
 	});
 
     /*
-	$('#slider_radius').slider({
+	slider('slider_radius', {
 			min: 0.01,
 			max: 5,
 			step: 0.01,
 			value: RADIUS,
-			slide: function(_event, ui){
-				var value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_radius").value = value;
             }
     */
-	$('#slider_mass1').slider({
+	slider('slider_mass1', {
             min: 0.1,
 			max: 10,
 			step: 0.1,
 			value: mass1,
-			slide: function(_event, ui){
-				const value = ui.value;
+			onInput: (value) => {
                 document.getElementById("input_mass1").value = value;
 			}
     });
-	$('#slider_mass2').slider({
+	slider('slider_mass2', {
             min: 0.1,
 			max: 10,
 			step: 0.1,
 			value: mass1,
-			slide: function(_event, ui){
-				const value = ui.value;
+			onInput: (value) => {
                 document.getElementById("input_mass2").value = value;
 			}
     });
         /*
-	$('#slider_N').slider({
+	slider('slider_N', {
 			min: 1,
 			max: 40,
 			step: 1,
 			value: N,
-			slide: function(_event, ui){
-				var value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_N").value = value;
 			}
 	});
-	$('#slider_theta').slider({
+	slider('slider_theta', {
 			min: 0,
 			max: 90,
 			step: 1,
 			value: theta * 180 / Math.PI,
-			slide: function(_event, ui){
-				var value = Math.PI * ui.value / 180.0;
-				document.getElementById("input_theta").value = ui.value;
+			onInput: (value) => {
+				document.getElementById("input_theta").value = value;
 			}
 	});
 
@@ -269,8 +264,8 @@ function initEvent(){
 
     */
 	//checkbox interface
-	$('#checkbox_contour').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_contour', (checked) => {
+			if(checked){
 				contourFlag = true;
 			}
 			else{
@@ -278,8 +273,8 @@ function initEvent(){
 			}
     });
     /*
-	$('#checkbox_orbital').click(function(){
-			if($(this).prop('checked') == true){
+	checkbox('checkbox_orbital', (checked) => {
+			if(checked){
 				orbital_flag = true;
 			}
 			else{

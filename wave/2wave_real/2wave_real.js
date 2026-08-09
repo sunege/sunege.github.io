@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { gridGeometry, fillGrid, lineGeometry } from '../../js/common/geometry.js';
+import { slider, checkbox } from '../../js/common/ui.js';
 
 window.addEventListener("load", function(){
 		initEvent();
@@ -48,16 +49,16 @@ function initEvent(){
 	document.getElementById("restartButton").value = "restart";
 
 	//checkbox
-	$('#checkbox_line1').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_line1', (checked) => {
+			if(checked){
 				line1Flag = true;
 			}
 			else{
 				line1Flag = false;
 			}
 	});
-	$('#checkbox_line2').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_line2', (checked) => {
+			if(checked){
 				line2Flag = true;
 			}
 			else{
@@ -66,61 +67,56 @@ function initEvent(){
 	});
 
 	//slider interface
-	$('#slider_alpha').slider({
+	slider('slider_alpha', {
 			min: 0,
 			max: 1,
 			step: 0.01,
 			value: alpha,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				alpha = value;
 				document.getElementById("input_alpha").value = value;
 			}
 	});
 	document.getElementById("input_alpha").value = alpha;
-	$('#slider_Amp').slider({
+	slider('slider_Amp', {
 			min: 0,
 			max: 20,
 			step: 1,
 			value: Amp,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_Amp").value = value;
 			}
 	});
 	document.getElementById("input_Amp").value = Amp;
 
-	$('#slider_lambda').slider({
+	slider('slider_lambda', {
 			min: 1,
 			max: 20,
 			step: 1,
 			value: _lambda,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_lambda").value = value;
 			}
 	});
 	document.getElementById("input_lambda").value = _lambda;
 
-	$('#slider_space').slider({
+	slider('slider_space', {
 			min: 0,
 			max: N,
 			step: 2,
 			value: space,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_space").value = value;
 			}
 	});
 	document.getElementById("input_space").value = space;
 
-	$('#slider_vel').slider({
+	slider('slider_vel', {
 			min: 1,
 			max: 20,
 			step: 1,
 			value: vel,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_vel").value = value;
 			}
 	});

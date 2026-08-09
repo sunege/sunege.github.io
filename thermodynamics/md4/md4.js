@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { quadGeometry } from '../../js/common/geometry.js';
+import { slider } from '../../js/common/ui.js';
 
 let color_code, reflect_x_flag, reflect_y_flag, reflect_z_flag, velocity_limit_flag, wall2, wall3, wall4, wall5, wall6;
 
@@ -427,88 +428,81 @@ window.addEventListener("load", function(){
 function initEvent(){
 
 	//slider interface
-	$('#slider_skip').slider({
+	slider('slider_skip', {
 		min: 1,
 		max: 100,
 		step: 1,
 		value: skip,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			skip = value;
 			document.getElementById("input_skip").value = value;
 		}
 	});
 
-	$('#slider_radius').slider({
+	slider('slider_radius', {
 		min: 0.01,
 		max: 5,
 		step: 0.01,
 		value: RADIUS,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_radius").value = value;
 		}
 	});
-// 	$('#slider_mass').slider({
+// 	slider('slider_mass', {
 // 		min: 0.01,
 // 		max: 10,
 // 		step: 0.01,
 // 		value: MASS,
-// 		slide: function(event, ui){
-// 			var value = ui.value;
+// 		onInput: (value) => {
+// 			var value = value;
 // 			document.getElementById("input_mass").value = value;
 // 		}
 // 	});
-	$('#slider_N').slider({
+	slider('slider_N', {
 		min: 3,
 		max: 900,
 		step: 1,
 		value: N,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_N").value = value;
 		}
 	});
     /*
-	$('#slider_temp').slider({
+	slider('slider_temp', {
 		min: 1,
 		max: 1000,
 		step: 1,
 		value: T,
-		slide: function(event, ui){
-			var value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_temp").value = value;
 		}
 	});
     */
 	document.getElementById("temp").innerHTML = T.toFixed(0);
-	$('#slider_restitution').slider({
+	slider('slider_restitution', {
 		min: 0.01,
 		max: 1.5,
 		step: 0.01,
 		value: restitution,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_restitution").value = value;
 		}
 	});
-	$('#slider_gravity').slider({
+	slider('slider_gravity', {
 		min: 0.0,
 		max: 1e+7,
 		step: 1,
 		value: gravity,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_gravity").value = value;
 		}
 	});
-	$('#slider_gamma').slider({
+	slider('slider_gamma', {
 		min: -5,
 		max: 5,
 		step: 0.5,
 		value: pre_gamma,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_gamma").value = value;
 		}
 	});

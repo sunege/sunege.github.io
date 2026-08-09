@@ -6,8 +6,7 @@
 		<title>Molecular Dynamics</title>
 
 		<!-- style sheet -->
-		<link type="text/css" rel="stylesheet"
-		href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/slider.css"/>
 		<link type="text/css" rel="stylesheet"
 		href="../../css/menu.css" rel="stylesheet"/>
 		<style>
@@ -19,7 +18,7 @@
                 margin-right: 20vw;
             }
 			/* スライダーのスタイル*/
-			div.slider{
+			input.slider{
 				width: 200px;
 			}
 
@@ -38,10 +37,6 @@
 		<!-- Javascript -->
 
         
-		<!-- jQuery -->
-		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
-		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
-		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
 
 		<!-- Three -->
 		<script type="importmap">
@@ -72,7 +67,7 @@
 							<table>
 								<tr>
 									<td>半径</td>
-									<td><div id="slider_radius" class="slider" style="width:180px"></div></td>
+									<td><input type="range" id="slider_radius" class="slider" style="width:180px"></td>
 									<td><input type="text" value="" id="input_radius" class="number" style="width:20px"/>m</td>
 								</tr>
 							</table>
@@ -90,7 +85,7 @@
 							<table>
 								<tr>
 									<td>粒子数</td>
-									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
+									<td><input type="range" id="slider_N" class="slider" style="width:180px"></td>
 									<td><input type="text" value="" id="input_N" class="number" style="width:20px"/>個</td>
 								</tr>
 							</table>
@@ -106,7 +101,7 @@
 							<table>
 								<tr>
 									<td>加熱冷却(反発係数)</td>
-									<td><div id="slider_restitution" class="slider" style="width:100px"></div></td>
+									<td><input type="range" id="slider_restitution" class="slider" style="width:100px"></td>
 									<td><input type="text" value="" id="input_restitution" class="number" style="width:20px"/></td>
 								</tr>
 							</table>
@@ -118,7 +113,7 @@
 							<table>
 								<tr>
 									<td>重力加速度</td>
-									<td><div id="slider_gravity" class="slider" style="width:180px"></div></td>
+									<td><input type="range" id="slider_gravity" class="slider" style="width:180px"></td>
 									<td><input type="text" value="" id="input_gravity" class="number" style="width:50px"/></td>
 								</tr>
 							</table>
@@ -148,7 +143,7 @@
 							<table>
 								<tr>
 									<td>描画倍率</td>
-									<td><center><div id="slider_skip" class="slider" style="width:180px"></div></center></td>
+									<td><center><input type="range" id="slider_skip" class="slider" style="width:180px"></center></td>
                                     <td><input type="text" value="" id="input_skip" class="number" style="width:45px"/></td>
 								</tr>
 							</table>

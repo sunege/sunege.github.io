@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { quadGeometry } from '../../js/common/geometry.js';
+import { slider } from '../../js/common/ui.js';
 
 let wall2, wall3, wall4, wall5, wall6;
 
@@ -352,56 +353,52 @@ window.addEventListener("load", function(){
 function initEvent(){
 
 	//slider interface
-	$('#slider_skip').slider({
+	slider('slider_skip', {
 		min: 0.01,
 		max: 1.01,
 		step: 0.01,
 		value: _skip,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			_skip = value;
 			skip = 1/(60*dt)*_skip;
 			document.getElementById("input_skip").value = value;
 		}
 	});
 
-	$('#slider_radius').slider({
+	slider('slider_radius', {
 		min: 0.01,
 		max: 5,
 		step: 0.01,
 		value: RADIUS,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_radius").value = value;
 		}
 	});
-// 	$('#slider_mass').slider({
+// 	slider('slider_mass', {
 // 		min: 0.01,
 // 		max: 10,
 // 		step: 0.01,
 // 		value: MASS,
-// 		slide: function(event, ui){
-// 			var value = ui.value;
+// 		onInput: (value) => {
+// 			var value = value;
 // 			document.getElementById("input_mass").value = value;
 // 		}
 // 	});
-	$('#slider_N').slider({
+	slider('slider_N', {
 		min: 3,
 		max: 200,
 		step: 1,
 		value: N,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_N").value = value;
 		}
 	});
-	$('#slider_temp').slider({
+	slider('slider_temp', {
 		min: 1,
 		max: 1000,
 		step: 1,
 		value: T,
-		slide: function(event, ui){
-			const value = ui.value;
+		onInput: (value) => {
 			document.getElementById("input_temp").value = value;
 		}
 	});

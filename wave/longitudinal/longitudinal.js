@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
+import { slider, checkbox } from '../../js/common/ui.js';
 
 let time = 0;		// time
 let dt = 0.0001; // Delta t
@@ -212,95 +213,87 @@ window.addEventListener("load", function(){
 function initEvent(){
 
 	//slider interface
-	$('#slider_skip').slider({
+	slider('slider_skip', {
 			min: 1,
 			max: 200,
 			step: 1,
 			value: skip,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				skip = value;
 				document.getElementById("input_skip").value = value;
 			}
 	});
-	$('#slider_mass').slider({
+	slider('slider_mass', {
 			min: 0.01,
 			max: 10,
 			step: 0.01,
 			value: MASS,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_mass").value = value;
 			}
 	});
-	$('#slider_N').slider({
+	slider('slider_N', {
 			min: 3,
 			max: 200,
 			step: 1,
 			value: N,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_N").value = value;
 			}
 	});
-	$('#slider_freq').slider({
+	slider('slider_freq', {
 			min: 0,
 			max: 10,
 			step: 0.01,
 			value: freq,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				phi = 2*Math.PI*time*(freq - value) + phi;
 				freq = value;
 				document.getElementById("input_freq").value = value;
 			}
 	});
-	$('#slider_A').slider({
+	slider('slider_A', {
 			min: 0,
 			max: 5,
 			step: 0.1,
 			value: A,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				A = value;
 				document.getElementById("input_A").value = value;
 			}
 	});
-	$('#slider_k').slider({
+	slider('slider_k', {
 			min: 0,
 			max: 10000,
 			step: 10,
 			value: spring.k,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_k").value = value;
 			}
 	});
-	$('#slider_nl').slider({
+	slider('slider_nl', {
 			min: 0.01,
 			max: 1.1,
 			step: 0.01,
 			value: nl,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_nl").value = value;
 			}
 	});
-	$('#slider_gamma').slider({
+	slider('slider_gamma', {
 			min: 0,
 			max: 1,
 			step: 0.01,
 			value: gamma,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				gamma = value;
 				document.getElementById("input_gamma").value = value;
 			}
 	});
 	
 	//checkbox
-	$('#checkbox_gravity').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_gravity', (checked) => {
+			if(checked){
 				gravity = 9.8;
 			}
 			else{

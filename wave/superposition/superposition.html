@@ -12,30 +12,25 @@ div#canvas-frame{
 input.number{
 	width: 30px;
 }
-div#controller div.slider{
+div#controller input.slider{
 	width: 150px;
 }
-div#controller div.slider#slider_direction1{
+div#controller input.slider#slider_direction1{
 	width: 150px;
 }
 
-div#controller div.slider#slider_direction2{
+div#controller input.slider#slider_direction2{
 	width: 150px;
 }
 .output{
 	clear: both;
 }
 </style>
-<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/slider.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
 
 <!-- Javascript -->
 
-<!-- jQuery -->
-<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
 
 <!-- Three -->
 		<script type="importmap">
@@ -70,7 +65,7 @@ div#controller div.slider#slider_direction2{
 					<table>
 						<tr>
 							<th>速さ</th>
-							<th><div id="slider_vel" class="slider" style="margin: 0px;"></div></th>
+							<th><input type="range" id="slider_vel" class="slider" style="margin: 0px;"></th>
 							<th><input type="text" value="" id="input_vel" class="number" ></input>m/s</th>
 						</tr>
 					</table>
@@ -86,7 +81,7 @@ div#controller div.slider#slider_direction2{
 							<tr>
 								<th>進行方向</th>
 								<th style="width: 30px;">左</th>
-								<th style="width: 150px;"><div id="slider_direction1" class="slider" style="margin: 0px;" ></div></th>
+								<th style="width: 150px;"><input type="range" id="slider_direction1" class="slider" style="margin: 0px;" ></th>
 								<th style="padding-left: 10px; width: 50px;">右</th>
 							</tr>
 						</table>
@@ -96,7 +91,7 @@ div#controller div.slider#slider_direction2{
 					<li><a href="#">
 						<table><tr>
 								<th>振幅</th>
-								<th><div id="slider_amp1" class="slider" ></div></th>
+								<th><input type="range" id="slider_amp1" class="slider" ></th>
 								<th><input type="text" value="" id="input_amp1" class="number" ></input>m</th>
 						</tr></table>
 					</a> </li>
@@ -104,14 +99,14 @@ div#controller div.slider#slider_direction2{
 					<li><a href="#">
 						<table><tr>
 								<th>波長</th>
-								<th><div id="slider_lambda1" class="slider"></div></th>
+								<th><input type="range" id="slider_lambda1" class="slider"></th>
 								<th><input type="text" value="" id="input_lambda1" class="number" ></input>m</th>
 						</tr></table>
 					</a></li>
 					<li><a href="#">
 						<table><tr>
 								<th>振動数</th>
-								<th><div id="slider_freq1" class="slider"></div></th>
+								<th><input type="range" id="slider_freq1" class="slider"></th>
 								<th><input type="text" value="" id="input_freq1" class="number" ></input>Hz</th>
 						</tr></table>
 					</a></li>
@@ -128,7 +123,7 @@ div#controller div.slider#slider_direction2{
 							<tr>
 								<th>進行方向</th>
 								<th style="width: 30px;">左</th>
-								<th style="width: 150px;"><div id="slider_direction2" class="slider"  style="margin: 0px;"></div></th>
+								<th style="width: 150px;"><input type="range" id="slider_direction2" class="slider"  style="margin: 0px;"></th>
 								<th style="padding-left: 10px;width: 50px;">右</th>
 							</tr>
 						</table>
@@ -137,7 +132,7 @@ div#controller div.slider#slider_direction2{
 					<li><a href="#">
 						<table> <tr>
 								<th>振幅</th>
-								<th><div id="slider_amp2" class="slider" ></div></th>
+								<th><input type="range" id="slider_amp2" class="slider" ></th>
 								<th><input type="text" value="" id="input_amp2" class="number" >m</th>
 						</tr> </table>
 					</a> </li>
@@ -145,14 +140,14 @@ div#controller div.slider#slider_direction2{
 					<li><a href="#">
 						<table><tr>
 								<th>波長</th>
-								<th><div id="slider_lambda2" class="slider"></div></th>
+								<th><input type="range" id="slider_lambda2" class="slider"></th>
 								<th><input type="text" value="" id="input_lambda2" class="number" ></input>m</th>
 						</tr></table>
 					</a> </li>
 					<li><a href="#">
 						<table><tr>
 								<th>振動数</th>
-								<th><div id="slider_freq2" class="slider"></div></th>
+								<th><input type="range" id="slider_freq2" class="slider"></th>
 								<th><input type="text" value="" id="input_freq2" class="number" ></input>Hz</th>
 						</tr></table>
 					</a></li>

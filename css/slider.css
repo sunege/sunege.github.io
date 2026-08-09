@@ -1,0 +1,77 @@
+/* jquery-ui.css の代わりに <input type="range"> の見た目を整える。
+   寸法と色は jQuery UI の既定テーマ（.ui-slider / .ui-slider-handle）に
+   合わせてあるので、見た目は今までとほぼ変わらない。 */
+
+/* 元は <div class="slider"> だったので、ブロック要素で親の幅いっぱい、という
+   振る舞いをそのまま引き継ぐ。ページ側の input.slider{width:...} や
+   style="width:..." で上書きできるよう、ここはあえて詳細度を低くしてある。 */
+.slider{
+    display: block;
+    width: 100%;
+}
+
+input[type=range].slider{
+    -webkit-appearance: none;
+    appearance: none;
+    /* jQuery UI のスライダー（div）は高さ 16px だった。つまみ 20px より低いが、
+       つまみは上下にはみ出して描かれていたので、それに合わせてある。
+       ここを 20px にすると 1 本あたり 4px ずつ下の要素が下がる。 */
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* --- 溝 --- */
+input[type=range].slider::-webkit-slider-runnable-track{
+    height: 12px;
+    background: #eeeeee;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+input[type=range].slider::-moz-range-track{
+    height: 12px;
+    background: #eeeeee;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+/* --- つまみ --- */
+input[type=range].slider::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-top: -3px;  /* (溝14px - つまみ20px) / 2 で溝の中央に合わせる */
+    background: #f6f6f6;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+input[type=range].slider::-moz-range-thumb{
+    width: 20px;
+    height: 20px;
+    background: #f6f6f6;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=range].slider:hover::-webkit-slider-thumb{
+    background: #ededed;
+}
+input[type=range].slider:hover::-moz-range-thumb{
+    background: #ededed;
+}
+
+input[type=range].slider:focus{
+    outline: none;
+}
+input[type=range].slider:focus-visible::-webkit-slider-thumb{
+    border-color: #999999;
+}
+input[type=range].slider:focus-visible::-moz-range-thumb{
+    border-color: #999999;
+}

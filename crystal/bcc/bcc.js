@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { quadGeometry } from '../../js/common/geometry.js';
+import { slider } from '../../js/common/ui.js';
 
 let wall2, wall3, wall4, wall5, wall6;
 
@@ -97,23 +98,21 @@ window.addEventListener("load", function(){
 ////////////////////////////////////////
 function initEvent(){
 
-    $('#slider_radius').slider({
+    slider('slider_radius', {
             min: 0.01,
             max: 5,
             step: 0.01,
             value: RADIUS,
-            slide: function(event, ui){
-                const value = ui.value;
+            onInput: (value) => {
                 document.getElementById("input_radius").value = value;
             }
     });
-    $('#slider_N').slider({
+    slider('slider_N', {
             min: 3,
             max: 200,
             step: 1,
             value: N,
-            slide: function(event, ui){
-                const value = ui.value;
+            onInput: (value) => {
                 document.getElementById("input_N").value = value;
             }
     });

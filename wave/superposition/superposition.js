@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
+import { slider, setSliderValue, checkbox } from '../../js/common/ui.js';
 
 window.addEventListener("load", function(){
 		initEvent();
@@ -43,24 +44,24 @@ function initEvent(){
 	document.getElementById("resetButton").value = "reset";
 
 	//checkbox
-	$('#checkbox_wave1').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_wave1', (checked) => {
+			if(checked){
 				wave1Flag = true;
 			}
 			else{
 				wave1Flag = false;
 			}
 	});
-	$('#checkbox_wave2').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_wave2', (checked) => {
+			if(checked){
 				wave2Flag = true;
 			}
 			else{
 				wave2Flag = false;
 			}
 	});
-	$('#checkbox_wave3').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_wave3', (checked) => {
+			if(checked){
 				wave3Flag = true;
 			}
 			else{
@@ -69,137 +70,128 @@ function initEvent(){
 	});
 
 	//slider interface
-	$('#slider_direction1').slider({
+	slider('slider_direction1', {
 			min: -1,
 			max: 1,
 			step: 2,
 			value: direction1,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				direction1 = value;
 			}
 	});
-	$('#slider_direction2').slider({
+	slider('slider_direction2', {
 			min: -1,
 			max: 1,
 			step: 2,
 			value: direction2,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				direction2 = value;
 			}
 	});
-	$('#slider_amp1').slider({
+	slider('slider_amp1', {
 			min: 0,
 			max: 5,
 			step: 0.1,
 			value: amp1,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				amp1 = value;
 				document.getElementById("input_amp1").value = value;
 			}
 	});
 	document.getElementById("input_amp1").value = amp1;
 
-	$('#slider_lambda1').slider({
+	slider('slider_lambda1', {
 			min: 0.01,
 			max: 5,
 			step: 0.01,
 			value: lambda1,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				lambda1 = value;
 				document.getElementById("input_lambda1").value = value;
 				freq1 = vel/lambda1;
 				document.getElementById("input_freq1").value = freq1;
-				$("#slider_freq1").slider("value", freq1);
+				setSliderValue('slider_freq1', freq1);
 			}
 	});
 	document.getElementById("input_lambda1").value = lambda1;
 
-	$('#slider_freq1').slider({
+	slider('slider_freq1', {
 			min: 1,
 			max: 30,
 			step: 0.1,
 			value: freq1,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				freq1 = value;
 				document.getElementById("input_freq1").value = value;
 				lambda1 = vel/freq1;
 				document.getElementById("input_lambda1").value = lambda1;
-				$('#slider_lambda1').slider("value", lambda1);
+				setSliderValue('slider_lambda1', lambda1);
 			}
 	});
 	document.getElementById("input_freq1").value = freq1;
 
-	$('#slider_vel').slider({
+	slider('slider_vel', {
 			min: 0,
 			max: 10,
 			step: 0.1,
 			value: vel,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				vel = value;
 				document.getElementById("input_vel").value = value;
 			}
 	});
 	document.getElementById("input_vel").value = vel;
 
-	$('#slider_amp2').slider({
+	slider('slider_amp2', {
 			min: 0,
 			max: 5,
 			step: 0.1,
 			value: amp2,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				amp2 = value;
 				document.getElementById("input_amp2").value = value;
 			}
 	});
 	document.getElementById("input_amp2").value = amp2;
 
-// 	$('#slider_lambda2').slider({
+// 	slider('slider_lambda2', {
 // 			min: 0.01,
 // 			max: 20,
 // 			step: 0.01,
 // 			value: lambda2,
-// 			slide: function(event, ui){
-// 				var value = ui.value;
+// 			onInput: (value) => {
+// 				var value = value;
 // 				lambda2 = value;
 // 				document.getElementById("input_lambda2").value = value;
 // 			}
 // 	});
 // 	document.getElementById("input_lambda2").value = lambda2;
-	$('#slider_lambda2').slider({
+	slider('slider_lambda2', {
 			min: 0.01,
 			max: 5,
 			step: 0.01,
 			value: lambda2,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				lambda2 = value;
 				document.getElementById("input_lambda2").value = value;
 				freq2 = vel/lambda2;
 				document.getElementById("input_freq2").value = freq2;
-				$("#slider_freq2").slider("value", freq2);
+				setSliderValue('slider_freq2', freq2);
 			}
 	});
 	document.getElementById("input_lambda2").value = lambda2;
 
-	$('#slider_freq2').slider({
+	slider('slider_freq2', {
 			min: 1,
 			max: 30,
 			step: 0.1,
 			value: freq2,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				freq2 = value;
 				document.getElementById("input_freq2").value = value;
 				lambda2 = vel/freq2;
 				document.getElementById("input_lambda2").value = lambda2;
-				$('#slider_lambda2').slider("value", lambda2);
+				setSliderValue('slider_lambda2', lambda2);
 			}
 	});
 	document.getElementById("input_freq2").value = freq2;
@@ -407,14 +399,13 @@ function loop(){
 		amp1 = 1; //ampritude
 		direction1 = 1; //wave direction right:-1
 		document.getElementById("input_amp1").value = amp1;
-		$('#slider_amp1').slider("value", amp1);
+		setSliderValue('slider_amp1', amp1);
 		document.getElementById("input_lambda1").value = lambda1;
-		$('#slider_lambda1').slider("value", lambda1);
+		setSliderValue('slider_lambda1', lambda1);
 		document.getElementById("input_freq1").value = vel/lambda1;
-		$('#slider_freq1').slider("value", vel/lambda1);
+		setSliderValue('slider_freq1', vel/lambda1);
 		document.getElementById("slider_direction1").value = direction1;
-		$('#slider_direction1').slider("value", direction1);
-
+		setSliderValue('slider_direction1', direction1);
 		//wave2
 		lambda2 = 2; //wave length
 		amp2 = 1; //ampritude
@@ -426,14 +417,13 @@ function loop(){
 // 		document.getElementById("slider_direction2").value = direction2;
 
 		document.getElementById("input_amp2").value = amp2;
-		$('#slider_amp2').slider("value", amp2);
+		setSliderValue('slider_amp2', amp2);
 		document.getElementById("input_lambda2").value = lambda2;
-		$('#slider_lambda2').slider("value", lambda2);
+		setSliderValue('slider_lambda2', lambda2);
 		document.getElementById("input_freq2").value = vel/lambda2;
-		$('#slider_freq2').slider("value", vel/lambda2);
+		setSliderValue('slider_freq2', vel/lambda2);
 		document.getElementById("slider_direction2").value = direction2;
-		$('#slider_direction2').slider("value", direction2);
-
+		setSliderValue('slider_direction2', direction2);
 		resetFlag = false;
 	}
 

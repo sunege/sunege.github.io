@@ -7,15 +7,11 @@
 		<style>
 			div#canvas-frame{ width:900px; height:600px; }
 		</style>
-		<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/slider.css"/>
 		<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
 
 		<!-- Javascript -->
 
-		<!-- jQuery -->
-		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
-		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
-		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
 
 		<!-- Three -->
 		<script type="importmap">
@@ -54,7 +50,7 @@
 					<!-- space -->
 					<table><tr>
 							<td>隙間(大きさ)</td>
-							<td><div id="slider_space" class="slider" style="width:180px"></div></td>
+							<td><input type="range" id="slider_space" class="slider" style="width:180px"></td>
 							<td><input type="text" value="" id="input_space" class="number" style="width:40px"/></td>
 					</tr></table>
 				</a>
@@ -69,7 +65,7 @@
 				<a href="#">
 					<table><tr>
 							<td>透明度</td>
-							<td><div id="slider_alpha" class="slider" style="width:180px;"></div></td>
+							<td><input type="range" id="slider_alpha" class="slider" style="width:180px;"></td>
 							<td><center><input type="text" value="" id="input_alpha" class="number" style="width:40px"/></center></td>
 					</tr></table>
 				</a>
@@ -79,7 +75,7 @@
 				<a href="#">
 					<table><tr>
 							<td>振幅</td>
-							<td><div id="slider_Amp" class="slider" style="width:180px;"></div></td>
+							<td><input type="range" id="slider_Amp" class="slider" style="width:180px;"></td>
 							<td><input type="text" value="" id="input_Amp" class="number" style="width:40px"/></td>
 					</tr></table>
 				</a>
@@ -89,7 +85,7 @@
 					<!-- input lambda -->
 					<table><tr>
 							<td>波長</td>
-							<td><div id="slider_lambda" class="slider" style="width:180px"></div></td>
+							<td><input type="range" id="slider_lambda" class="slider" style="width:180px"></td>
 							<td><input type="text" value="" id="input_lambda" class="number" style="width:40px"/></td>
 					</tr></table>
 				</a>
@@ -99,7 +95,7 @@
 					<!-- velocity -->
 					<table><tr>
 							<td>波の速さ</td>
-							<td><div id="slider_vel" class="slider" style="width:180px"></div></td>
+							<td><input type="range" id="slider_vel" class="slider" style="width:180px"></td>
 							<td><input type="text" value="" id="input_vel" class="number" style="width:40px"/></td>
 					</tr></table>
 				</a>

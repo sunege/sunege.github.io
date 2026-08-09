@@ -5,8 +5,7 @@
 		<title>Spring String</title>
 
 		<!-- style sheet -->
-		<link type="text/css" rel="stylesheet"
-		href="../../css/jquery-ui.css"/>
+		<link type="text/css" rel="stylesheet" href="../../css/slider.css"/>
 		<link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
 		<style>
 			div#canvas-frame{
@@ -14,7 +13,7 @@
 				height: 600px;
 				float: left;
 			}
-			div#controller div.slider{
+			div#controller input.slider{
 				width: 180px;
 			}
 			input.number{
@@ -24,10 +23,6 @@
 
 		<!-- Javascript -->
 
-		<!-- jQuery -->
-		<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
-		<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
-		<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
 
 
 		<!-- Three -->
@@ -63,7 +58,7 @@
 						<table><tr>
 								<!-- input skip -->
 								<td>描画間隔</td>
-								<td><div id="slider_skip" class="slider" style="width:180px"></div></td>
+								<td><input type="range" id="slider_skip" class="slider" style="width:180px"></td>
 								<td><input type="text" value="" id="input_skip" class="number" /></td>
 						</tr></table>
 					</a></li>
@@ -76,7 +71,7 @@
 							<table><tr>
 									<!-- mass -->
 									<td>質量</td>
-									<td><div id="slider_mass" class="slider" style="width:180px"></div></td>
+									<td><input type="range" id="slider_mass" class="slider" style="width:180px"></td>
 									<td><input type="text" value="" id="input_mass" class="number" />kg</td>
 							</tr></table>
 						</a></li>
@@ -84,7 +79,7 @@
 							<table><tr>
 									<!-- N -->
 									<td>粒子数</td>
-									<td><div id="slider_N" class="slider" style="width:180px"></div></td>
+									<td><input type="range" id="slider_N" class="slider" style="width:180px"></td>
 									<td><input type="text" value="" id="input_N" class="number" />個</td>
 							</tr></table>
 						</a></li>
@@ -92,7 +87,7 @@
 							<table><tr>
 									<!-- frequency -->
 									<td>振動数</td>
-									<td><div id="slider_freq" class="slider" style="width:180px"></div></td>
+									<td><input type="range" id="slider_freq" class="slider" style="width:180px"></td>
 									<td><input type="text" value="" id="input_freq" class="number"/>Hz</td>
 							</tr></table>
 						</a></li>
@@ -100,7 +95,7 @@
 							<table><tr>
 									<!-- Amp -->
 									<td>振幅</td>
-									<td><div id="slider_A" class="slider"></div></td>
+									<td><input type="range" id="slider_A" class="slider"></td>
 									<td><input type="text" value="" id="input_A" class="number"/>m</td>
 							</tr></table>
 						</a></li>
@@ -115,21 +110,21 @@
 						<li><a href="#">
 							<table><tr>
 									<td>ばね定数</td>
-									<td><div id="slider_k" class="slider"></div></td>
+									<td><input type="range" id="slider_k" class="slider"></td>
 									<td><input type="text" value="" id="input_k" class="number"/>N/m</td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">
 							<table><tr>
 									<td>自然長=間隔×</td>
-									<td><div id="slider_nl" class="slider"></div></td>
+									<td><input type="range" id="slider_nl" class="slider"></td>
 									<td><input type="text" value="" id="input_nl" class="number"/></td>
 							</tr></table>
 						</a></li>
 						<li><a href="#">
 							<table><tr>
 									<td>空気抵抗</td>
-									<td><div id="slider_gamma" class="slider"></div></td>
+									<td><input type="range" id="slider_gamma" class="slider"></td>
 									<td><input type="text" value="" id="input_gamma" class="number"/>Ns/m</td>
 							</tr></table>
 						</a></li>

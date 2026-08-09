@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight, applyLegacyAmbient } from '../../js/common/three-setup.js';
 import { lineGeometry } from '../../js/common/geometry.js';
+import { slider, checkbox } from '../../js/common/ui.js';
 
 const time = 0;		// time
 let dt = 2; // Delta t
@@ -191,76 +192,70 @@ window.addEventListener("load", function(){
 function initEvent(){
 
 	//slider interface
-	$('#slider_skip').slider({
+	slider('slider_skip', {
 			min: 0.01,
 			max: 1.01,
 			step: 0.01,
 			value: _skip,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				_skip = value;
 				skip = 1/(60*dt)*_skip;
 				document.getElementById("input_skip").value = value;
 			}
 	});
 
-	$('#slider_radius').slider({
+	slider('slider_radius', {
 			min: 0.01,
 			max: 0.5,
 			step: 0.01,
 			value: RADIUS,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_radius").value = value;
 			}
 	});
-	$('#slider_mass').slider({
+	slider('slider_mass', {
 			min: 0.01,
 			max: 1,
 			step: 0.01,
 			value: MASS,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_mass").value = value;
 			}
 		});
-	$('#slider_N').slider({
+	slider('slider_N', {
 			min: 2,
 			max: 20,
 			step: 1,
 			value: N,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_N").value = value;
 			}
 	});
-	$('#slider_velocity').slider({
+	slider('slider_velocity', {
 			min: 0,
 			max: 30,
 			step: 1,
 			value: vel_init,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_velocity").value = value;
 			}
 	});
-// 	$('#slider_gamma').slider({
+// 	slider('slider_gamma', {
 // 			min: 0,
 // 			max: 1,
 // 			step: 0.01,
 // 			value: gamma,
-// 			slide: function(event, ui){
-// 				var value = ui.value;
+// 			onInput: (value) => {
+// 				var value = value;
 // 				document.getElementById("input_gamma").value = value;
 // 			}
 // 	});
-	$('#slider_strobe').slider({
+	slider('slider_strobe', {
 			min: 0.01,
 			max: 1,
 			step: 0.01,
 			value: strobe_time,
-			slide: function(event, ui){
-				const value = ui.value;
+			onInput: (value) => {
 				document.getElementById("input_strobe").value = value;
 			}
 	});
@@ -278,8 +273,8 @@ function initEvent(){
 
 
 	//checkbox interface
-	$('#checkbox_orbital').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_orbital', (checked) => {
+			if(checked){
 				orbital_flag = true;
 			}
 			else{
@@ -287,8 +282,8 @@ function initEvent(){
 			}
 	});
 
-	$('#checkbox_strobe').click(function(){
-			if($(this).prop('checked') === true){
+	checkbox('checkbox_strobe', (checked) => {
+			if(checked){
 				strobe_flag = true;
 			}
 			else{
