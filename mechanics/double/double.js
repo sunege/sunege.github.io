@@ -589,7 +589,10 @@ let draggedObj;
 function mouseEvent() {
     renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
     renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+    // mouseup は canvas ではなく window で受ける。canvas に付けていると、
+    // ボールを canvas の外まで運んでからボタンを離した場合に mouseup が
+    // 飛んでこず、ボールがマウスに追従したままになる。
+    window.addEventListener( 'mouseup', onDocumentMouseUp, false );
 }
 
 function onDocumentMouseDown(event) {
@@ -698,7 +701,9 @@ function onDocumentMouseUp(event) {
 
     trackball.enabled = true;
 
-    if (mouseoveredObj) {
-        draggedObj = null;
-    }
+    // mouseoveredObj が入っているときだけ解除していたが、これはドラッグ中に
+    // 更新されない（更新するのは「ドラッグしていないとき」の分岐だけ）。
+    // ボールの上を通らずに掴んだ場合などは null のままなので解除されず、
+    // ボールがマウスに追従し続けていた。ボタンを離したら常に解除する。
+    draggedObj = null;
 }
