@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { TrackballControls } from '../../js/vendor/three/controls/TrackballControls.js';
 import { initThree, initLight } from '../../js/common/three-setup.js';
-import { lineGeometry } from '../../js/common/geometry.js';
+import { lineGeometry, ribbonGeometry } from '../../js/common/geometry.js';
 import { slider, setSliderValue, checkbox } from '../../js/common/ui.js';
 
 window.addEventListener("load", function(){
@@ -299,6 +299,14 @@ let freq2 = vel/lambda2;
 let amp2 = 1; //ampritude
 let direction2 = -1; //wave direction left:-1
 
+//波形の線の太さ（ワールド座標）。この見え方だと 1 ≒ 72px なので 0.045 で約 3px
+const wave_width = 0.045;
+
+//波形のマテリアル。毎フレーム作り直さないようここに置く
+const line1Material = new THREE.MeshBasicMaterial({ color: 0xDD88FF, side: THREE.DoubleSide });
+const line2Material = new THREE.MeshBasicMaterial({ color: 0x88DDFF, side: THREE.DoubleSide });
+const line3Material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, side: THREE.DoubleSide });
+
 //grid
 let grid;
 const grid_diff = 0.5; //グリッドの間隔
@@ -325,12 +333,13 @@ function initObject(){
 		gridGeometry.push(v1);
 		gridGeometry.push(v2);
 		if(i===(num_grid_x - 1) / 2){
-			gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 2});
+			gridMaterial = new THREE.LineDashedMaterial({ color: 0xFFFFFF, linewidth: 2, dashSize: 0.08, gapSize: 0.08 });
 		}
 		else{
-			gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
+			gridMaterial = new THREE.LineDashedMaterial({ color: 0xFFFFFF, linewidth: 1, dashSize: 0.08, gapSize: 0.08 });
 		}
 		grid[i] = new THREE.Line(lineGeometry(gridGeometry), gridMaterial);
+		grid[i].computeLineDistances(); // LineDashedMaterial は破線の位置をこの距離から決める
 		scene.add(grid[i]);
 	}
 	//pallarel y axial
@@ -341,8 +350,9 @@ function initObject(){
 		v2 = new THREE.Vector3(x, ((num_grid_x - 1) / 2) * grid_diff, -0.05);  
 		gridGeometry.push(v1);
 		gridGeometry.push(v2);
-		gridMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 1});
+		gridMaterial = new THREE.LineDashedMaterial({ color: 0xFFFFFF, linewidth: 1, dashSize: 0.08, gapSize: 0.08 });
 		grid[i + num_grid_x] = new THREE.Line(lineGeometry(gridGeometry), gridMaterial);
+		grid[i + num_grid_x].computeLineDistances();
 		scene.add(grid[i + num_grid_x]);
 	}
 
@@ -372,12 +382,13 @@ function calculate(){
 		geometry3[n] = vertex3;
 		n++;
 	}
-	const line1Material = new THREE.LineBasicMaterial({ color: 0xDD88FF ,linewidth: 4});
-	const line2Material = new THREE.LineBasicMaterial({ color: 0x88DDFF ,linewidth: 4});
-	const line3Material = new THREE.LineBasicMaterial({ color: 0xFFFFFF ,linewidth: 4});
-	line1 = new THREE.Line(lineGeometry(geometry1), line1Material);
-	line2 = new THREE.Line(lineGeometry(geometry2), line2Material);
-	line3 = new THREE.Line(lineGeometry(geometry3), line3Material);
+	// 毎フレーム作り直すので、前のフレームのジオメトリは捨てる
+	line1?.geometry.dispose();
+	line2?.geometry.dispose();
+	line3?.geometry.dispose();
+	line1 = new THREE.Mesh(ribbonGeometry(geometry1, wave_width), line1Material);
+	line2 = new THREE.Mesh(ribbonGeometry(geometry2, wave_width), line2Material);
+	line3 = new THREE.Mesh(ribbonGeometry(geometry3, wave_width), line3Material);
 }
 
 

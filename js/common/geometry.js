@@ -45,6 +45,95 @@ export function lineGeometry(points) {
 }
 
 /**
+ * 折れ線を、指定した太さを持つ帯（三角形の列）にしたジオメトリを作る。
+ *
+ * WebGL では LineBasicMaterial の linewidth が無視され、線は常に 1px で
+ * 描かれる（three.js 側の制限で、r70 の頃から変わらない）。太さの要る線は
+ * 線ではなく細長い面として描くしかないので、その面をここで作る。
+ * マテリアルは MeshBasicMaterial を DoubleSide で使う想定。
+ *
+ * 各頂点を xy 平面内で法線方向に ±width/2 ずらす。折れ点では前後の線分の
+ * 法線を平均した向き（マイター）へ、折れ角の分だけ伸ばした長さでずらすので、
+ * 曲がっているところでも帯の幅は一定になる。折れ角が鋭いと伸びが発散する
+ * ため上限を設けてある。
+ *
+ * @param {object[]} points THREE.Vector3 の配列（2 点以上）
+ * @param {number} width 帯の幅（ワールド座標）
+ */
+export function ribbonGeometry(points, width) {
+	const geometry = new THREE.BufferGeometry();
+	const count = points.length;
+	if (count < 2) {
+		setAttribute(geometry, 'position', new Float32Array(0), 3);
+		return geometry;
+	}
+
+	// 線分ごとの単位法線。線分を xy 平面内で 90 度回したもの
+	const normals = new Array(count - 1);
+	for (let i = 0; i < count - 1; i++) {
+		const dx = points[i + 1].x - points[i].x;
+		const dy = points[i + 1].y - points[i].y;
+		const len = Math.sqrt(dx * dx + dy * dy);
+		// 長さ 0 の線分には向きが無いので、直前の線分の法線を引き継ぐ
+		normals[i] = len > 0 ? [-dy / len, dx / len] : (normals[i - 1] || [0, 1]);
+	}
+
+	const half = width / 2;
+	const MITER_LIMIT = 4; // マイターの伸びの上限。鋭角で帯が飛び出すのを防ぐ
+	const position = new Float32Array(count * 2 * 3);
+
+	for (let i = 0; i < count; i++) {
+		const before = normals[Math.max(i - 1, 0)];
+		const after = normals[Math.min(i, count - 2)];
+
+		let mx = before[0] + after[0];
+		let my = before[1] + after[1];
+		const len = Math.sqrt(mx * mx + my * my);
+		if (len > 0) {
+			mx /= len;
+			my /= len;
+		}
+		else {
+			// 前後がちょうど逆向き（180 度の折り返し）。平均が消えるので片側を使う
+			mx = after[0];
+			my = after[1];
+		}
+
+		const cos = mx * after[0] + my * after[1];
+		const scale = cos > 0 ? Math.min(1 / cos, MITER_LIMIT) : MITER_LIMIT;
+		const ox = mx * half * scale;
+		const oy = my * half * scale;
+
+		const p = points[i];
+		const n = i * 6;
+		position[n] = p.x + ox;
+		position[n + 1] = p.y + oy;
+		position[n + 2] = p.z;
+		position[n + 3] = p.x - ox;
+		position[n + 4] = p.y - oy;
+		position[n + 5] = p.z;
+	}
+	setAttribute(geometry, 'position', position, 3);
+
+	// 頂点 2 つで 1 組。組と組の間を四角形（三角形 2 枚）で埋める
+	const index = count * 2 > 65535 ? new Uint32Array((count - 1) * 6) : new Uint16Array((count - 1) * 6);
+	let k = 0;
+	for (let i = 0; i < count - 1; i++) {
+		const v = i * 2;
+		index[k++] = v;
+		index[k++] = v + 1;
+		index[k++] = v + 3;
+
+		index[k++] = v;
+		index[k++] = v + 3;
+		index[k++] = v + 2;
+	}
+	setIndex(geometry, index);
+
+	return geometry;
+}
+
+/**
  * 破線で描く円の輪郭のジオメトリを作る。
  * 旧コードは CircleGeometry（中心＋円周の頂点を持つ扇形）から中心頂点を
  * vertices.shift() で取り除き、computeLineDistances() を呼んでいた。
