@@ -75,3 +75,107 @@ input[type=range].slider:focus-visible::-webkit-slider-thumb{
 input[type=range].slider:focus-visible::-moz-range-thumb{
     border-color: #999999;
 }
+
+
+/* --- 左端からつまみまでを塗る（jQuery UI の range: "min"）---
+   塗る幅は js/common/ui.js が --fill に入れる。 */
+input[type=range].slider.filled::-webkit-slider-runnable-track{
+    background:
+        linear-gradient(#f6a828, #f6a828) left / var(--fill, 0%) 100% no-repeat,
+        #eeeeee;
+}
+input[type=range].slider.filled::-moz-range-track{
+    background:
+        linear-gradient(#f6a828, #f6a828) left / var(--fill, 0%) 100% no-repeat,
+        #eeeeee;
+}
+
+
+/* --- つまみが 2 つのスライダー ---
+   <input type="range"> は 1 本につきつまみ 1 つなので、溝は入れ物に描き、
+   その上に中身が透明な input を 2 本重ねる。 */
+.range-slider{
+    position: relative;
+    height: 16px;
+    box-sizing: border-box;
+    background: #eeeeee;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+/* 2 つのつまみの間を塗る。--low / --high は js/common/ui.js が入れる。 */
+.range-slider::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--low, 0%);
+    right: calc(100% - var(--high, 100%));
+    background: #f6a828;
+    border-radius: 4px;
+}
+
+.range-slider input[type=range]{
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+    left: 0;
+    top: -1px;  /* 入れ物の border の分だけ上げて、溝の中央につまみを合わせる */
+    width: 100%;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    /* 溝の部分をクリックしても、どちらのつまみを動かすべきか決められない。
+       つまみ以外はクリックを下へ通し、掴んだつまみだけが反応するようにする。 */
+    pointer-events: none;
+}
+
+.range-slider input[type=range]::-webkit-slider-runnable-track{
+    height: 14px;
+    background: transparent;
+}
+.range-slider input[type=range]::-moz-range-track{
+    height: 14px;
+    background: transparent;
+}
+
+.range-slider input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: auto;
+    width: 20px;
+    height: 20px;
+    margin-top: -3px;
+    background: #f6f6f6;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.range-slider input[type=range]::-moz-range-thumb{
+    pointer-events: auto;
+    width: 20px;
+    height: 20px;
+    background: #f6f6f6;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.range-slider input[type=range]:hover::-webkit-slider-thumb{
+    background: #ededed;
+}
+.range-slider input[type=range]:hover::-moz-range-thumb{
+    background: #ededed;
+}
+.range-slider input[type=range]:focus{
+    outline: none;
+}
+.range-slider input[type=range]:focus-visible::-webkit-slider-thumb{
+    border-color: #999999;
+}
+.range-slider input[type=range]:focus-visible::-moz-range-thumb{
+    border-color: #999999;
+}

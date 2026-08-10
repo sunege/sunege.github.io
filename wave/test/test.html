@@ -6,16 +6,10 @@
 
 <style>
 </style>
-<link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="../../css/jquery.jqplot.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/slider.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/menu.css"/>
 
 <!-- Javascript -->
-
-<!-- jQuery -->
-<script type="text/javascript" src="../../js/jquery/jquery.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
 
 <!-- Three -->
 		<script type="importmap">
@@ -23,57 +17,50 @@
 		</script>
 
 <!-- Main script -->
-<script type="text/javascript">
-var x = 10;
-var x1 = 2;
-var x2 = x - x1;
-$(function(){
-	$("#slider1").slider({
-		min: 0,
-		max: 10,
-		value: x1,
-		step: 1,
-		create: function(event, ui){
-			//document.getElementById("input1").value = 2;
-			$(':text[id="input1"]').val(x1);
-		},
-		slide: function(event, ui){
-			var value = ui.value;
-			$(':text[id="input1"]').val(value);
-			$(':text[id="input2"]').val(x-value);
-			$("#slider2").slider("value", x-value);
-		}
-	});
+<script type="module">
+import { slider, setSliderValue } from '../../js/common/ui.js';
 
-	$(':text[id="input1"]').change(function(){
-		$("#slider1").slider("value", $(this).val());
-	});
+const x = 10;
+const x1 = 2;
+const x2 = x - x1;
 
-	$("#slider2").slider({
-		min: 0,
-		max: 10,
-		value: x2,
-		step: 1,
-		create: function(event, ui){
-			$(':text[id="input2"]').val(x2);
-		},
-		slide: function(event, ui){
-			var value = ui.value;
-			document.getElementById("input2").value = value;
-		}
-	});
+slider('slider1', {
+	min: 0,
+	max: 10,
+	step: 1,
+	value: x1,
+	callOnInit: true,
+	onInput: (value) => {
+		document.getElementById("input1").value = value;
+		document.getElementById("input2").value = x - value;
+		setSliderValue('slider2', x - value);
+	}
+});
 
-	$(':text[id="input2"]').change(function(){
-		$("#slider2").slider("value", $(this).val());
-	});
-	
+document.getElementById("input1").addEventListener('change', (event) => {
+	setSliderValue('slider1', event.target.value);
+});
+
+slider('slider2', {
+	min: 0,
+	max: 10,
+	step: 1,
+	value: x2,
+	callOnInit: true,
+	onInput: (value) => {
+		document.getElementById("input2").value = value;
+	}
+});
+
+document.getElementById("input2").addEventListener('change', (event) => {
+	setSliderValue('slider2', event.target.value);
 });
 </script>
 </head>
 <body>
-	<div id="slider1"></div>
+	<input type="range" id="slider1" class="slider">
 	<input type="text" value="" id="input1"></input>
-	<div id="slider2"></div>
+	<input type="range" id="slider2" class="slider">
 	<input type="text" value="" id="input2" class="number" ></input>
 </body>
 </html>

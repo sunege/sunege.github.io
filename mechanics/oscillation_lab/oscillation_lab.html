@@ -4,18 +4,129 @@
 <head>
     <meta charset="utf-8" />
     <title>spring_lab</title>
-    <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.min.css" />
-    <script type="text/javascript" src="../../js/jquery/jquery.js"></script>
-    <script type="text/javascript" src="../../js/jquery-ui/jquery-ui.js"></script>
-    <link type="text/css" rel="stylesheet" href="../../css/jquery-ui.css" />
-    <script type="text/javascript" src="../../js/jquery-ui-touch-punch/jquery.ui.touch-punch.js"></script>
-    <script type="text/javascript" src="../../js/jqPlot/jquery.jqplot.min.js"></script>
-    <link rel="stylesheet" href="../../css/jquery.jqplot.min.css">
-    </link>
+    <link type="text/css" rel="stylesheet" href="../../css/slider.css" />
 </head>
 
 <body>
-    <script>
+    <canvas id="view" width="500" height="200" style="float: left"></canvas>
+    <br />
+    <div id="graph" style="position: absolute; left: 500px; width: 400px; height: 400px;"></div>
+    <div class="view_controller" style="position: absolute; top: 190px; width: 500px">
+        <input type="button" id="btn_start_stop" value="start" />
+        <input type="button" id="btn_init" value="reset" />
+        <br />
+        <label id="label_refresh_rate" style="position: absolute; top:25px;">描画倍率</label>
+        <br />
+        <input id="indicator_refresh_rate" style="position: absolute; top: 25px; left: 70px" type="text" size="3"
+
+            readonly />
+        <label style="position:absolute; top: 25px; left: 130px;">倍</label>
+        <input type="range" id="slider_refresh_rate" class="slider filled"
+            style="position: absolute; top: 50px; left: 0px; width:150px;" />
+
+        <label id="label_graph_range" style="position: absolute; top:25px; left: 180px">グラフ表示範囲</label>
+        <input id="indicator_graph_min" style="position: absolute; top:25px; left: 300px" type="text" size="3"
+            readonly />
+        <label style="position: absolute; top:25px; left: 360px">s</label>
+        <label style="position: absolute; top:25px; left: 370px">～</label>
+        <input id="indicator_graph_max" style="position: absolute; top:25px; left: 390px" type="text" size="3"
+            readonly />
+        <label style="position: absolute; top:25px; left: 450px">s</label>
+        <div id="slider_graph_range" class="range-slider"
+            style="position: absolute; top:50px; left: 200px; width:220px;"><input type="range" /><input
+                type="range" /></div>
+    </div>
+
+    <div class="system_controller" style="position: absolute; top:260px;">
+        <table border="1" style="border-collapse: collapse;">
+            <tr>
+                <td style="text-align: center;">
+                    <label>系１</label>
+                    <br/>
+                    <br/>
+                    <label>系２</label>
+                </td>
+                <td>
+                    <div class="amp" style="margin-left: auto; margin-right: auto; width: 130px;">
+                        <label id="label_mass">最初の位置</label><br />
+                        <input id="indicator_amp1" type="text" size="3" readonly />
+                        <label>m</label>
+                        <input type="range" id="slider_amp1" class="slider filled" style="width:100px;" />
+
+                        <input id="indicator_amp2" type="text" size="3" readonly />
+                        <label>m</label>
+                        <input type="range" id="slider_amp2" class="slider filled" style="width:100px;" />
+                    </div>
+                </td>
+
+                <td>
+                    <div class="mass" style="width: 130px;">
+                        <label id="label_mass">質量</label><br />
+                        <input id="indicator_mass1" type="text" size="3" readonly />
+                        <label>kg</label>
+                        <input type="range" id="slider_mass1" class="slider filled" style="width:100px;" />
+
+                        <input id="indicator_mass2" type="text" size="3" readonly />
+                        <label>kg</label>
+                        <input type="range" id="slider_mass2" class="slider filled" style="width:100px;" />
+                    </div>
+                </td>
+
+                <td>
+                    <div class="spring_k" style="width: 130px;">
+                        <label id="label_k">ばね定数</label><br />
+                        <input id="indicator_k1" type="text" size="3" readonly />
+                        <label>N/m</label>
+                        <input type="range" id="slider_k1" class="slider filled" style="width:100px;" />
+
+                        <input id="indicator_k2" type="text" size="3" readonly />
+                        <label>N/m</label>
+                        <input type="range" id="slider_k2" class="slider filled" style="width:100px;" />
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align: center;">
+                    <label>系１</label>
+                    <br/>
+                    <br/>
+                    <label>系２</label>
+                </td>
+                <td>
+                    <div class="gamma">
+                        <label id="label_gamma">空気抵抗係数</label><br />
+                        <input id="indicator_gamma1" type="text" size="3" readonly />
+                        <label>Ns/m</label>
+                        <input type="range" id="slider_gamma1" class="slider filled" style="width:100px;" />
+
+                        <input id="indicator_gamma2" type="text" size="3" readonly />
+                        <label>Ns/m</label>
+                        <input type="range" id="slider_gamma2" class="slider filled" style="width:100px;" />
+                    </div>
+                </td>
+
+                <td>
+                    <div class="mu">
+                        <label id="label_mu">動摩擦係数</label><br />
+                        <input id="indicator_mu1" type="text" size="3" readonly />
+                        <input type="range" id="slider_mu1" class="slider filled" style="width:100px;" />
+
+                        <input id="indicator_mu2" type="text" size="3" readonly />
+                        <input type="range" id="slider_mu2" class="slider filled" style="width:100px;" />
+                    </div>
+                </td>
+                <td>
+                    <div></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script type="module">
+        import { slider, rangeSlider } from '../../js/common/ui.js';
+        import { Plot2D } from '../../js/common/plot2d.js';
+
         ////////　物理系の設定
         //　時間
         let time = 0;
@@ -103,15 +214,11 @@
 
 
         ////////　描画系の設定
-        //　canvasの生成、追加
-        const WIDTH = 500;
-        const HEIGHT = 200;
-        const canvas = document.createElement('canvas');
-        canvas.width = WIDTH;
-        canvas.height = HEIGHT;
-        canvas.style = "float: left";
+        //　canvasの取得
+        const canvas = document.getElementById('view');
+        const WIDTH = canvas.width;
+        const HEIGHT = canvas.height;
         const context = canvas.getContext('2d');
-        document.body.appendChild(canvas);
 
         //　粒子の描画オブジェクト
         class Particle {
@@ -271,9 +378,6 @@
 
 
         //////// グラフ
-        // グラフのインスタンス
-        let jqplot;
-
         // グラフのフラグ
         let graph_plot_count = 0;
         let graph_plot_skip = 0;
@@ -287,33 +391,25 @@
         let graph_time_min = 0;
         let graph_time_max = 5;
 
-        let options = {
-            title: "x-t図",
-            axes: {
-                xaxis: {
-                    label: '時間[s]',
-                    min: graph_time_min,
-                    max: graph_time_max,
-                    tickInterval: graph_time_max / 10
-                },
-                yaxis: {
-                    label: '変位[m]',
-                    min: -0.12,
-                    max: 0.12,
-                    tickInterval: 0.02
-                }
+        // jqPlot は描き直すたびに作り直していたが、Plot2D は一度作れば draw() で
+        // 何度でも描き替えられる。表示範囲を変えるときは xAxis を直接書き換える。
+        const plot = new Plot2D('graph', {
+            title: 'x-t図',
+            xAxis: {
+                label: '時間[s]',
+                min: graph_time_min,
+                max: graph_time_max,
+                tickInterval: graph_time_max / 10
             },
-            seriesDefaults: {
-                markerOptions: {
-                    show: false
-                }
+            yAxis: {
+                // 旧版は幅が足りず 2 行に折り返されていたので、そこに合わせて改行する。
+                label: '変位\n[m]',
+                min: -0.12,
+                max: 0.12,
+                tickInterval: 0.02
             },
-            legend: {
-                show: true,
-                labels: ['系１', '系２']
-            },
-            clear: true 
-        };
+            legend: ['系１', '系２']
+        });
 
         //グラフデータの更新
         function update_graph_data() {
@@ -349,363 +445,199 @@
             init_systems();
             draw();
             system_obj.forEach((element, index) => graph_data[index] = [[time, element.x]]);
-            if(jqplot!=null){
-                jqplot.destroy();
-                //$.jqplot('graph', graph_data, options).destroy();
-            }
-            options.axes.xaxis.max = graph_time_max;
-            options.axes.xaxis.tickInterval = (graph_time_max - graph_time_min) / 10;
-            jqplot = $.jqplot("graph", graph_data, options);
+            plot.xAxis.max = graph_time_max;
+            plot.xAxis.tickInterval = (graph_time_max - graph_time_min) / 10;
+            plot.draw(graph_data);
             plot_time = 0;
         }
 
+        document.getElementById("btn_start_stop").addEventListener('click', click_start_stop);
+        document.getElementById("btn_init").addEventListener('click', click_init);
+
         ////　スライダー操作
-        //　描画速度
-        $(function () {
-            // 描画倍率
-            $("#slider_refresh_rate").slider({
-                min: 0.1,
-                max: 2.0,
-                step: 0.1,
-                range: "min",
-                value: refresh_rate,
-                slide: function (e, ui) {
-                    $("#indicator_refresh_rate").val(ui.value);
-                    refresh_rate = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_refresh_rate").val($(this).slider("option", "value"));
-                }
-            });
-            // グラフ表示範囲
-            $("#slider_graph_range").slider({
-                min: 0,
-                max: 10.2,
-                step: 0.2,
-                range: true,
-                values: [graph_time_min, graph_time_max],
-                slide: function (e, ui) {
-                    $("#indicator_graph_min").val(ui.values[0]);
-                    $("#indicator_graph_max").val(ui.values[1]);
-                    graph_time_min = ui.values[0];
-                    graph_time_max = ui.values[1];
-                    jqplot.destroy();
-                    //$.jqplot('graph', graph_data, options).destroy();
-                    options.axes.xaxis.min = graph_time_min;
-                    options.axes.xaxis.max = graph_time_max;
-                    options.axes.xaxis.tickInterval = (graph_time_max - graph_time_min) / 10;
-                    jqplot.replot(options);
-                    //$.jqplot('graph', graph_data, options);
-                },
-                create: function (e, ui) {
-                    let values = $(this).slider("option", "values");
-                    $("#indicator_graph_min").val(values[0]);
-                    $("#indicator_graph_max").val(values[1]);
-                }
-            });
+        // 描画倍率
+        slider('slider_refresh_rate', {
+            min: 0.1,
+            max: 2.0,
+            step: 0.1,
+            value: refresh_rate,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_refresh_rate").value = value;
+                refresh_rate = value;
+            }
+        });
+        // グラフ表示範囲
+        rangeSlider('slider_graph_range', {
+            min: 0,
+            max: 10.2,
+            step: 0.2,
+            values: [graph_time_min, graph_time_max],
+            callOnInit: true,
+            onInput: ([low, high]) => {
+                document.getElementById("indicator_graph_min").value = low;
+                document.getElementById("indicator_graph_max").value = high;
+                graph_time_min = low;
+                graph_time_max = high;
+                plot.xAxis.min = graph_time_min;
+                plot.xAxis.max = graph_time_max;
+                plot.xAxis.tickInterval = (graph_time_max - graph_time_min) / 10;
+                plot.draw(graph_data);
+            }
+        });
 
-            //　振幅1
-            $("#slider_amp1").slider({
-                min: 0.01,
-                max: 0.1,
-                step: 0.01,
-                range: "min",
-                value: system_init_params_set[0].x,
-                slide: function (e, ui) {
-                    $("#indicator_amp1").val(ui.value);
-                    system_init_params_set[0].x = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_amp1").val($(this).slider("option", "value"));
-                }
-            });
-            //　振幅2
-            $("#slider_amp2").slider({
-                min: 0.01,
-                max: 0.1,
-                step: 0.01,
-                range: "min",
-                value: system_init_params_set[1].x,
-                slide: function (e, ui) {
-                    $("#indicator_amp2").val(ui.value);
-                    system_init_params_set[1].x = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_amp2").val($(this).slider("option", "value"));
-                }
-            });
+        //　振幅1
+        slider('slider_amp1', {
+            min: 0.01,
+            max: 0.1,
+            step: 0.01,
+            value: system_init_params_set[0].x,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_amp1").value = value;
+                system_init_params_set[0].x = value;
+            }
+        });
+        //　振幅2
+        slider('slider_amp2', {
+            min: 0.01,
+            max: 0.1,
+            step: 0.01,
+            value: system_init_params_set[1].x,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_amp2").value = value;
+                system_init_params_set[1].x = value;
+            }
+        });
 
-            //　質量1
-            $("#slider_mass1").slider({
-                min: 0.1,
-                max: 1.1,
-                step: 0.1,
-                range: "min",
-                value: system_init_params_set[0].mass,
-                slide: function (e, ui) {
-                    $("#indicator_mass1").val(ui.value);
-                    system_init_params_set[0].mass = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_mass1").val($(this).slider("option", "value"));
-                }
-            });
-            //　質量2
-            $("#slider_mass2").slider({
-                min: 0.1,
-                max: 1.1,
-                step: 0.1,
-                range: "min",
-                value: system_init_params_set[1].mass,
-                slide: function (e, ui) {
-                    $("#indicator_mass2").val(ui.value);
-                    system_init_params_set[1].mass = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_mass2").val($(this).slider("option", "value"));
-                }
-            });
+        //　質量1
+        slider('slider_mass1', {
+            min: 0.1,
+            max: 1.1,
+            step: 0.1,
+            value: system_init_params_set[0].mass,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_mass1").value = value;
+                system_init_params_set[0].mass = value;
+            }
+        });
+        //　質量2
+        slider('slider_mass2', {
+            min: 0.1,
+            max: 1.1,
+            step: 0.1,
+            value: system_init_params_set[1].mass,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_mass2").value = value;
+                system_init_params_set[1].mass = value;
+            }
+        });
 
-            //　ばね定数1
-            $("#slider_k1").slider({
-                min: 1,
-                max: 20,
-                step: 1,
-                range: "min",
-                value: system_init_params_set[0].k,
-                slide: function (e, ui) {
-                    $("#indicator_k1").val(ui.value);
-                    system_init_params_set[0].k = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_k1").val($(this).slider("option", "value"));
-                }
-            });
-            //　ばね定数2
-            $("#slider_k2").slider({
-                min: 1,
-                max: 20,
-                step: 1,
-                range: "min",
-                value: system_init_params_set[1].k,
-                slide: function (e, ui) {
-                    $("#indicator_k2").val(ui.value);
-                    system_init_params_set[1].k = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_k2").val($(this).slider("option", "value"));
-                }
-            });
+        //　ばね定数1
+        slider('slider_k1', {
+            min: 1,
+            max: 20,
+            step: 1,
+            value: system_init_params_set[0].k,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_k1").value = value;
+                system_init_params_set[0].k = value;
+            }
+        });
+        //　ばね定数2
+        slider('slider_k2', {
+            min: 1,
+            max: 20,
+            step: 1,
+            value: system_init_params_set[1].k,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_k2").value = value;
+                system_init_params_set[1].k = value;
+            }
+        });
 
-            //　空気抵抗1
-            $("#slider_gamma1").slider({
-                min: 0,
-                max: 5,
-                step: 0.1,
-                range: "min",
-                value: system_init_params_set[0].gamma,
-                slide: function (e, ui) {
-                    $("#indicator_gamma1").val(ui.value);
-                    system_init_params_set[0].gamma = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_gamma1").val($(this).slider("option", "value"));
-                }
-            });
-            //　空気抵抗2
-            $("#slider_gamma2").slider({
-                min: 0,
-                max: 5,
-                step: 0.1,
-                range: "min",
-                value: system_init_params_set[1].gamma,
-                slide: function (e, ui) {
-                    $("#indicator_gamma2").val(ui.value);
-                    system_init_params_set[1].gamma = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_gamma2").val($(this).slider("option", "value"));
-                }
-            });
+        //　空気抵抗1
+        slider('slider_gamma1', {
+            min: 0,
+            max: 5,
+            step: 0.1,
+            value: system_init_params_set[0].gamma,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_gamma1").value = value;
+                system_init_params_set[0].gamma = value;
+            }
+        });
+        //　空気抵抗2
+        slider('slider_gamma2', {
+            min: 0,
+            max: 5,
+            step: 0.1,
+            value: system_init_params_set[1].gamma,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_gamma2").value = value;
+                system_init_params_set[1].gamma = value;
+            }
+        });
 
-            //　動摩擦係数1
-            $("#slider_mu1").slider({
-                min: 0,
-                max: 0.2,
-                step: 0.01,
-                range: "min",
-                value: system_init_params_set[0].mu,
-                slide: function (e, ui) {
-                    $("#indicator_mu1").val(ui.value);
-                    system_init_params_set[0].mu = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_mu1").val($(this).slider("option", "value"));
-                }
-            });
-            //　動摩擦係数2
-            $("#slider_mu2").slider({
-                min: 0,
-                max: 0.2,
-                step: 0.01,
-                range: "min",
-                value: system_init_params_set[1].mu,
-                slide: function (e, ui) {
-                    $("#indicator_mu2").val(ui.value);
-                    system_init_params_set[1].mu = ui.value;
-                },
-                create: function (e, ui) {
-                    $("#indicator_mu2").val($(this).slider("option", "value"));
-                }
-            });
+        //　動摩擦係数1
+        slider('slider_mu1', {
+            min: 0,
+            max: 0.2,
+            step: 0.01,
+            value: system_init_params_set[0].mu,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_mu1").value = value;
+                system_init_params_set[0].mu = value;
+            }
+        });
+        //　動摩擦係数2
+        slider('slider_mu2', {
+            min: 0,
+            max: 0.2,
+            step: 0.01,
+            value: system_init_params_set[1].mu,
+            callOnInit: true,
+            onInput: (value) => {
+                document.getElementById("indicator_mu2").value = value;
+                system_init_params_set[1].mu = value;
+            }
         });
 
 
+        let flag_graph_update = true;
+        click_init();
 
-        $(function () {
-            let flag_graph_update = true;
-            click_init();
-
-            draw();
-            ////////　メイン処理
-            function loop(timestamp) {
-                plot = null;
-                if (flag_run) {
-                    for (let i = 0; i < Math.floor(100 * refresh_rate); i++) {
-                        time_dev_systems();
-                    }
-                    draw();
-                    if(flag_graph_update){
-                        update_graph_data();
-                    }
-                    if (graph_plot_count > graph_plot_skip && plot_time < graph_time_max) {
-                        plot_time = time;
-                        if(jqplot!=null) {
-                            jqplot.destroy();
-                        }
-                        jqplot = $.jqplot('graph', graph_data, options);
-                        //$.jqplot('graph', graph_data, options).replot();
-                        graph_plot_count = 0;
-                    }
-                    graph_plot_count++;
-                    flag_graph_update = !flag_graph_update;
+        draw();
+        ////////　メイン処理
+        function loop(timestamp) {
+            if (flag_run) {
+                for (let i = 0; i < Math.floor(100 * refresh_rate); i++) {
+                    time_dev_systems();
                 }
-                window.requestAnimationFrame((ts) => loop(ts));
+                draw();
+                if(flag_graph_update){
+                    update_graph_data();
+                }
+                if (graph_plot_count > graph_plot_skip && plot_time < graph_time_max) {
+                    plot_time = time;
+                    plot.draw(graph_data);
+                    graph_plot_count = 0;
+                }
+                graph_plot_count++;
+                flag_graph_update = !flag_graph_update;
             }
             window.requestAnimationFrame((ts) => loop(ts));
-        });
-
+        }
+        window.requestAnimationFrame((ts) => loop(ts));
     </script>
-    <br />
-    <div id="graph" style="position: absolute; left: 500px; width: 400px; height: 400px;"></div>
-    <div class="view_controller" style="position: absolute; top: 190px; width: 500px">
-        <input type="button" id="btn_start_stop" onclick="click_start_stop()" value="start" />
-        <input type="button" id="btn_init" onclick="click_init()" value="reset" />
-        <br />
-        <label id="label_refresh_rate" style="position: absolute; top:25px;">描画倍率</label>
-        <br />
-        <input id="indicator_refresh_rate" style="position: absolute; top: 25px; left: 70px" type="text" size="3"
-
-            readonly />
-        <label style="position:absolute; top: 25px; left: 130px;">倍</label>
-        <div id="slider_refresh_rate" style="position: absolute; top: 50px; left: 0px; width:150px;"></div>
-
-        <label id="label_graph_range" style="position: absolute; top:25px; left: 180px">グラフ表示範囲</label>
-        <input id="indicator_graph_min" style="position: absolute; top:25px; left: 300px" type="text" size="3"
-            readonly />
-        <label style="position: absolute; top:25px; left: 360px">s</label>
-        <label style="position: absolute; top:25px; left: 370px">～</label>
-        <input id="indicator_graph_max" style="position: absolute; top:25px; left: 390px" type="text" size="3"
-            readonly />
-        <label style="position: absolute; top:25px; left: 450px">s</label>
-        <div id="slider_graph_range" style="position: absolute; top:50px; left: 200px; width:220px;"></div>
-    </div>
-
-    <div class="system_controller" style="position: absolute; top:260px;">
-        <table border="1" style="border-collapse: collapse;">
-            <tr>
-                <td style="text-align: center;">
-                    <label>系１</label>
-                    <br/>
-                    <br/>
-                    <label>系２</label>
-                </td>
-                <td>
-                    <div class="amp" style="margin-left: auto; margin-right: auto; width: 130px;">
-                        <label id="label_mass">最初の位置</label><br />
-                        <input id="indicator_amp1" type="text" size="3" readonly />
-                        <label>m</label>
-                        <div id="slider_amp1" style="width:100px;"></div>
-
-                        <input id="indicator_amp2" type="text" size="3" readonly />
-                        <label>m</label>
-                        <div id="slider_amp2" style="width:100px;"></div>
-                    </div>
-                </td>
-
-                <td>
-                    <div class="mass" style="width: 130px;">
-                        <label id="label_mass">質量</label><br />
-                        <input id="indicator_mass1" type="text" size="3" readonly />
-                        <label>kg</label>
-                        <div id="slider_mass1" style="width:100px;"></div>
-
-                        <input id="indicator_mass2" type="text" size="3" readonly />
-                        <label>kg</label>
-                        <div id="slider_mass2" style="width:100px;"></div>
-                    </div>
-                </td>
-
-                <td>
-                    <div class="spring_k" style="width: 130px;">
-                        <label id="label_k">ばね定数</label><br />
-                        <input id="indicator_k1" type="text" size="3" readonly />
-                        <label>N/m</label>
-                        <div id="slider_k1" style="width:100px;"></div>
-
-                        <input id="indicator_k2" type="text" size="3" readonly />
-                        <label>N/m</label>
-                        <div id="slider_k2" style="width:100px;"></div>
-                    </div>
-                </td>
-            </tr>
-
-            <tr>
-                <td style="text-align: center;">
-                    <label>系１</label>
-                    <br/>
-                    <br/>
-                    <label>系２</label>
-                </td>
-                <td>
-                    <div class="gamma">
-                        <label id="label_gamma">空気抵抗係数</label><br />
-                        <input id="indicator_gamma1" type="text" size="3" readonly />
-                        <label>Ns/m</label>
-                        <div id="slider_gamma1" style="width:100px;"></div>
-
-                        <input id="indicator_gamma2" type="text" size="3" readonly />
-                        <label>Ns/m</label>
-                        <div id="slider_gamma2" style="width:100px;"></div>
-                    </div>
-                </td>
-
-                <td>
-                    <div class="mu">
-                        <label id="label_mu">動摩擦係数</label><br />
-                        <input id="indicator_mu1" type="text" size="3" readonly />
-                        <div id="slider_mu1" style="width:100px;"></div>
-
-                        <input id="indicator_mu2" type="text" size="3" readonly />
-                        <div id="slider_mu2" style="width:100px;"></div>
-                    </div>
-                </td>
-                <td>
-                    <div></div>
-                </td>
-            </tr>
-        </table>
-    </div>
 </body>
 
 </html>

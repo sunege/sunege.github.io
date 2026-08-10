@@ -10,6 +10,20 @@
 // touch-punch に相当するものは要らない。
 
 /**
+ * 溝の塗り潰し（jQuery UI の range: "min"）の幅を CSS 変数で伝える。
+ * class="slider filled" が付いた要素だけが対象で、それ以外では何もしない。
+ * 塗りの描画そのものは css/slider.css 側にある。
+ */
+function paintFill(el) {
+	if (!el.classList.contains('filled')) {
+		return;
+	}
+	const min = Number(el.min);
+	const max = Number(el.max);
+	el.style.setProperty('--fill', `${(Number(el.value) - min) / (max - min) * 100}%`);
+}
+
+/**
  * <input type="range"> を初期化する。
  *
  * 値の受け渡しについて二点。input 要素の value は文字列なので、
@@ -25,9 +39,12 @@
  * @param {number} options.step 刻み幅
  * @param {number} options.value 初期値
  * @param {(value: number) => void} [options.onInput] 操作されたときに呼ばれる
+ * @param {boolean} [options.callOnInit] 初期化した直後にも onInput を呼ぶ。
+ *   jQuery UI の create コールバックに相当する。表示欄の初期値を
+ *   HTML と JS の両方に書かずに済ませたいときに使う
  * @returns {HTMLInputElement | null} 初期化した input 要素。無ければ null
  */
-export function slider(id, { min, max, step, value, onInput }) {
+export function slider(id, { min, max, step, value, onInput, callOnInit }) {
 	const el = document.getElementById(id);
 
 	// jQuery UI では要素が無ければ何も起きなかった。実際にそうなっている
@@ -43,9 +60,17 @@ export function slider(id, { min, max, step, value, onInput }) {
 	el.max = max;
 	el.step = step;
 	el.value = value;
+	paintFill(el);
 
-	if (onInput) {
-		el.addEventListener('input', () => onInput(Number(el.value)));
+	el.addEventListener('input', () => {
+		paintFill(el);
+		if (onInput) {
+			onInput(Number(el.value));
+		}
+	});
+
+	if (onInput && callOnInit) {
+		onInput(Number(el.value));
 	}
 
 	// スライダーはドロップメニューの <a href="#"> の中にある。クリックが
@@ -55,6 +80,86 @@ export function slider(id, { min, max, step, value, onInput }) {
 	el.addEventListener('click', (event) => event.preventDefault());
 
 	return el;
+}
+
+/**
+ * つまみが 2 つあるスライダー（jQuery UI の range: true）を初期化する。
+ *
+ * <input type="range"> は 1 本につきつまみ 1 つなので、2 本を重ねて置き、
+ * つまみだけがクリックを受け取るようにしてある（見た目は css/slider.css）。
+ * HTML 側はこの形を想定している:
+ *
+ *   <div id="slider_graph_range" class="range-slider" style="width:220px">
+ *       <input type="range"><input type="range">
+ *   </div>
+ *
+ * @param {string} id 2 本の input を包んでいる要素の id
+ * @param {object} options
+ * @param {number} options.min 最小値
+ * @param {number} options.max 最大値
+ * @param {number} options.step 刻み幅
+ * @param {[number, number]} options.values 下側・上側の初期値
+ * @param {(values: [number, number]) => void} [options.onInput] 操作されたときに呼ばれる
+ * @param {boolean} [options.callOnInit] 初期化した直後にも onInput を呼ぶ
+ * @returns {[HTMLInputElement, HTMLInputElement] | null} 2 本の input。無ければ null
+ */
+export function rangeSlider(id, { min, max, step, values, onInput, callOnInit }) {
+	const container = document.getElementById(id);
+
+	if (container === null) {
+		console.warn(`rangeSlider: #${id} が見つかりません`);
+		return null;
+	}
+
+	const [low, high] = container.querySelectorAll('input[type=range]');
+	if (low === undefined || high === undefined) {
+		console.warn(`rangeSlider: #${id} の中に input[type=range] が 2 本ありません`);
+		return null;
+	}
+
+	for (const el of [low, high]) {
+		el.min = min;
+		el.max = max;
+		el.step = step;
+	}
+	low.value = values[0];
+	high.value = values[1];
+
+	const update = () => {
+		// 片方がもう片方を追い越さないようにする（jQuery UI も追い越せなかった）。
+		if (Number(low.value) > Number(high.value)) {
+			if (document.activeElement === low) {
+				low.value = high.value;
+			}
+			else {
+				high.value = low.value;
+			}
+		}
+
+		const span = max - min;
+		container.style.setProperty('--low', `${(Number(low.value) - min) / span * 100}%`);
+		container.style.setProperty('--high', `${(Number(high.value) - min) / span * 100}%`);
+
+		// つまみが重なると上に載っている方しか掴めない。2 つとも右端まで
+		// 寄せたときだけは下側を手前に出さないと、そこから戻せなくなる。
+		low.style.zIndex = (Number(low.value) === max && Number(high.value) === max) ? '1' : '';
+	};
+
+	for (const el of [low, high]) {
+		el.addEventListener('input', () => {
+			update();
+			if (onInput) {
+				onInput([Number(low.value), Number(high.value)]);
+			}
+		});
+	}
+
+	update();
+	if (onInput && callOnInit) {
+		onInput([Number(low.value), Number(high.value)]);
+	}
+
+	return [low, high];
 }
 
 /**
@@ -92,5 +197,6 @@ export function setSliderValue(id, value) {
 	const el = document.getElementById(id);
 	if (el !== null) {
 		el.value = value;
+		paintFill(el);
 	}
 }
