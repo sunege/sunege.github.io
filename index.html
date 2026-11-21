@@ -269,11 +269,12 @@ div.ref {
 			高校の授業で使ったものとか使う予定のものたちです。<br/>
 			いろんなパラメータをいじったり、ぐるぐる回したりして遊べます。<br/>
 			最近claude codeにコード支援してもらっています。<br/>
-            【2026/6/1 更新】音のデジタル化　追加<br/>
-            【2026/6/1 更新】画像のデジタル化　追加<br/>
-            【2026/6/2 更新】共通テスト疑似言語　追加<br/>
-            【2026/6/6 更新】ブラックホール撮影会　追加<br/>
-            【2026/7/16 更新】物理教材ドローアプリ　追加<br/>
+            【2026/6/1 更新】<a href="https://digitization-of-sound.vercel.app/">音のデジタル化</a>　追加<br/>
+            【2026/6/1 更新】<a href="https://digitization-of-img.vercel.app/">画像のデジタル化</a>　追加<br/>
+            【2026/6/2 更新】<a href="https://coding-sim.vercel.app/">共通テスト疑似言語</a>　追加<br/>
+            【2026/6/6 更新】<a href="https://black-hole-picture.vercel.app/">ブラックホール撮影会</a>　追加<br/>
+            【2026/7/16 更新】<a href="https://draw-phys.vercel.app">物理教材ドローアプリ</a>　追加<br/>
+            【2026/11/21 更新】<a href="https://sunege-mol.vercel.app/">分子シミュレータ</a>　追加<br/>
 			</p>
 		</div>
 	</div>
@@ -462,19 +463,50 @@ div.ref {
                 <p>電荷や導体を置いて、電磁場の実験ができます。プリセットから実験を選ぶこともできます。厳密にMaxwell方程式を解いているわけではない。Poisson方程式（静電場）＋Maxwell方程式（FDTDで放射）のハイブリッドです。運動する電荷の周りの静電場が厳密ではないです。</p>
         </div>
         <div class="crystal">
-            <h2>結晶格子</h2>
-            <a href="crystal/bcc/bcc.html">
-                <p>体心立方格子</p>
-            </a>
-            <p>未完成</p>
-
-            <a href="crystal/fcc/fcc.html">
-                <p>面心立方格子</p>
-            </a>
-            <p>未完成</p>
-
+            <h2>化学</h2>
+            <a href="https://sunege-mol.vercel.app/">
+				<p>分子シミュレータ</p>
+				<img src="./img/mol1.png" height="100px" >
+				<img src="./img/mol2.png" height="100px" >
+			</a>
+			<p>原子を配置して、安定な形を探します。<br />
+				安定になった後、電子の様子を可視化できます。<br />
+				コストのやすい基底関数でちゃんとDFT計算をします（wasm利用）。<br />
+				精度はあまり良くない（物理量に誤差あり）ので形を見る程度で。</p>
         </div>
-        <!-- <div class="others"> -->
+		<div class="infomation">
+			<h2>情報</h2>
+
+            <a href="https://coding-sim.vercel.app/">
+				<p>共通テストの言語シミュレータ</p>
+				<img src="./img/programing-sim.png" height="100px">
+			</a>
+            <p>共通テスト用の疑似言語をシミュレートしています。<br />
+				右上のプルダウンメニューから、教材を選んで学習できます。
+			</p>
+
+            <a href="https://digitization-of-sound.vercel.app/">
+				<p>音のデジタル化</p>
+				<img src="./img/digitization-of-sound1.png" height="100px">
+				<img src="./img/digitization-of-sound2.png" height="100px">
+			</a>
+            <p>音の標本化、デジタル化を体験します</p>
+
+            <a href="./others/dot.html">
+				<p>ビットマトリックス</p>
+				<img src="./img/dot.png" height="100px">
+			</a>
+            <p>16進数で画像表示する仕組み。ピクセル動画がつくれます。</p>
+
+            <a href="https://digitization-of-img.vercel.app/">
+				<p>画像のデジタル化</p>
+				<img src="./img/digitization-of-img1.png" height="100px">
+				<img src="./img/digitization-of-img2.png" height="100px">
+			</a>
+            <p>画像の標本化、デジタル化を体験します</p>
+
+		</div>
+        <div class="others">
             <h2>その他</h2>
             <a href="https://draw-phys.vercel.app">
                 <p>物理教材ドローアプリ</p>
@@ -486,7 +518,7 @@ div.ref {
             <br />
             <br />
 
-			<p>プログラミングを勉強してくそげーをたくさん作ろう</p>
+			<p>プログラミングを勉強して作ろう</p>
 
             <a href="others/game.html">色塗りゲーム</a>
             <p>５×５は解けるの？</p>
@@ -495,22 +527,8 @@ div.ref {
 			<p>暇つぶし</p>
 
 			<a href="others/kusogame.html">よけるゲーム</a>
-			<p>腹の立つくそげー初めから詰んでることもありますが腹を立てないでください</p>
-
-            <a href="./others/dot.html">ビットマトリックス</a>
-            <p>16進数で画像表示する仕組み</p>
-
-            <a href="https://digitization-of-sound.vercel.app/">音のデジタル化</a>
-            <p>音の標本化、デジタル化を体験します</p>
-
-            <a href="https://digitization-of-img.vercel.app/">画像のデジタル化</a>
-            <p>画像の標本化、デジタル化を体験します</p>
-
-            <a href="https://coding-sim.vercel.app/">共通テストの言語シミュレータ</a>
-            <p>共通テスト用の疑似言語をシミュレートしています</p>
-
-
-        <!-- </div> -->
+			<p>腹立つ初めから詰んでることもありますが腹を立てないでください</p>
+        </div> 
         <div id="link">
             <p>＊githubのリポジトリは<a href="https://github.com/sunege/sunege.github.io">こちら</a></p>
         </div>
@@ -520,6 +538,8 @@ div.ref {
                 <li>遠藤理平（2013）「HTML5による物理シミュレーション」-JavaScriptでThree.js/jqPlot/jQuery UIを使う 株式会社カットシステム</li>
                 <li>遠藤理平（2013）「HTML5による物理シミュレーション 波動・拡散編」-JavaScriptライブラリとCanvas 2D Context/Web Workersを使う 株式会社カットシステム</li>
             </ul>
+			<h2>作っている人</h2>
+			<p>高校の教員　物理と情報を教えている　素粒子物理学が好き</p>
         </div>
       
       <br/>
